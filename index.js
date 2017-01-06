@@ -1,6 +1,12 @@
+const QUEUE_URL = "https://addons.mozilla.org/en-US/editors/queue/";
+
+var Services = require("resource://gre/modules/Services.jsm").Services;
+var { Ci } = require("chrome");
+
 var self = require("sdk/self");
 var pageMod = require("sdk/page-mod");
 var prefs = require('sdk/simple-prefs');
+var events = require('sdk/system/events');
 var storage = (function() {
     let data = require("sdk/simple-storage").storage;
     //let data = {};
@@ -12,8 +18,19 @@ var storage = (function() {
 })();
 
 
+events.on('http-on-modify-request', function(event) {
+  let channel = event.subject.QueryInterface(Ci.nsIHttpChannel);
+  let url = channel.URI.spec;
+  let perPage = prefs.prefs['per-page'];
+
+  if (url.startsWith(QUEUE_URL) && !url.includes("per_page") && perPage != 100) {
+    let newUrl = url.replace(/(#.*$)|$/, `?per_page=${perPage}$1`)
+    channel.redirectTo(Services.io.newURI(newUrl, null, null));
+  }
+});
+
 pageMod.PageMod({
-  include: "https://addons.mozilla.org/en-US/editors/queue/*",
+  include: QUEUE_URL + "*",
   contentScriptFile: [ "./lib/moment.min.js", "./content/queue.js"],
   contentStyleFile: "./css/queue.css",
   contentScriptWhen: "ready",
