@@ -84,9 +84,22 @@ function initPageLayout() {
       });
     });
   }
-}
 
-  
+  // Autocomplete "no results" row
+  let queueBody = document.querySelector("#addon-queue > tbody");
+
+  let noResultsRow = document.createElement("tr");
+  noResultsRow.id = "amoqueue-helper-autocomplete-noresults";
+  noResultsRow.style.display = "none";
+
+  let noResultsCell = document.createElement("td");
+  noResultsCell.setAttribute("colspan", header.children.length);
+  noResultsCell.style.textAlign = "center";
+  noResultsCell.textContent = "no results";
+
+  noResultsRow.appendChild(noResultsCell);
+  queueBody.appendChild(noResultsRow);
+}
 
 function hideBecause(row, reason, state) {
   if (!row.amoqueue_helper_hidebecause) {
@@ -202,8 +215,28 @@ function updateReviewInfoDisplay(id, info) {
   }
 }
 
+function updateAutocomplete() {
+  let textquery = document.getElementById("id_text_query")
+  let value = textquery.value.toLowerCase();
+  let foundsome = false;
+  document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
+    let name = row.querySelector("td:nth-of-type(2) > a ").textContent.toLowerCase();
+    let hide = textquery.value && !name.includes(value)
+    hideBecause(row, "search", hide);
+    if (!hide) {
+      foundsome = true;
+    }
+  });
+
+  let noResults = document.getElementById("amoqueue-helper-autocomplete-noresults");
+  noResults.style.display = foundsome ? "none" : "";
+}
+
 function main() {
     initPageLayout();
+
+    document.getElementById("id_text_query")
+            .addEventListener("keyup", updateAutocomplete, false);
 
     self.port.on("receive-review-info", function(data) {
       for (let reviewinfo of data) {
@@ -213,6 +246,9 @@ function main() {
 
     window.addEventListener("pageshow", updateQueueInfo, false);
     updateQueueInfo();
+
+    window.addEventListener("pageshow", updateAutocomplete, false);
+    updateAutocomplete();
 }
 // --- main ---
 
