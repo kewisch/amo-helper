@@ -195,6 +195,8 @@ function updateReviewInfoDisplay(id, info) {
   if (lastactivity.type == "needinfo" &&
       lastactivity.date && moment().diff(lastactivity.date, "days") > OVERDUE_SOURCES) {
     row.classList.add("amoqueue-helper-overdue");
+  } else {
+    row.classList.remove("amoqueue-helper-overdue");
   }
 
   row.className = row.className.replace(/amoqueue-helper-type-[^ ]*/g, "");
