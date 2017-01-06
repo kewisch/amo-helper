@@ -1,0 +1,4 @@
+profile
+*.xpi
+.jpmignore
+.git

@@ -1,0 +1,57 @@
+{
+  "title": "AMO Queue Helper",
+  "name": "amoqueue",
+  "version": "1.0.0",
+  "description": "Enhancements to the AMO review queue",
+  "main": "index.js",
+  "author": "Philipp Kewisch",
+  "engines": {
+    "firefox": ">=38.0a1"
+  },
+  "license": "MPL-2.0",
+  "keywords": [
+    "jetpack"
+  ],
+  "permissions": {
+    "multiprocess": true
+  },
+  "preferences": [{
+    "name": "staletime",
+    "title": "Hours to keep information",
+    "description": "Review information older than this amount of hours will get removed",
+    "type": "integer",
+    "value": 24
+  },{
+    "name": "show-info",
+    "title": "Show Information Requests",
+    "hidden": "true",
+    "type": "radio",
+    "value": "both",
+    "options": [{
+      "value": "both",
+      "label": "Both"
+    },{
+      "value": "only",
+      "label": "Only"
+    },{
+      "value": "none",
+      "label": "None"
+    }]
+  },{
+    "name": "show-admin",
+    "title": "Reviews to Show",
+    "hidden": "true",
+    "type": "radio",
+    "value": "both",
+    "options": [{
+      "value": "both",
+      "label": "Both"
+    },{
+      "value": "regular",
+      "label": "Regular"
+    },{
+      "value": "admin",
+      "label": "Admin"
+    }]
+  }]
+}

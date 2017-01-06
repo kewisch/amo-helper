@@ -1,0 +1,13 @@
+tr.amoqueue-helper-overdue td.amoqueue-helper-cell {
+  color: #E30613;
+}
+
+tr.amoqueue-helper-reviewtime-low td.amoqueue-helper-waitcell {
+  color: #009640;
+}
+tr.amoqueue-helper-reviewtime-medium td.amoqueue-helper-waitcell {
+  color: #F39200;
+}
+tr.amoqueue-helper-reviewtime-high td.amoqueue-helper-waitcell {
+  color: #E30613;
+}
