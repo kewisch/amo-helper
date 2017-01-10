@@ -18,16 +18,10 @@ var storage = (function() {
 })();
 var queueWorkers = new Set();
 
-events.on('http-on-modify-request', function(event) {
-  let channel = event.subject.QueryInterface(Ci.nsIHttpChannel);
-  let url = channel.URI.spec;
-  let perPage = prefs.prefs['per-page'];
-
-  if (url.startsWith(QUEUE_URL) && !url.includes("per_page") && perPage != 100) {
-    let newUrl = url.replace(/(#.*$)|$/, `?per_page=${perPage}$1`)
-    channel.redirectTo(Services.io.newURI(newUrl, null, null));
-  }
-});
+Services.mm.loadFrameScript(self.data.url('framescript.js'), true);
+exports.onUnload = function (reason) {
+	Services.mm.removeDelayedFrameScript(self.data.url('framescript.js'));
+};
 
 function processReviewInfo(ids) {
   let now = new Date();
