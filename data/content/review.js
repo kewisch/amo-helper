@@ -68,22 +68,9 @@ var versions = Array.from(document.querySelectorAll("#review-files .listing-body
 
   let activities = Array.from(listbody.querySelectorAll(".activity tr")).reduce((results, activityrow) => {
     let state = activityrow.firstElementChild.textContent.trim();
-    if (!state) {
-      // empty row, not much use.
-      return results;
-    }
     let author = stateHasAuthor(state) ? activityrow.querySelector("td > div > a") : null;
 
-    if (activityrow.firstElementChild.className == "no-activity") {
-      let listingauthor = document.querySelector("#scroll_sidebar ul:nth-of-type(3) > li > a");
-      results.push({
-        state: "Submission",
-        type: stateToType("Submission"),
-        author: authorInfo(listingauthor),
-        date: submissiondate,
-        comment: ""
-      });
-    } else {
+    if (state && activityrow.firstElementChild.className != "no-activity") {
       results.push({
         state: state,
         type: stateToType(state),
@@ -94,6 +81,17 @@ var versions = Array.from(document.querySelectorAll("#review-files .listing-body
     }
     return results;
   }, []).map(activityAnnotator);
+
+  if (!activities.length) {
+    let listingauthor = document.querySelector("#scroll_sidebar ul:nth-of-type(3) > li > a");
+    activities.push(activityAnnotator({
+      state: "Submission",
+      type: stateToType("Submission"),
+      author: authorInfo(listingauthor),
+      date: submissiondate,
+      comment: ""
+    }));
+  }
 
   let installanchor = listbody.querySelector(".editors-install");
 
