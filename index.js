@@ -1,12 +1,8 @@
 const QUEUE_URL = "https://addons.mozilla.org/en-US/editors/queue/";
 
-var Services = require("resource://gre/modules/Services.jsm").Services;
-var { Ci } = require("chrome");
-
 var self = require("sdk/self");
 var pageMod = require("sdk/page-mod");
 var prefs = require('sdk/simple-prefs');
-var events = require('sdk/system/events');
 var storage = (function() {
     let data = require("sdk/simple-storage").storage;
     //let data = {};
@@ -17,17 +13,6 @@ var storage = (function() {
     return data;
 })();
 var queueWorkers = new Set();
-
-events.on('http-on-modify-request', function(event) {
-  let channel = event.subject.QueryInterface(Ci.nsIHttpChannel);
-  let url = channel.URI.spec;
-  let perPage = prefs.prefs['per-page'];
-
-  if (url.startsWith(QUEUE_URL) && !url.includes("per_page") && perPage != 100) {
-    let newUrl = url.replace(/(#.*$)|$/, `?per_page=${perPage}$1`)
-    channel.redirectTo(Services.io.newURI(newUrl, null, null));
-  }
-});
 
 function processReviewInfo(ids) {
   let now = new Date();
@@ -54,6 +39,15 @@ function processReviewInfo(ids) {
     return results;
   }, []);
 }
+
+pageMod.PageMod({
+  include: QUEUE_URL + "*",
+  contentScriptWhen: "start",
+  contentScriptFile: "./content/queue_redirect.js",
+  onAttach: function(worker) {
+    worker.port.emit("per_page", prefs.prefs['per-page']);
+  }
+});
 
 pageMod.PageMod({
   include: QUEUE_URL + "*",
