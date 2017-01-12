@@ -1,23 +1,22 @@
 const QUEUE_URL = "https://addons.mozilla.org/en-US/editors/queue/";
 
-var self = require("sdk/self");
 var XMLHttpRequest = require("sdk/net/xhr").XMLHttpRequest;
 var pageMod = require("sdk/page-mod");
-var prefs = require('sdk/simple-prefs');
+var prefs = require("sdk/simple-prefs");
 var storage = (function() {
-    let data = require("sdk/simple-storage").storage;
-    //let data = {};
-    
-    if (!data.reviewinfo) {
-        data.reviewinfo = {};
-    }
-    return data;
+  let data = require("sdk/simple-storage").storage;
+  // let data = {};
+
+  if (!data.reviewinfo) {
+    data.reviewinfo = {};
+  }
+  return data;
 })();
 var queueWorkers = new Set();
 
 function processReviewInfo(ids) {
   let now = new Date();
-  let timelimit = prefs.prefs['staletime'] * 3600000;
+  let timelimit = prefs.prefs["staletime"] * 3600000;
   if (timelimit == 0) {
     // If we really use a timelimit of infinite, the storage will keep on growing
     // In two weeks the reviewer will have forgotten about the time limit :-)
@@ -66,7 +65,7 @@ function determineSize(version) {
 
   return sendxhr(version.installurl).then((xhr) => {
     if (xhr.status == 302) {
-      return sendxhr(xhr.getResponseHeader('location'));
+      return sendxhr(xhr.getResponseHeader("location"));
     }
     return xhr;
   }).then((xhr) => {
@@ -74,7 +73,6 @@ function determineSize(version) {
   }, () => {
     version.size = 0;
   });
-
 }
 
 pageMod.PageMod({
@@ -82,26 +80,26 @@ pageMod.PageMod({
   contentScriptWhen: "start",
   contentScriptFile: "./content/queue_redirect.js",
   onAttach: function(worker) {
-    worker.port.emit("per_page", prefs.prefs['per-page']);
+    worker.port.emit("per_page", prefs.prefs["per-page"]);
   }
 });
 
 pageMod.PageMod({
   include: QUEUE_URL + "*",
-  contentScriptFile: [ "./lib/moment.min.js", "./content/queue.js"],
+  contentScriptFile: ["./lib/moment.min.js", "./content/queue.js"],
   contentStyleFile: "./css/queue.css",
   contentScriptWhen: "ready",
   onAttach: function(worker) {
     queueWorkers.add(worker);
 
     // Review info requests from the queue page
-    worker.port.on("request-review-info", function(ids) {
+    worker.port.on("request-review-info", (ids) => {
       worker.port.emit("receive-review-info", processReviewInfo(ids));
     });
 
     // Preferences
-    worker.port.on("change-pref", function(key, value) {
-        prefs.prefs[key] = value;
+    worker.port.on("change-pref", (key, value) => {
+      prefs.prefs[key] = value;
     });
 
     let onPrefChange = (prefName) => {
@@ -111,7 +109,7 @@ pageMod.PageMod({
     worker.port.emit("receive-prefs", prefs.prefs);
 
     // Cleanup
-    worker.on("detach", function() {
+    worker.on("detach", () => {
       prefs.removeListener("", onPrefChange);
       queueWorkers.delete(worker);
     });
@@ -123,7 +121,7 @@ pageMod.PageMod({
   contentScriptFile: "./content/review.js",
   contentScriptWhen: "ready",
   onAttach: function(worker) {
-    worker.port.on("review-info-received", function(data) {
+    worker.port.on("review-info-received", (data) => {
       determineSize(data.versions[data.versions.length - 1]).then(() => {
         // Determine the size of the last approved version, if it exists
         if (data.lastapproved_idx) {
@@ -132,7 +130,7 @@ pageMod.PageMod({
         return null;
       }).then(() => {
         storage.reviewinfo[data.id] = data;
-        queueWorkers.forEach((w) => w.port.emit("receive-review-info", [data]));
+        queueWorkers.forEach((qworker) => qworker.port.emit("receive-review-info", [data]));
       });
     });
   }

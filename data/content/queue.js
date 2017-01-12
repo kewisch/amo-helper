@@ -11,7 +11,7 @@ function initPageLayout() {
   column.className = "amoqueue-helper-lastupdate";
   column.textContent = "Last Update";
   header.appendChild(column);
-  
+
   // Info column
   column = document.createElement("th");
   column.className ="amoqueue-helper-info-column";
@@ -62,7 +62,7 @@ function initPageLayout() {
     } else {
       row.classList.add("amoqueue-helper-reviewtime-high");
     }
-  
+
     // Remove type column, don't see the need for it.
     row.querySelector("td:nth-of-type(3)").remove();
   }
@@ -73,16 +73,16 @@ function initPageLayout() {
 
   // Search box enhancements
   addSearchRadio("Show Information requests", "show-info", ["Both", "Only", "None"], (state) => {
-      document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
-        let needinfo = row.classList.contains("amoqueue-helper-iconclass-info");
-        if (state == "both") {
-          hideBecause(row, "info", false);
-        } else if (state == "only") {
-          hideBecause(row, "info", !needinfo);
-        } else if (state == "none") {
-          hideBecause(row, "info", needinfo);
-        }
-      });
+    document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
+      let needinfo = row.classList.contains("amoqueue-helper-iconclass-info");
+      if (state == "both") {
+        hideBecause(row, "info", false);
+      } else if (state == "only") {
+        hideBecause(row, "info", !needinfo);
+      } else if (state == "none") {
+        hideBecause(row, "info", needinfo);
+      }
+    });
   });
 
   if (document.querySelector(".app-icon.ed-sprite-admin-review")) {
@@ -118,7 +118,7 @@ function initPageLayout() {
 
 function hideBecause(row, reason, state) {
   if (!row.amoqueue_helper_hidebecause) {
-    row.amoqueue_helper_hidebecause = new Set(); 
+    row.amoqueue_helper_hidebecause = new Set();
   }
 
   if (state) {
@@ -143,23 +143,23 @@ function addSearchRadio(labelText, prefName, optionLabels, stateUpdater) {
   legend.textContent = labelText;
   fieldset.appendChild(legend);
 
-  for (let option of optionLabels) { 
-      let label = document.createElement("label");
-      let radio = document.createElement("input")
-      let value = option.toLowerCase();
-      radio.setAttribute("type", "radio");
-      radio.setAttribute("name", prefName);
-      radio.setAttribute("value", value);
-      if (value == initial) {
-        radio.setAttribute("checked", "checked");
-      }
-      label.appendChild(radio);
-      label.appendChild(document.createTextNode(option));
-      fieldset.appendChild(label);
+  for (let option of optionLabels) {
+    let label = document.createElement("label");
+    let radio = document.createElement("input");
+    let value = option.toLowerCase();
+    radio.setAttribute("type", "radio");
+    radio.setAttribute("name", prefName);
+    radio.setAttribute("value", value);
+    if (value == initial) {
+      radio.setAttribute("checked", "checked");
+    }
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(option));
+    fieldset.appendChild(label);
   }
   searchbox.appendChild(fieldset);
 
-  fieldset.addEventListener("change", function(event) {
+  fieldset.addEventListener("change", (event) => {
     self.port.emit("change-pref", prefName, event.target.value);
     stateUpdater(event.target.value);
   }, false);
@@ -167,34 +167,9 @@ function addSearchRadio(labelText, prefName, optionLabels, stateUpdater) {
   stateUpdater(initial);
 }
 
-function addSearchCheckbox(labelText, prefName, stateUpdater) {
-  let searchbox = document.querySelector("div.queue-search");
-  let label = document.createElement("label");
-  let checkbox = document.createElement("input")
-  checkbox.setAttribute("type", "checkbox");
-  label.appendChild(checkbox);
-  label.appendChild(document.createTextNode("Hide information requests"));
-  searchbox.appendChild(label);
-
-  checkbox.addEventListener("change", function(event) {
-    self.port.emit("change-pref", prefName, event.target.checked);
-    stateUpdater(event.target.checked);
-  }, false);
-
-  checkbox.checked = prefs[prefName];
-  stateUpdater(checkbox.checked);
-}
-
 function updateQueueInfo() {
   let ids = Array.from(document.querySelectorAll("#addon-queue .addon-row")).map((row) => row.getAttribute("data-addon"));
   self.port.emit("request-review-info", ids);
-}
-
-function destroyLayout() {
-  document.querySelector(".amoqueue-helper-info-column").remove();
-  for (let cell of document.querySelectorAll(".amoqueue-helper-info-cell")) {
-    cell.remove();
-  }
 }
 
 function updateReviewInfoDisplay(id, info) {
@@ -253,12 +228,12 @@ function updateReviewInfoDisplay(id, info) {
 }
 
 function updateAutocomplete() {
-  let textquery = document.getElementById("id_text_query")
+  let textquery = document.getElementById("id_text_query");
   let value = textquery.value.toLowerCase();
   let foundsome = false;
   document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
     let name = row.querySelector("td:nth-of-type(2) > a ").textContent.toLowerCase();
-    let hide = textquery.value && !name.includes(value)
+    let hide = textquery.value && !name.includes(value);
     hideBecause(row, "search", hide);
     if (!hide) {
       foundsome = true;
@@ -270,36 +245,36 @@ function updateAutocomplete() {
 }
 
 function displaySize(size, relative=false) {
-    let prefix = size < 0 ? "-" : (relative ? "+" : "");
-    let asize = Math.abs(size);
-    let i = Math.floor(Math.log(asize) / Math.log(1024));
-    return prefix + Number((asize / Math.pow(1024, i)).toFixed(2)) + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+  let prefix = size < 0 ? "-" : (relative ? "+" : "");
+  let asize = Math.abs(size);
+  let i = Math.floor(Math.log(asize) / Math.log(1024));
+  return prefix + Number((asize / Math.pow(1024, i)).toFixed(2)) + " " + ["B", "kB", "MB", "GB", "TB"][i];
 }
 
 function main() {
-    initPageLayout();
+  initPageLayout();
 
-    document.getElementById("id_text_query")
-            .addEventListener("keyup", updateAutocomplete, false);
+  document.getElementById("id_text_query")
+          .addEventListener("keyup", updateAutocomplete, false);
 
-    self.port.on("receive-review-info", function(data) {
-      for (let reviewinfo of data) {
-        updateReviewInfoDisplay(reviewinfo.id, reviewinfo);
-      }
-    });
+  self.port.on("receive-review-info", (data) => {
+    for (let reviewinfo of data) {
+      updateReviewInfoDisplay(reviewinfo.id, reviewinfo);
+    }
+  });
 
-    window.addEventListener("pageshow", updateQueueInfo, false);
-    updateQueueInfo();
+  window.addEventListener("pageshow", updateQueueInfo, false);
+  updateQueueInfo();
 
-    window.addEventListener("pageshow", updateAutocomplete, false);
-    updateAutocomplete();
+  window.addEventListener("pageshow", updateAutocomplete, false);
+  updateAutocomplete();
 }
 // --- main ---
 
-self.port.on("change-pref", function(key, value) {
+self.port.on("change-pref", (key, value) => {
   prefs[key] = value;
 });
-self.port.on("receive-prefs", function(prefdata) {
+self.port.on("receive-prefs", (prefdata) => {
   prefs = prefdata;
   main();
 });

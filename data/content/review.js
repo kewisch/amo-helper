@@ -7,14 +7,13 @@ function floatingtime(str, dtonly) {
 }
 
 function authorInfo(anchor) {
-  return !anchor ? null : {
+  return anchor ? {
     name: anchor.getAttribute("title"),
     url: anchor.getAttribute("href")
-  };
+  } : null;
 }
 
 function activityAnnotator(activity) {
-
   if (activity.state == "More information requested" &&
       activity.comment.includes("provide the original sources")) {
     activity.state = "Sources Requested";
@@ -25,10 +24,8 @@ function activityAnnotator(activity) {
     activity.state = "Submission";
   } else if (activity.state == "More information requested" &&
              activity.comment.includes("Please provide us with detailed information on how to test this add-on")) {
-    activity.state = "Testing info requested"
+    activity.state = "Testing info requested";
   }
-
-
 
   return activity;
 }
@@ -54,7 +51,7 @@ function stateToType(state) {
     "Comment": "comment",
     "Super review requested": "superreview"
   }[state] || "unknown";
-};
+}
 
 // --- main ---
 
@@ -100,7 +97,7 @@ var versions = Array.from(document.querySelectorAll("#review-files .listing-body
 
   return {
     version: headerparts[1].trim(),
-    date: submissiondate, 
+    date: submissiondate,
     status: status,
 
     installurl: installanchor ? installanchor.getAttribute("href") : null,
@@ -114,7 +111,7 @@ var info = {
   id: document.querySelector("#addon").getAttribute("data-id"),
   slug: document.location.href.match(/\/([^\/]+)$/)[1],
   lastupdate: new Date().toISOString(),
-  
+
   versions: versions,
   latest_idx: versions.length - 1,
   lastapproved_idx: lastapproved_idx
