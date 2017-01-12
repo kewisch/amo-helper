@@ -1,6 +1,7 @@
 const QUEUE_URL = "https://addons.mozilla.org/en-US/editors/queue/";
 
 var self = require("sdk/self");
+var XMLHttpRequest = require("sdk/net/xhr").XMLHttpRequest;
 var pageMod = require("sdk/page-mod");
 var prefs = require('sdk/simple-prefs');
 var storage = (function() {
@@ -38,6 +39,42 @@ function processReviewInfo(ids) {
     }
     return results;
   }, []);
+}
+
+function determineSize(version) {
+  function sendxhr(url) {
+    return new Promise((resolve, reject) => {
+      var xhr = new XMLHttpRequest();
+      xhr.open("HEAD", url, true);
+      xhr.onload = (event) => {
+        if (xhr.readyState == 4) {
+          resolve(xhr);
+        }
+      };
+      xhr.onerror = (event) => {
+        reject(xhr);
+      };
+
+      xhr.send(null);
+    });
+  }
+
+  if (!version.installurl.startsWith("https://addons.mozilla.org/firefox/downloads")) {
+    version.size = 0;
+    return Promise.resolve();
+  }
+
+  return sendxhr(version.installurl).then((xhr) => {
+    if (xhr.status == 302) {
+      return sendxhr(xhr.getResponseHeader('location'));
+    }
+    return xhr;
+  }).then((xhr) => {
+    version.size = parseInt(xhr.getResponseHeader("content-length"), 10);
+  }, () => {
+    version.size = 0;
+  });
+
 }
 
 pageMod.PageMod({
@@ -87,8 +124,16 @@ pageMod.PageMod({
   contentScriptWhen: "ready",
   onAttach: function(worker) {
     worker.port.on("review-info-received", function(data) {
-      storage.reviewinfo[data.id] = data;
-      queueWorkers.forEach((w) => w.port.emit("receive-review-info", [data]));
+      determineSize(data.versions[data.versions.length - 1]).then(() => {
+        // Determine the size of the last approved version, if it exists
+        if (data.lastapproved_idx) {
+          return determineSize(data.versions[data.lastapproved_idx]);
+        }
+        return null;
+      }).then(() => {
+        storage.reviewinfo[data.id] = data;
+        queueWorkers.forEach((w) => w.port.emit("receive-review-info", [data]));
+      });
     });
   }
 });

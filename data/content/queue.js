@@ -5,27 +5,42 @@ var prefs = {};
 
 function initPageLayout() {
   let header = document.querySelector("#addon-queue > thead > .listing-header");
+
+  // Last update column
   let column = document.createElement("th");
   column.className = "amoqueue-helper-lastupdate";
   column.textContent = "Last Update";
   header.appendChild(column);
   
+  // Info column
   column = document.createElement("th");
   column.className ="amoqueue-helper-info-column";
   column.textContent = "Last Action";
   header.appendChild(column);
 
+  // Size column
+  column = document.createElement("th");
+  column.className ="amoqueue-helper-size-column";
+  column.textContent = "Size";
+  header.appendChild(column);
+
   let rows = document.querySelectorAll(".addon-row");
   for (let row of rows) {
+    // Last Update column
     // reuse the last column because there is an extra column on AMO
     let cell = row.lastElementChild; // document.createElement("td");
     cell.className = "amoqueue-helper-cell amoqueue-helper-lastupdate-cell";
     row.appendChild(cell);
 
+    // Info column
     cell = document.createElement("td");
     cell.className = "amoqueue-helper-cell amoqueue-helper-info-cell";
     row.appendChild(cell);
 
+    // Size column
+    cell = document.createElement("td");
+    cell.className = "amoqueue-helper-cell amoqueue-helper-size-cell";
+    row.appendChild(cell);
 
     // Add css classes for app icons. Should probably add this in product.
     for (let icon of row.querySelectorAll(".app-icon")) {
@@ -191,6 +206,7 @@ function updateReviewInfoDisplay(id, info) {
   unsafeWindow.document.getElementById("addon-" + id).amoqueue_info = cloneInto(info, unsafeWindow);
 
   let lastversion = info.versions[info.versions.length - 1];
+  let lastapprovedversion = info.lastapproved_idx !== null && info.versions[info.lastapproved_idx];
   let lastactivity = lastversion.activities[lastversion.activities.length - 1];
   if (!lastactivity) {
     return;
@@ -206,6 +222,7 @@ function updateReviewInfoDisplay(id, info) {
   row.className = row.className.replace(/amoqueue-helper-type-[^ ]*/g, "");
   row.classList.add("amoqueue-helper-type-" + lastactivity.type);
 
+  // Last update cell
   let changedcell = row.querySelector(".amoqueue-helper-lastupdate-cell");
   if (changedcell) {
     changedcell.textContent = lastactivity.date ? moment(lastactivity.date).fromNow() : "";
@@ -214,10 +231,24 @@ function updateReviewInfoDisplay(id, info) {
     }
   }
 
+  // Info cell
   let infocell = row.querySelector(".amoqueue-helper-info-cell");
   if (infocell) {
     infocell.textContent = lastactivity.state;
     infocell.setAttribute("title", `Last Comment:\n\n ${lastactivity.comment}`);
+  }
+
+  // Size cell
+  let sizecell = row.querySelector(".amoqueue-helper-size-cell");
+  if (sizecell) {
+    if (lastversion.size && lastapprovedversion && lastapprovedversion.size) {
+      let size = lastversion.size - lastapprovedversion.size;
+      sizecell.textContent = displaySize(size, true);
+    } else if (lastversion.size) {
+      sizecell.textContent = displaySize(lastversion.size);
+    } else {
+      sizecell.textContent = "";
+    }
   }
 }
 
@@ -236,6 +267,13 @@ function updateAutocomplete() {
 
   let noResults = document.getElementById("amoqueue-helper-autocomplete-noresults");
   noResults.style.display = foundsome ? "none" : "";
+}
+
+function displaySize(size, relative=false) {
+    let prefix = size < 0 ? "-" : (relative ? "+" : "");
+    let asize = Math.abs(size);
+    let i = Math.floor(Math.log(asize) / Math.log(1024));
+    return prefix + Number((asize / Math.pow(1024, i)).toFixed(2)) + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
 }
 
 function main() {

@@ -13,7 +13,6 @@ function authorInfo(anchor) {
   };
 }
 
-
 function activityAnnotator(activity) {
 
   if (activity.state == "More information requested" &&
@@ -57,12 +56,11 @@ function stateToType(state) {
   }[state] || "unknown";
 };
 
-
 // --- main ---
 
+var lastapproved_idx = null;
 
-
-var versions = Array.from(document.querySelectorAll("#review-files .listing-body")).map((listbody) => {
+var versions = Array.from(document.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
   let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
   let submissiondate = floatingtime(headerparts[2].trim(), true);
 
@@ -94,11 +92,16 @@ var versions = Array.from(document.querySelectorAll("#review-files .listing-body
   }
 
   let installanchor = listbody.querySelector(".editors-install");
+  let status = headerparts[3].trim().split(",")[0];
+
+  if (status == "Approved") {
+    lastapproved_idx = idx;
+  }
 
   return {
     version: headerparts[1].trim(),
     date: submissiondate, 
-    status: headerparts[3].trim().split(",")[0],
+    status: status,
 
     installurl: installanchor ? installanchor.getAttribute("href") : null,
 
@@ -106,12 +109,15 @@ var versions = Array.from(document.querySelectorAll("#review-files .listing-body
   };
 });
 
+
 var info = {
   id: document.querySelector("#addon").getAttribute("data-id"),
   slug: document.location.href.match(/\/([^\/]+)$/)[1],
   lastupdate: new Date().toISOString(),
   
-  versions: versions
+  versions: versions,
+  latest_idx: versions.length - 1,
+  lastapproved_idx: lastapproved_idx
 };
 
 unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
