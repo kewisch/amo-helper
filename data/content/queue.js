@@ -184,6 +184,10 @@ function destroyLayout() {
 
 function updateReviewInfoDisplay(id, info) {
   let row = document.getElementById("addon-" + id);
+  if (!row) {
+    return;
+  }
+
   unsafeWindow.document.getElementById("addon-" + id).amoqueue_info = cloneInto(info, unsafeWindow);
 
   let lastversion = info.versions[info.versions.length - 1];
