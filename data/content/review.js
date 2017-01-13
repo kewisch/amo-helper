@@ -53,69 +53,87 @@ function stateToType(state) {
   }[state] || "unknown";
 }
 
-// --- main ---
+function getInfo() {
+  var lastapproved_idx = null;
 
-var lastapproved_idx = null;
+  var versions = Array.from(document.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
+    let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
+    let submissiondate = floatingtime(headerparts[2].trim(), true);
 
-var versions = Array.from(document.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
-  let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
-  let submissiondate = floatingtime(headerparts[2].trim(), true);
+    let activities = Array.from(listbody.querySelectorAll(".activity tr")).reduce((results, activityrow) => {
+      let state = activityrow.firstElementChild.textContent.trim();
+      let author = stateHasAuthor(state) ? activityrow.querySelector("td > div > a") : null;
 
-  let activities = Array.from(listbody.querySelectorAll(".activity tr")).reduce((results, activityrow) => {
-    let state = activityrow.firstElementChild.textContent.trim();
-    let author = stateHasAuthor(state) ? activityrow.querySelector("td > div > a") : null;
+      if (state && activityrow.firstElementChild.className != "no-activity") {
+        results.push({
+          state: state,
+          type: stateToType(state),
+          author: authorInfo(author),
+          date: author ? floatingtime(author.nextSibling.textContent.replace(" on ", "")) : submissiondate,
+          comment: activityrow.lastElementChild.textContent.trim()
+        });
+      }
+      return results;
+    }, []).map(activityAnnotator);
 
-    if (state && activityrow.firstElementChild.className != "no-activity") {
-      results.push({
-        state: state,
-        type: stateToType(state),
-        author: authorInfo(author),
-        date: author ? floatingtime(author.nextSibling.textContent.replace(" on ", "")) : submissiondate,
-        comment: activityrow.lastElementChild.textContent.trim()
-      });
+    if (!activities.length) {
+      let listingauthor = document.querySelector("#scroll_sidebar ul:nth-of-type(3) > li > a");
+      activities.push(activityAnnotator({
+        state: "Submission",
+        type: stateToType("Submission"),
+        author: authorInfo(listingauthor),
+        date: submissiondate,
+        comment: ""
+      }));
     }
-    return results;
-  }, []).map(activityAnnotator);
 
-  if (!activities.length) {
-    let listingauthor = document.querySelector("#scroll_sidebar ul:nth-of-type(3) > li > a");
-    activities.push(activityAnnotator({
-      state: "Submission",
-      type: stateToType("Submission"),
-      author: authorInfo(listingauthor),
+    let installanchor = listbody.querySelector(".editors-install");
+    let status = headerparts[3].trim().split(",")[0];
+
+    if (status == "Approved") {
+      lastapproved_idx = idx;
+    }
+
+    return {
+      version: headerparts[1].trim(),
       date: submissiondate,
-      comment: ""
-    }));
-  }
+      status: status,
 
-  let installanchor = listbody.querySelector(".editors-install");
-  let status = headerparts[3].trim().split(",")[0];
+      installurl: installanchor ? installanchor.getAttribute("href") : null,
 
-  if (status == "Approved") {
-    lastapproved_idx = idx;
-  }
+      activities: activities
+    };
+  });
+
 
   return {
-    version: headerparts[1].trim(),
-    date: submissiondate,
-    status: status,
+    id: document.querySelector("#addon").getAttribute("data-id"),
+    slug: document.location.href.match(/\/([^\/]+)$/)[1],
+    lastupdate: new Date().toISOString(),
 
-    installurl: installanchor ? installanchor.getAttribute("href") : null,
-
-    activities: activities
+    versions: versions,
+    latest_idx: versions.length - 1,
+    lastapproved_idx: lastapproved_idx
   };
-});
+}
 
+// --- main ---
 
-var info = {
-  id: document.querySelector("#addon").getAttribute("data-id"),
-  slug: document.location.href.match(/\/([^\/]+)$/)[1],
-  lastupdate: new Date().toISOString(),
+(function() {
+  if (!location.href.startsWith("https://addons.mozilla.org/en-US/editors/review/")) {
+    // Due to the hack at the end we also need to make sure the script does not
+    // re-run for the data url
+    return;
+  }
 
-  versions: versions,
-  latest_idx: versions.length - 1,
-  lastapproved_idx: lastapproved_idx
-};
+  var info = getInfo();
+  unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
+  self.port.emit("review-info-received", info);
 
-unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
-self.port.emit("review-info-received", info);
+  if (self.options.background) {
+    // There is a bug in the SDK that page-workers don't get unloaded when
+    // destroyed, to avoid keeping the whole page active we just load a static
+    // resource instead.
+    window.location = "data:text/plain;charset=utf-8,goodbye";
+  }
+})();

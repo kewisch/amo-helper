@@ -1,7 +1,9 @@
 const QUEUE_URL = "https://addons.mozilla.org/en-US/editors/queue/";
+const REVIEW_URL = "https://addons.mozilla.org/en-US/editors/review/";
 
 var XMLHttpRequest = require("sdk/net/xhr").XMLHttpRequest;
 var pageMod = require("sdk/page-mod");
+var pageWorker = require("sdk/page-worker");
 var prefs = require("sdk/simple-prefs");
 var storage = (function() {
   let data = require("sdk/simple-storage").storage;
@@ -75,6 +77,39 @@ function determineSize(version) {
   });
 }
 
+function reviewOnAttach(worker) {
+  return new Promise((resolve, reject) => {
+    worker.port.on("review-info-received", (data) => {
+      determineSize(data.versions[data.versions.length - 1]).then(() => {
+        // Determine the size of the last approved version, if it exists
+        if (data.lastapproved_idx) {
+          return determineSize(data.versions[data.lastapproved_idx]);
+        }
+        return null;
+      }).then(() => {
+        storage.reviewinfo[data.id] = data;
+        queueWorkers.forEach((qworker) => qworker.port.emit("receive-review-info", [data]));
+      }).then(resolve, reject);
+    });
+  });
+}
+
+function downloadReviewInfo(id) {
+  return new Promise((resolve, reject) => {
+    let worker = pageWorker.Page({
+      contentScriptFile: "./content/review.js",
+      contentScriptOptions: { background: true },
+      contentScriptWhen: "ready",
+      attachTo: ["top"],
+      contentURL: REVIEW_URL + id
+    });
+    reviewOnAttach(worker).catch(() => {}).then(() => {
+      worker.destroy();
+      worker.dispose();
+    }).then(resolve, reject);
+  });
+}
+
 pageMod.PageMod({
   include: QUEUE_URL + "*",
   contentScriptWhen: "start",
@@ -89,12 +124,26 @@ pageMod.PageMod({
   contentScriptFile: ["./lib/moment.min.js", "./content/queue.js"],
   contentStyleFile: "./css/queue.css",
   contentScriptWhen: "ready",
+  attachTo: ["top"],
   onAttach: function(worker) {
     queueWorkers.add(worker);
 
     // Review info requests from the queue page
     worker.port.on("request-review-info", (ids) => {
       worker.port.emit("receive-review-info", processReviewInfo(ids));
+    });
+
+    // Clear all review data
+    worker.port.on("clear-review-info", () => {
+      storage.reviewinfo = {};
+      queueWorkers.forEach((qworker) => qworker.port.emit("clear-review-info"));
+    });
+
+    // Load review data
+    worker.port.on("download-review-info", (ids) => {
+      Promise.all(ids.map(downloadReviewInfo)).then(() => {
+        worker.port.emit("download-review-info-completed");
+      });
     });
 
     // Preferences
@@ -117,21 +166,9 @@ pageMod.PageMod({
 });
 
 pageMod.PageMod({
-  include: "https://addons.mozilla.org/en-US/editors/review/*",
+  include: REVIEW_URL + "*",
   contentScriptFile: "./content/review.js",
+  contentScriptOptions: {},
   contentScriptWhen: "ready",
-  onAttach: function(worker) {
-    worker.port.on("review-info-received", (data) => {
-      determineSize(data.versions[data.versions.length - 1]).then(() => {
-        // Determine the size of the last approved version, if it exists
-        if (data.lastapproved_idx) {
-          return determineSize(data.versions[data.lastapproved_idx]);
-        }
-        return null;
-      }).then(() => {
-        storage.reviewinfo[data.id] = data;
-        queueWorkers.forEach((qworker) => qworker.port.emit("receive-review-info", [data]));
-      });
-    });
-  }
+  onAttach: reviewOnAttach
 });

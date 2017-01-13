@@ -1,6 +1,8 @@
 "use strict";
 
 const OVERDUE_SOURCES = 7;
+const IS_ADMIN = !!document.querySelector(".app-icon.ed-sprite-admin-review");
+
 var prefs = {};
 
 function initPageLayout() {
@@ -85,7 +87,7 @@ function initPageLayout() {
     });
   });
 
-  if (document.querySelector(".app-icon.ed-sprite-admin-review")) {
+  if (IS_ADMIN) {
     addSearchRadio("Show Reviews", "show-admin", ["Both", "Admin", "Regular"], (state) => {
       document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
         let isadmin = row.classList.contains("amoqueue-helper-iconclass-admin-review");
@@ -114,6 +116,47 @@ function initPageLayout() {
 
   noResultsRow.appendChild(noResultsCell);
   queueBody.appendChild(noResultsRow);
+
+  // Queue buttons container
+  let searchbox = document.querySelector("div.queue-search");
+  let queueButtons = document.createElement("div");
+  queueButtons.className = "amoqueue-queue-buttons";
+  searchbox.appendChild(queueButtons);
+
+  if (IS_ADMIN) {
+    // Load button
+    let loadButton = document.createElement("button");
+    loadButton.id = "amoqueue-load-button";
+    loadButton.className = "amoqueue-queue-button";
+    loadButton.appendChild(document.createElement("span")).className = "image";
+
+    let loadLabel = loadButton.appendChild(document.createElement("span"));
+    loadLabel.textContent = "Load";
+    loadLabel.className = "label";
+
+    loadButton.addEventListener("click", () => {
+      let noinfo = Array.from(document.querySelectorAll("#addon-queue .addon-row:not(.amoqueue-has-info)"))
+                        .slice(0, prefs["addons-per-load"])
+                        .map((row) => row.getAttribute("data-addon"));
+      loadButton.setAttribute("disabled", "true");
+      window.localStorage["dont_poll"] = true;
+
+      downloadReviewInfo(noinfo).then(() => {
+        delete window.localStorage["dont_poll"];
+        loadButton.removeAttribute("disabled");
+      });
+    }, false);
+    queueButtons.appendChild(loadButton);
+  }
+
+  // Clear button
+  let clearButton = document.createElement("button");
+  clearButton.className = "amoqueue-queue-button";
+  clearButton.textContent = "Clear";
+  clearButton.addEventListener("click", () => {
+    self.port.emit("clear-review-info");
+  }, false);
+  queueButtons.appendChild(clearButton);
 }
 
 function hideBecause(row, reason, state) {
@@ -178,14 +221,17 @@ function updateReviewInfoDisplay(id, info) {
     return;
   }
 
-  unsafeWindow.document.getElementById("addon-" + id).amoqueue_info = cloneInto(info, unsafeWindow);
-
-  let lastversion = info.versions[info.versions.length - 1];
-  let lastapprovedversion = info.lastapproved_idx !== null && info.versions[info.lastapproved_idx];
-  let lastactivity = lastversion.activities[lastversion.activities.length - 1];
-  if (!lastactivity) {
-    return;
+  if (Object.keys(info).length) {
+    row.classList.add("amoqueue-has-info");
+    unsafeWindow.document.getElementById("addon-" + id).amoqueue_info = cloneInto(info, unsafeWindow);
+  } else {
+    row.classList.remove("amoqueue-has-info");
+    delete unsafeWindow.document.getElementById("addon-" + id).amoqueue_info;
   }
+
+  let lastversion = info.versions && info.versions[info.versions.length - 1];
+  let lastapprovedversion = info.versions && info.lastapproved_idx !== null && info.versions[info.lastapproved_idx];
+  let lastactivity = lastversion ? lastversion.activities[lastversion.activities.length - 1] : {};
 
   if (lastactivity.type == "needinfo" &&
       lastactivity.date && moment().diff(lastactivity.date, "days") > OVERDUE_SOURCES) {
@@ -195,7 +241,9 @@ function updateReviewInfoDisplay(id, info) {
   }
 
   row.className = row.className.replace(/amoqueue-helper-type-[^ ]*/g, "");
-  row.classList.add("amoqueue-helper-type-" + lastactivity.type);
+  if (lastactivity.type) {
+    row.classList.add("amoqueue-helper-type-" + lastactivity.type);
+  }
 
   // Last update cell
   let changedcell = row.querySelector(".amoqueue-helper-lastupdate-cell");
@@ -209,17 +257,19 @@ function updateReviewInfoDisplay(id, info) {
   // Info cell
   let infocell = row.querySelector(".amoqueue-helper-info-cell");
   if (infocell) {
-    infocell.textContent = lastactivity.state;
-    infocell.setAttribute("title", `Last Comment:\n\n ${lastactivity.comment}`);
+    infocell.textContent = lastactivity.state || "";
+    if (lastactivity.comment) {
+      infocell.setAttribute("title", `Last Comment:\n\n ${lastactivity.comment}`);
+    }
   }
 
   // Size cell
   let sizecell = row.querySelector(".amoqueue-helper-size-cell");
   if (sizecell) {
-    if (lastversion.size && lastapprovedversion && lastapprovedversion.size) {
+    if (lastversion && lastversion.size && lastapprovedversion && lastapprovedversion.size) {
       let size = lastversion.size - lastapprovedversion.size;
       sizecell.textContent = displaySize(size, true);
-    } else if (lastversion.size) {
+    } else if (lastversion && lastversion.size) {
       sizecell.textContent = displaySize(lastversion.size);
     } else {
       sizecell.textContent = "";
@@ -244,6 +294,15 @@ function updateAutocomplete() {
   noResults.style.display = foundsome ? "none" : "";
 }
 
+function downloadReviewInfo(ids) {
+  return new Promise((resolve) => {
+    self.port.once("download-review-info-completed", () => {
+      resolve();
+    });
+    self.port.emit("download-review-info", ids);
+  });
+}
+
 function displaySize(size, relative=false) {
   let prefix = size < 0 ? "-" : (relative ? "+" : "");
   let asize = Math.abs(size);
@@ -260,6 +319,13 @@ function main() {
   self.port.on("receive-review-info", (data) => {
     for (let reviewinfo of data) {
       updateReviewInfoDisplay(reviewinfo.id, reviewinfo);
+    }
+  });
+
+  self.port.on("clear-review-info", () => {
+    for (let row of document.querySelectorAll("#addon-queue .addon-row")) {
+      let id = row.getAttribute("data-addon");
+      updateReviewInfoDisplay(id, {});
     }
   });
 

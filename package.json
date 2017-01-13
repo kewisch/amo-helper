@@ -1,7 +1,7 @@
 {
   "title": "AMO Queue Helper",
   "name": "amoqueue",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Enhancements to the AMO review queue",
   "main": "index.js",
   "author": "Philipp Kewisch",
@@ -27,6 +27,12 @@
     "description": "Number of items to show in the queue per page",
     "type": "integer",
     "value": 100
+  },{
+    "name": "addons-per-load",
+    "title": "Items per load",
+    "description": "Number of items to load when clicking the load button",
+    "type": "integer",
+    "value": 3
   },{
     "name": "show-info",
     "title": "Show Information Requests",
