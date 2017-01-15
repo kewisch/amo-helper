@@ -9,7 +9,6 @@ var tabsToClose = {};
 var reviewPages = {};
 
 function removeTabsFor(tabId, addonid, closeTabs) {
-  console.log(`Removing tabs for ${tabId} / ${addonid}`);
   if (tabsToClose[addonid]) {
     if (closeTabs) {
       for (let tab of Object.values(tabsToClose[addonid])) {
