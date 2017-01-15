@@ -77,16 +77,23 @@ function determineSize(version) {
   });
 }
 
+function updateSizes(data) {
+  if (!prefs.prefs["is-admin"]) {
+    return Promise.resolve();
+  }
+  return determineSize(data.versions[data.versions.length - 1]).then(() => {
+    // Determine the size of the last approved version, if it exists
+    if (data.lastapproved_idx) {
+      return determineSize(data.versions[data.lastapproved_idx]);
+    }
+    return null;
+  });
+}
+
 function reviewOnAttach(worker) {
   return new Promise((resolve, reject) => {
     worker.port.on("review-info-received", (data) => {
-      determineSize(data.versions[data.versions.length - 1]).then(() => {
-        // Determine the size of the last approved version, if it exists
-        if (data.lastapproved_idx) {
-          return determineSize(data.versions[data.lastapproved_idx]);
-        }
-        return null;
-      }).then(() => {
+      updateSizes(data).then(() => {
         storage.reviewinfo[data.id] = data;
         queueWorkers.forEach((qworker) => qworker.port.emit("receive-review-info", [data]));
       }).then(resolve, reject);

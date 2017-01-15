@@ -1,7 +1,7 @@
 "use strict";
 
 const OVERDUE_SOURCES = 7;
-const IS_ADMIN = !!document.querySelector(".app-icon.ed-sprite-admin-review");
+const IS_ADMIN = !!document.getElementById("unlisted-queues");
 
 var prefs = {};
 
@@ -21,10 +21,12 @@ function initPageLayout() {
   header.appendChild(column);
 
   // Size column
-  column = document.createElement("th");
-  column.className ="amoqueue-helper-size-column";
-  column.textContent = "Size";
-  header.appendChild(column);
+  if (IS_ADMIN) {
+    column = document.createElement("th");
+    column.className ="amoqueue-helper-size-column";
+    column.textContent = "Size";
+    header.appendChild(column);
+  }
 
   let rows = document.querySelectorAll(".addon-row");
   for (let row of rows) {
@@ -40,9 +42,11 @@ function initPageLayout() {
     row.appendChild(cell);
 
     // Size column
-    cell = document.createElement("td");
-    cell.className = "amoqueue-helper-cell amoqueue-helper-size-cell";
-    row.appendChild(cell);
+    if (IS_ADMIN) {
+      cell = document.createElement("td");
+      cell.className = "amoqueue-helper-cell amoqueue-helper-size-cell";
+      row.appendChild(cell);
+    }
 
     // Add css classes for app icons. Should probably add this in product.
     for (let icon of row.querySelectorAll(".app-icon")) {
@@ -344,3 +348,5 @@ self.port.on("receive-prefs", (prefdata) => {
   prefs = prefdata;
   main();
 });
+
+self.port.emit("change-pref", "is-admin", IS_ADMIN);

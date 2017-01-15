@@ -1,7 +1,7 @@
 {
   "title": "AMO Queue Helper",
   "name": "amoqueue",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Enhancements to the AMO review queue",
   "main": "index.js",
   "author": "Philipp Kewisch",
@@ -33,6 +33,11 @@
     "description": "Number of items to load when clicking the load button",
     "type": "integer",
     "value": 3
+  },{
+    "name": "is-admin",
+    "title": "Enable admin features",
+    "hidden": "true",
+    "type": "bool"
   },{
     "name": "show-info",
     "title": "Show Information Requests",
