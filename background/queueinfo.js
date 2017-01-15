@@ -15,6 +15,7 @@ var storage = (function() {
   return data;
 })();
 var queueWorkers = new Set();
+var installedPageMods = [];
 
 function processReviewInfo(ids) {
   let now = new Date();
@@ -117,17 +118,17 @@ function downloadReviewInfo(id) {
   });
 }
 
-exports.startup = function() {
-  pageMod.PageMod({
+function installContent() {
+  installedPageMods.push(pageMod.PageMod({
     include: QUEUE_URL + "*",
     contentScriptWhen: "start",
     contentScriptFile: "./queueinfo/queue_redirect.js",
     onAttach: function(worker) {
       worker.port.emit("per_page", prefs.prefs["per-page"]);
     }
-  });
+  }));
 
-  pageMod.PageMod({
+  installedPageMods.push(pageMod.PageMod({
     include: QUEUE_URL + "*",
     contentScriptFile: ["./lib/moment.min.js", "./queueinfo/queue.js"],
     contentStyleFile: "./queueinfo/queue.css",
@@ -171,13 +172,25 @@ exports.startup = function() {
         queueWorkers.delete(worker);
       });
     }
-  });
+  }));
 
-  pageMod.PageMod({
+  installedPageMods.push(pageMod.PageMod({
     include: REVIEW_URL + "*",
     contentScriptFile: "./queueinfo/review.js",
     contentScriptOptions: {},
     contentScriptWhen: "ready",
     onAttach: reviewOnAttach
-  });
+  }));
+}
+
+exports.startup = function() {
+  function queueinfoEnableChange() {
+    installedPageMods.forEach(mod => mod.destroy());
+    if (prefs.prefs["queueinfo-enable"]) {
+      installContent();
+    }
+  }
+
+  prefs.on("queueinfo-enable", queueinfoEnableChange);
+  queueinfoEnableChange();
 };

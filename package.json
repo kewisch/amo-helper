@@ -16,6 +16,12 @@
     "multiprocess": true
   },
   "preferences": [{
+    "name": "queueinfo-enable",
+    "title": "Enable Queue enhancements",
+    "description": "Makes various improvements to the queue page",
+    "type": "bool",
+    "value": true
+  },{
     "name": "staletime",
     "title": "Hours to keep information",
     "description": "Review information older than this amount of hours will get removed",
