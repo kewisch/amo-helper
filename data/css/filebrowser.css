@@ -1,0 +1,10 @@
+.td-line-number > .line-number {
+  transition: box-shadow 1s ease-in-out;
+  border-radius: 2ex;
+}
+
+.td-line-number > .line-number:active {
+  box-shadow: 0px 0px 20px rgba(227,6,19,0.8), 0 0 5px rgba(227,6,19,0.8) inset;
+  transition: box-shadow .05s linear;
+  border-radius: 2ex;
+}

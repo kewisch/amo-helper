@@ -172,3 +172,13 @@ pageMod.PageMod({
   contentScriptWhen: "ready",
   onAttach: reviewOnAttach
 });
+
+pageMod.PageMod({
+  include: [
+    "https://addons.mozilla.org/en-US/firefox/files/browse/*",
+    "https://addons.mozilla.org/en-US/firefox/files/compare/*"
+  ],
+  contentScriptFile: ["./content/copylink.js"],
+  contentScriptWhen: "ready",
+  contentStyleFile: "./css/filebrowser.css"
+});
