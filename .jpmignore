@@ -1,0 +1,9 @@
+README.md
+profile
+*.sw*
+*.xpi
+.jpmignore
+.gitignore
+.git
+.eslintrc
+.eslintignore

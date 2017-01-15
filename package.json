@@ -1,8 +1,8 @@
 {
-  "title": "AMO Queue Helper",
+  "title": "AMO Helper",
   "name": "amoqueue",
   "version": "2.1.0",
-  "description": "Enhancements to the AMO review queue",
+  "description": "Enhancements to the AMO review experience",
   "main": "index.js",
   "author": "Philipp Kewisch",
   "contributors": ["Andreas Wagner"],
