@@ -34,6 +34,18 @@
     "type": "integer",
     "value": 3
   },{
+    "name": "tabclose-other-queue",
+    "title": "Close duplicate queue tabs",
+    "description": "Close duplicate queue tabs when a new one is loaded",
+    "type": "bool",
+    "value": true
+  },{
+    "name": "tabclose-review-children",
+    "title": "Close review child tabs",
+    "description": "Close review child tabs (e.g. file browser) when review is closed",
+    "type": "bool",
+    "value": true
+  },{
     "name": "is-admin",
     "title": "Enable admin features",
     "hidden": "true",

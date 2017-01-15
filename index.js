@@ -16,6 +16,8 @@ var storage = (function() {
 })();
 var queueWorkers = new Set();
 
+require("background/tabclose").startup();
+
 function processReviewInfo(ids) {
   let now = new Date();
   let timelimit = prefs.prefs["staletime"] * 3600000;
