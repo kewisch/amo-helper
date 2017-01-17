@@ -57,7 +57,7 @@ function tabReady(tab) {
       removeTabsFor(tab.id, reviewPages[tab.id], prefs.prefs["tabclose-review-children"]);
     }
 
-    if (tab.readyState == "complete" && prefs.prefs["tabclose-other-queue"]) {
+    if (tab.readyState == "interactive" && prefs.prefs["tabclose-other-queue"]) {
       removeOtherTabs(tab.url, tab);
     }
   }
