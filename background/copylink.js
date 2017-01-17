@@ -6,7 +6,7 @@ exports.startup = function() {
       "https://addons.mozilla.org/en-US/firefox/files/browse/*",
       "https://addons.mozilla.org/en-US/firefox/files/compare/*"
     ],
-    contentScriptFile: ["./copylink/copylink.js"],
+    contentScriptFile: ["./lib/jquery-3.1.1.min.js", "./copylink/copylink.js"],
     contentScriptWhen: "ready",
     contentStyleFile: "./copylink/filebrowser.css"
   });

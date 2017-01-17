@@ -7,12 +7,10 @@ function onclickln(event) {
   copybox.text(filename + " line " + line);
   $("body").append(copybox);
   copybox.select();
-  pagedoc.execCommand("copy");
+  document.execCommand("copy");
   copybox.remove();
   event.preventDefault();
   event.stopPropagation();
 }
 
-var $ = unsafeWindow.$;
-var pagedoc = unsafeWindow.document;
-$(pagedoc).on("click", ".td-line-number a", onclickln);
+$("#file-viewer-inner").on("click", ".td-line-number a", onclickln);
