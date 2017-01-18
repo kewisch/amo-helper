@@ -1,11 +1,11 @@
 {
-  "title": "AMO Helper",
+  "title": "AMO Review Helper",
   "name": "amoqueue",
   "version": "2.1.0",
   "description": "Enhancements to the AMO review experience",
   "main": "index.js",
   "author": "Philipp Kewisch",
-  "contributors": ["Andreas Wagner"],
+  "hasEmbeddedWebExtension": true,
   "engines": {
     "firefox": ">=38.0a1"
   },

@@ -1,4 +1,5 @@
 data/lib/
+webextension/libs/
 profile/
 package.json
 amoqueue.xpi
