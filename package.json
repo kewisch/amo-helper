@@ -53,26 +53,6 @@
     "type": "bool",
     "value": true
   },{
-    "name": "compare-enable",
-    "title": "Enable compare grid",
-    "description": "Adds a grid to review pages that allows quick comparison between versions",
-    "type": "bool",
-    "value": true
-  },{
-    "name": "compare-download-folder",
-    "type": "directory",
-    "title": "Add-on download folder"
-  },{
-    "name": "compare-command",
-    "title": "Compare tool location",
-    "type": "file"
-  },{
-    "name": "compare-command-args",
-    "title": "Compare tool arguments",
-    "description": "Please use $1 and $2 to specify the file names.",
-    "type": "string",
-    "value": "$1 $2"
-  },{
     "name": "is-admin",
     "title": "Enable admin features",
     "hidden": "true",
