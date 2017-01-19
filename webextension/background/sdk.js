@@ -19,8 +19,13 @@ var sdk = (function() {
       });
     }
 
-    sdkMessageListeners.forEach((callback) => {
-      callback(data.message, data.sender, sendReply);
+    chrome.tabs.get(data.sender.tabId, (tab) => {
+      data.sender.tab = tab;
+      delete data.sender.tabId;
+
+      sdkMessageListeners.forEach((callback) => {
+        callback(data.message, data.sender, sendReply);
+      });
     });
   });
 

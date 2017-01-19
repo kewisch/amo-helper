@@ -9,8 +9,24 @@
     "128": "images/addon.svg"
   },
 
+  "permissions": [
+    "clipboardWrite",
+    "contextMenus",
+    "tabs",
+    "storage"
+  ],
+
+  "options_ui": {
+    "page": "options/options.html",
+    "chrome_style": true
+  },
+
   "background": {
-    "scripts": ["background/sdk.js", "background/context.js"]
+    "scripts": [
+      "background/sdk.js",
+      "background/context.js",
+      "background/tabclose.js"
+    ]
   },
 
   "sdk_content_scripts": [
@@ -22,7 +38,14 @@
       "js": ["libs/jquery-3.1.1.min.js", "content/copylink/filebrowser.js"],
       "css": ["content/copylink/filebrowser.css"],
       "run_at": "document_end"
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
+        "https://addons.mozilla.org/en-US/firefox/files/compare/*",
+        "https://addons.mozilla.org/en-US/developers/addon/*"
+      ],
+      "js": ["content/tabclose/find_addonid.js"],
+      "run_at": "document_end"
     }
-  ],
-  "permissions": ["clipboardWrite", "contextMenus", "tabs"]
+  ]
 }

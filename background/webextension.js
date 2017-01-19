@@ -3,6 +3,9 @@ var manifest = require("../webextension/manifest.json");
 var self = require("sdk/self"); // eslint-disable-line consistent-this
 var pageMod = require("sdk/page-mod");
 var { defer } = require("sdk/core/promise");
+var { viewFor } = require("sdk/view/core");
+
+var { Management: { global: { TabManager } } } = require("resource://gre/modules/Extension.jsm");
 
 var contentPipeline = defer();
 var storagePipeline = defer();
@@ -54,8 +57,8 @@ function pageModAttach(worker) {
     worker.port.on("__sdk_contentscript_request", (data) => {
       data.workerId = workerId;
       data.sender = {
-        url: worker.tab.url
-        // TODO possibly other properties
+        url: worker.tab.url,
+        tabId: TabManager.getId(viewFor(worker.tab))
       };
       pipeline.postMessage(data);
     });
