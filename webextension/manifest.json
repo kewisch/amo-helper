@@ -26,12 +26,17 @@
     "chrome_style": true
   },
 
+  "omnibox": {
+    "keyword": "amo"
+  },
+
   "background": {
     "scripts": [
       "background/sdk.js",
       "background/context.js",
       "background/tabclose.js",
-      "background/queueinfo.js"
+      "background/queueinfo.js",
+      "background/omnibox.js"
     ]
   },
 

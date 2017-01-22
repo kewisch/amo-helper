@@ -214,7 +214,7 @@
     "no-var": 0,
 
     // Disallow global and local variables that aren't used, but allow unused function arguments.
-    "no-unused-vars": [2, {"vars": "all", "args": "none", "varsIgnorePattern": "EXPORTED_SYMBOLS"}],
+    "no-unused-vars": [2, {"vars": "all", "args": "none", "varsIgnorePattern": "EXPORTED_SYMBOLS|rest"}],
 
     // Require padding inside curly braces
     "object-curly-spacing": [2, "always"],
