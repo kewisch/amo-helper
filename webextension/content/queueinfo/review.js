@@ -53,10 +53,27 @@ function stateToType(state) {
   }[state] || "unknown";
 }
 
-function getInfo() {
+function determineSize(version) {
+  if (!version) {
+    return Promise.resolve();
+  }
+
+  return fetch(version.installurl, { method: "HEAD" }).then((response) => {
+    if (response.status == 302) {
+      return fetch(response.headers.get("Location"), { method: "HEAD" });
+    }
+    return response;
+  }).then((response) => {
+    version.size = parseInt(response.headers.get("Content-Length"), 10);
+  }, () => {
+    version.size = 0;
+  });
+}
+
+function getInfo(doc) {
   var lastapproved_idx = null;
 
-  var versions = Array.from(document.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
+  var versions = Array.from(doc.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
     let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
     let submissiondate = floatingtime(headerparts[2].trim(), true);
 
@@ -77,7 +94,7 @@ function getInfo() {
     }, []).map(activityAnnotator);
 
     if (!activities.length) {
-      let listingauthor = document.querySelector("#scroll_sidebar ul:nth-of-type(3) > li > a");
+      let listingauthor = doc.querySelector("#scroll_sidebar ul:nth-of-type(3) > li > a");
       activities.push(activityAnnotator({
         state: "Submission",
         type: stateToType("Submission"),
@@ -105,10 +122,9 @@ function getInfo() {
     };
   });
 
-
   return {
-    id: document.querySelector("#addon").getAttribute("data-id"),
-    slug: document.location.href.match(/\/([^\/]+)$/)[1],
+    id: doc.querySelector("#addon").getAttribute("data-id"),
+    slug: doc.location.href.match(/\/([^\/]+)$/)[1],
     lastupdate: new Date().toISOString(),
 
     versions: versions,
@@ -117,23 +133,21 @@ function getInfo() {
   };
 }
 
-// --- main ---
+function getInfoWithSize(doc) {
+  let info = getInfo(doc);
+  // unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
 
-(function() {
-  if (!location.href.startsWith("https://addons.mozilla.org/en-US/editors/review/")) {
-    // Due to the hack at the end we also need to make sure the script does not
-    // re-run for the data url
-    return;
-  }
+  return Promise.all([
+    determineSize(info.versions[info.latest_idx]),
+    determineSize(info.versions[info.lastapproved_idx])
+  ]).then(() => {
+    return info;
+  });
+}
 
-  var info = getInfo();
-  unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
-  self.port.emit("review-info-received", info);
+// -- main --
 
-  if (self.options.background) {
-    // There is a bug in the SDK that page-workers don't get unloaded when
-    // destroyed, to avoid keeping the whole page active we just load a static
-    // resource instead.
-    window.location = "data:text/plain;charset=utf-8,goodbye";
-  }
-})();
+getInfoWithSize(document).then((info) => {
+  // unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
+  chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
+});

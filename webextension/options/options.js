@@ -1,29 +1,20 @@
-// Saves options to chrome.storage
-function save_options() {
-  let closeOtherQueue = document.getElementById("closeOtherQueue").checked;
-  let closeReviewChild = document.getElementById("closeReviewChild").checked;
-
-  chrome.storage.local.set({
-    closeOtherQueue: closeOtherQueue,
-    closeReviewChild: closeReviewChild,
-  }, () => {
-    // Update status to let user know options were saved.
-    let status = document.getElementById("status");
-    status.textContent = "Options saved.";
-    setTimeout(() => {
-      status.textContent = "";
-    }, 750);
-  });
-}
-
 function restore_options() {
   chrome.storage.local.get({
-    closeOtherQueue: true,
-    closeReviewChild: true,
-  }, (items) => {
-    document.getElementById("closeOtherQueue").checked = items.closeOtherQueue;
-    document.getElementById("closeReviewChild").checked = items.closeReviewChild;
+    "tabclose-other-queue": true,
+    "tabclose-review-child": true
+  }, (prefs) => {
+    document.getElementById("tabclose-other-queue").checked = prefs["tabclose-other-queue"];
+    document.getElementById("tabclose-review-child").checked = prefs["tabclose-review-child"];
   });
 }
+
+function change_options(event) {
+  let node = event.target;
+
+  if (node.getAttribute("type") == "checkbox" && node.id) {
+    chrome.storage.local.set({ [node.id]: node.checked });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", restore_options);
-document.getElementById("save").addEventListener("click", save_options);
+document.body.addEventListener("change", change_options);

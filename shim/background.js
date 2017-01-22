@@ -16,7 +16,6 @@ const runAtMap = {
   document_idle: "end"
 };
 
-
 function convertWebExtensionUrls(urls) {
   return urls ? urls.map(url => `resource://${self.id}/webextension/${url}`) : undefined;
 }
@@ -26,8 +25,10 @@ function pageModAttach(worker) {
 
   storagePipeline.promise.then((pipeline) => {
     let pipelineListener = (data) => {
-      if (data.workerId == workerId) {
+      if (data.action == "result" && data.workerId == workerId) {
         worker.port.emit("__sdk_storage_response_" + data.responseId, data.result);
+      } else if (data.action == "changed") {
+        worker.port.emit("__sdk_storage_changed", data.changes, data.area);
       }
     };
 
@@ -65,37 +66,35 @@ function pageModAttach(worker) {
   });
 }
 
-exports.startup = function() {
-  require("sdk/webextension").startup().then((api) => {
-    const { browser } = api;
+require("sdk/webextension").startup().then((api) => {
+  const { browser } = api;
 
-    browser.runtime.onConnect.addListener((port) => {
-      if (port.name == "__sdk_storage") {
-        storagePipeline.resolve(port);
-      } else if (port.name == "__sdk_contentscript") {
-        contentPipeline.resolve(port);
-      }
-    });
-
-    let webExtension = LegacyExtensionsUtils.getEmbeddedExtensionFor({ id: self.id });
-
-    for (let contentScript of manifest.sdk_content_scripts) {
-      let matchesAboutBlank = contentScript.match_about_blank ? ["about:blank"] : [];
-      let scriptFiles = convertWebExtensionUrls(contentScript.js);
-
-      pageMod.PageMod({
-        include: contentScript.matches.concat(matchesAboutBlank),
-        contentStyleFile: convertWebExtensionUrls(contentScript.css),
-        contentScriptFile: ["./webext_content.js"].concat(scriptFiles),
-        contentScriptWhen: runAtMap[contentScript.run_at] || "end",
-        contentScriptOptions: {
-          uuid: webExtension.extension.uuid,
-          manifest: manifest
-        },
-        attachTo: contentScript.all_frames ? ["top", "frame"] : ["top"],
-        // not supporting include/exclude_globs
-        onAttach: pageModAttach
-      });
+  browser.runtime.onConnect.addListener((port) => {
+    if (port.name == "__sdk_storage") {
+      storagePipeline.resolve(port);
+    } else if (port.name == "__sdk_contentscript") {
+      contentPipeline.resolve(port);
     }
   });
-};
+
+  let webExtension = LegacyExtensionsUtils.getEmbeddedExtensionFor({ id: self.id });
+
+  for (let contentScript of manifest.sdk_content_scripts) {
+    let matchesAboutBlank = contentScript.match_about_blank ? ["about:blank"] : [];
+    let scriptFiles = convertWebExtensionUrls(contentScript.js);
+
+    pageMod.PageMod({
+      include: contentScript.matches.concat(matchesAboutBlank),
+      contentStyleFile: convertWebExtensionUrls(contentScript.css),
+      contentScriptFile: [`resource://${self.id}/shim/content.js`].concat(scriptFiles),
+      contentScriptWhen: runAtMap[contentScript.run_at] || "end",
+      contentScriptOptions: {
+        uuid: webExtension.extension.uuid,
+        manifest: manifest
+      },
+      attachTo: contentScript.all_frames ? ["top", "frame"] : ["top"],
+      // not supporting include/exclude_globs
+      onAttach: pageModAttach
+    });
+  }
+});

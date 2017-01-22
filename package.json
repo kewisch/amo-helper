@@ -1,9 +1,9 @@
 {
   "title": "AMO Review Helper",
   "name": "amoqueue",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Enhancements to the AMO review experience",
-  "main": "index.js",
+  "main": "shim/background.js",
   "author": "Philipp Kewisch",
   "hasEmbeddedWebExtension": true,
   "engines": {
@@ -14,80 +14,7 @@
     "jetpack"
   ],
   "permissions": {
-    "multiprocess": true
-  },
-  "preferences": [{
-    "name": "queueinfo-enable",
-    "title": "Enable Queue enhancements",
-    "description": "Makes various improvements to the queue page",
-    "type": "bool",
-    "value": true
-  },{
-    "name": "staletime",
-    "title": "Hours to keep information",
-    "description": "Review information older than this amount of hours will get removed",
-    "type": "integer",
-    "value": 24
-  },{
-    "name": "per-page",
-    "title": "Items per page",
-    "description": "Number of items to show in the queue per page",
-    "type": "integer",
-    "value": 100
-  },{
-    "name": "addons-per-load",
-    "title": "Items per load",
-    "description": "Number of items to load when clicking the load button",
-    "type": "integer",
-    "value": 3
-  },{
-    "name": "tabclose-other-queue",
-    "title": "Close duplicate queue tabs",
-    "description": "Close duplicate queue tabs when a new one is loaded",
-    "type": "bool",
-    "value": true
-  },{
-    "name": "tabclose-review-children",
-    "title": "Close review child tabs",
-    "description": "Close review child tabs (e.g. file browser) when review is closed",
-    "type": "bool",
-    "value": true
-  },{
-    "name": "is-admin",
-    "title": "Enable admin features",
-    "hidden": "true",
-    "type": "bool"
-  },{
-    "name": "show-info",
-    "title": "Show Information Requests",
-    "hidden": "true",
-    "type": "radio",
-    "value": "both",
-    "options": [{
-      "value": "both",
-      "label": "Both"
-    },{
-      "value": "only",
-      "label": "Only"
-    },{
-      "value": "none",
-      "label": "None"
-    }]
-  },{
-    "name": "show-admin",
-    "title": "Reviews to Show",
-    "hidden": "true",
-    "type": "radio",
-    "value": "both",
-    "options": [{
-      "value": "both",
-      "label": "Both"
-    },{
-      "value": "regular",
-      "label": "Regular"
-    },{
-      "value": "admin",
-      "label": "Admin"
-    }]
-  }]
+    "multiprocess": true,
+    "cross-domain-content": ["https://addons.cdn.mozilla.net/"]
+  }
 }

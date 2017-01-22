@@ -32,6 +32,7 @@ var sdk = (function() {
   storagePipeline.onMessage.addListener((data) => {
     function sendReply(result) {
       storagePipeline.postMessage({
+        action: "result",
         result: result,
         workerId: data.workerId,
         responseId: data.responseId
@@ -44,7 +45,18 @@ var sdk = (function() {
       chrome.storage[data.area][data.method](data.items, sendReply);
     }
   });
-  // TODO onChanged
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    // TODO is postponing this needed? currently makes sure change notification
+    // is after reply function.
+    setTimeout(() => {
+      storagePipeline.postMessage({
+        action: "changed",
+        changes: changes,
+        area: area
+      });
+    }, 100);
+  });
 
   return {
     runtime: {

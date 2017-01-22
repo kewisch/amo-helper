@@ -10,7 +10,8 @@ let tabsToClose = {};
 let reviewPages = {};
 
 function removeTabsFor(tabId, addonid, closeTabs) {
-  console.log(`Removing tabs for ${tabId} / ${addonid}: ${Object.keys(tabsToClose[addonid])}`);
+  let showkeys = Object.keys(tabsToClose[addonid] || {});
+  console.log(`Removing tabs for ${tabId} / ${addonid}: ${showkeys}`);
   if (tabsToClose[addonid]) {
     if (closeTabs) {
       chrome.tabs.remove(Object.keys(tabsToClose[addonid]).map(Number));
@@ -62,8 +63,8 @@ sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   chrome.storage.local.get({
-    closeReviewChild: true,
-    closeOtherQueue: true
+    "tabclose-other-queue": true,
+    "tabclose-review-child": true
   }, (prefs) => {
     let isReview = tab.url.match(REVIEW_RE);
     let isQueue = tab.url.match(QUEUE_RE);
@@ -72,10 +73,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       reviewPages[tabId] = isReview[2];
     } else if (isQueue) {
       if (tabId in reviewPages) {
-        removeTabsFor(tabId, reviewPages[tabId], prefs.closeReviewChild);
+        removeTabsFor(tabId, reviewPages[tabId], prefs["tabclose-review-child"]);
       }
 
-      if (changeInfo.status == "complete" && prefs.closeOtherQueue) {
+      if (changeInfo.status == "complete" && prefs["tabclose-other-queue"]) {
         removeOtherTabs(tab.url, tab);
       }
     }

@@ -2,21 +2,35 @@
 <html>
 <head>
   <title>AMO Helper Options</title>
-  <style> label { display: block; }</style>
+  <style>
+    body {
+      font: message-box;
+    }
+    label {
+      display: block;
+      font-size: 1.25em;
+      line-height: 22px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
   <label>
-    <input type="checkbox" id="closeOtherQueue">
+    <input type="checkbox" id="tabclose-other-queue">
     Close other tabs showing the same queue on load
   </label>
 
   <label>
-    <input type="checkbox" id="closeReviewChild">
+    <input type="checkbox" id="tabclose-review-child">
     Close file viewers and validation results when exiting reviews
   </label>
 
-  <div id="status"></div>
-  <button id="save">Save</button>
+  <!--
+  <label>
+    <input type="number" id="queueinfo-addons-per-load">
+    Number of items to show in the queue per page
+  </label>
+  -->
 
   <script src="options.js"></script>
 </body>

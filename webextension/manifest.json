@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "AMO Review Helper",
-  "version": "1.0",
+  "version": "3.0.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -13,7 +13,12 @@
     "clipboardWrite",
     "contextMenus",
     "tabs",
-    "storage"
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+
+    "https://addons.mozilla.org/",
+    "https://addons.cdn.mozilla.net/"
   ],
 
   "options_ui": {
@@ -25,7 +30,8 @@
     "scripts": [
       "background/sdk.js",
       "background/context.js",
-      "background/tabclose.js"
+      "background/tabclose.js",
+      "background/queueinfo.js"
     ]
   },
 
@@ -45,6 +51,22 @@
         "https://addons.mozilla.org/en-US/developers/addon/*"
       ],
       "js": ["content/tabclose/find_addonid.js"],
+      "run_at": "document_end"
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/queue/*"
+      ],
+      "js": [
+        "libs/moment.min.js",
+        "content/queueinfo/queue.js"
+      ],
+      "css": ["content/queueinfo/queue.css"],
+      "run_at": "document_end"
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*"
+      ],
+      "js": ["content/queueinfo/review.js"],
       "run_at": "document_end"
     }
   ]
