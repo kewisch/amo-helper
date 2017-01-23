@@ -11,6 +11,7 @@
   },
 
   "permissions": [
+    "alarms",
     "clipboardWrite",
     "contextMenus",
     "tabs",
@@ -31,13 +32,21 @@
     "keyword": "amo"
   },
 
+  "browser_action": {
+    "default_icon": "images/addon.svg",
+    "default_title": "addons.mozilla.org",
+    "default_popup": "content/browseraction/popup.html",
+    "browser_style": false
+  },
+
   "background": {
     "scripts": [
       "background/sdk.js",
       "background/context.js",
       "background/tabclose.js",
       "background/queueinfo.js",
-      "background/omnibox.js"
+      "background/omnibox.js",
+      "background/browseraction.js"
     ]
   },
 
@@ -73,6 +82,22 @@
         "https://addons.mozilla.org/en-US/editors/review/*"
       ],
       "js": ["content/queueinfo/review.js"],
+      "run_at": "document_end"
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/queue/*"
+      ],
+      "js": [
+        "content/browseraction/queue.js"
+      ],
+      "run_at": "document_end"
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/"
+      ],
+      "js": [
+        "content/browseraction/dashboard.js"
+      ],
       "run_at": "document_end"
     }
   ]

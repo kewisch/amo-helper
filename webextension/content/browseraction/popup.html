@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+    :root {
+      --menu-background-color: #EBE9E9;
+      --menu-color: black;
+
+      --menu-background-color-select: #3991FC;
+      --menu-color-select: white;
+    }
+
+    html, body {
+      padding: 0;
+      margin: 0;
+      font: -moz-pull-down-menu;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu > li > a {
+      text-decoration: none;
+      color: var(--menu-color);
+    }
+
+    .menu > li {
+      color: var(--menu-color);
+      background-color: var(--menu-background-color);
+      padding: 0 21px 2px;
+      list-style-type: none;
+    }
+
+    .menu > li:hover, .menu > li:hover > a {
+      color: var(--menu-color-select);
+      background-color: var(--menu-background-color-select);
+    }
+
+    .menu > li.separator {
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      padding: 0;
+    }
+    .menu > li.separator:hover {
+      color: var(--menu-color);
+      background-color: var(--menu-background-color);
+    }
+
+    </style>
+  </head>
+  <body>
+    <ul id="menu" class="menu">
+      <li><a href="https://addons.mozilla.org/en-US/editors/">Editors Dashboard</a></li>
+      <li class="separator"></li>
+      <li><a href="https://addons.mozilla.org/en-US/editors/queue/new">New Queue</a></li>
+      <li><a href="https://addons.mozilla.org/en-US/editors/queue/updates">Updates Queue</a></li>
+      <li><a href="https://addons.mozilla.org/en-US/editors/queue/reviews">Moderated Reviews Queue</a></li>
+      <!-- 
+      <li class="separator"></li>
+      <li><a href="#refreshcount">Refresh Queue Badge</a></li>
+      -->
+    </ul>
+    <script type="application/javascript" src="popup.js"></script>
+  </body>
+</html>
