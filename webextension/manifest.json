@@ -1,6 +1,7 @@
 {
   "manifest_version": 2,
   "name": "AMO Review Helper",
+  "short_name": "AMO Helper",
   "version": "3.0.0",
   "icons": {
     "16": "images/addon.svg",
@@ -17,8 +18,8 @@
     "webRequest",
     "webRequestBlocking",
 
-    "https://addons.mozilla.org/",
-    "https://addons.cdn.mozilla.net/"
+    "https://addons.mozilla.org/*",
+    "https://addons.cdn.mozilla.net/*"
   ],
 
   "options_ui": {
