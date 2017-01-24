@@ -18,6 +18,8 @@ function change_options(event) {
 
   if (node.getAttribute("type") == "checkbox") {
     chrome.storage.local.set({ [node.id]: node.checked });
+  } else if (node.getAttribute("type") == "number") {
+    chrome.storage.local.set({ [node.id]: parseInt(node.value, 10) });
   } else if (node.localName == "input") {
     chrome.storage.local.set({ [node.id]: node.value });
   }
