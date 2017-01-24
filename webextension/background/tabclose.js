@@ -10,8 +10,6 @@ let tabsToClose = {};
 let reviewPages = {};
 
 function removeTabsFor(tabId, addonid, closeTabs) {
-  let showkeys = Object.keys(tabsToClose[addonid] || {});
-  console.log(`Removing tabs for ${tabId} / ${addonid}: ${showkeys}`);
   if (tabsToClose[addonid]) {
     if (closeTabs) {
       chrome.tabs.remove(Object.keys(tabsToClose[addonid]).map(Number));
@@ -25,7 +23,6 @@ function removeTabsFor(tabId, addonid, closeTabs) {
   // The closing tab is a review, find all opening tabs
   chrome.tabs.query({ url: [FILEBROWSER_MATCH, COMPARE_MATCH] }, (compareTabs) => {
     let tabsToClose = compareTabs.filter(tab => tab.openerTabId == tabId);
-    console.log(`Found tabs ${tabsToClose.map(tab => tab.url)} to close`);
     chrome.tabs.remove(tabsToClose.map(tab => tab.id));
   });
   */
@@ -86,8 +83,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
   chrome.storage.local.get({ closeReviewChild: true }, (prefs) => {
     chrome.tabs.get(tabId, (tab) => {
-      console.log(`Checking ${tab.url} for ${REVIEW_RE}`);
-
       let matches = tab.url.match(REVIEW_RE);
       if (matches) {
         removeTabsFor(tabId, matches[2], prefs.closeReviewChild);
