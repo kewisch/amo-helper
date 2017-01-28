@@ -61,6 +61,12 @@
       "run_at": "document_end"
     },{
       "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*"
+      ],
+      "js": ["content/copylink/review.js"],
+      "run_at": "document_end"
+    },{
+      "matches": [
         "https://addons.mozilla.org/en-US/firefox/files/browse/*",
         "https://addons.mozilla.org/en-US/firefox/files/compare/*",
         "https://addons.mozilla.org/en-US/developers/addon/*"
