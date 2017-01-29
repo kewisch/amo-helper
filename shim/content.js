@@ -146,6 +146,11 @@ function fetch(url, options={}) {
   return new Promise((resolve, reject) => {
     var xhr = new XMLHttpRequest();
     xhr.open(options.method || "GET", url, true);
+    if (options._xhr_responseType) {
+      // XHR doesn't support setting this after the fact, so we need to
+      // introduce a non-standard option.
+      xhr.responseType = options._xhr_responseType;
+    }
     xhr.onload = (event) => {
       if (xhr.readyState == 4) {
         resolve({
@@ -159,6 +164,13 @@ function fetch(url, options={}) {
           },
           json: function() {
             return Promise.resolve(JSON.parse(xhr.responseText));
+          },
+          arrayBuffer: function() {
+            if (xhr.responseType == "arraybuffer") {
+              return Promise.resolve(xhr.response);
+            } else {
+              return Promise.reject("Missing _xhr_responseType=arraybuffer option");
+            }
           }
         });
       }

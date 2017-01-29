@@ -53,17 +53,91 @@ function stateToType(state) {
   }[state] || "unknown";
 }
 
+function retrieveVersion(version, method="GET", responseType="arraybuffer") {
+  return fetch(version.installurl, { method, _xhr_responseType: responseType }).then((response) => {
+    if (response.status == 302) {
+      return fetch(response.headers.get("Location"), { method });
+    }
+    return response;
+  });
+}
+
+function unzip(buffer) {
+  return JSZip.loadAsync(buffer).then((zip) => {
+    let filedata = {};
+    let promises = [];
+
+    zip.forEach((relPath, file) => {
+      if (file.dir) { // || !file.name.endsWith(".js")) {
+        return;
+      }
+
+      promises.push(file.async("string").then((content) => {
+        filedata[relPath] = content;
+      }));
+    });
+
+    return Promise.all(promises).then(() => filedata);
+  });
+}
+
+function diffStat(dataA, dataB) {
+  let insertions = 0;
+  let deletions = 0;
+  let files = 0;
+
+  for (let [pathA, contentA] of Object.entries(dataA)) {
+    if (!(pathA in dataB)) {
+      insertions += contentA.split("\n").length;
+      files++;
+      continue;
+    }
+    let changes = JsDiff.diffLines(contentA, dataB[pathA]);
+    delete dataB[pathA];
+
+    let changed = false;
+    for (let change of changes) {
+      if (change.added) {
+        insertions += change.count;
+      } else if (change.removed) {
+        deletions += change.count;
+      }
+      changed = changed || change.added || change.removed;
+    }
+
+    if (changed) {
+      files++;
+    }
+  }
+
+  for (let contentB of Object.values(dataB)) {
+    deletions += contentB.split("\n").length;
+    files++;
+  }
+
+  return { insertions, deletions, files };
+}
+
+
+function determineChanges(versionA, versionB) {
+  function retrieveAndUnzip(version) {
+    return retrieveVersion(version).then(resp => {
+      return resp.arrayBuffer();
+    }).then(unzip);
+  }
+
+  return Promise.all([
+    retrieveAndUnzip(versionA),
+    retrieveAndUnzip(versionB),
+  ]).then(([dataA, dataB]) => diffStat(dataA, dataB));
+}
+
 function determineSize(version) {
   if (!version) {
     return Promise.resolve();
   }
 
-  return fetch(version.installurl, { method: "HEAD" }).then((response) => {
-    if (response.status == 302) {
-      return fetch(response.headers.get("Location"), { method: "HEAD" });
-    }
-    return response;
-  }).then((response) => {
+  return retrieveVersion(version, "HEAD").then((response) => {
     version.size = parseInt(response.headers.get("Content-Length"), 10);
   }, () => {
     version.size = 0;
@@ -133,21 +207,35 @@ function getInfo(doc) {
   };
 }
 
-function getInfoWithSize(doc) {
-  let info = getInfo(doc);
-  // unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
-
-  return Promise.all([
-    determineSize(info.versions[info.latest_idx]),
-    determineSize(info.versions[info.lastapproved_idx])
-  ]).then(() => {
+function updateSize(info) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({ "queueinfo-use-diff": false }, resolve);
+  }).then((prefs) => {
+    if (prefs["queueinfo-use-diff"] && info.lastapproved_idx !== null) {
+      let prev = info.versions[info.lastapproved_idx];
+      let cur = info.versions[info.latest_idx];
+      return determineChanges(prev, cur).then((stats) => {
+        info.diffinfo = stats;
+      });
+    } else {
+      return Promise.all([
+        determineSize(info.versions[info.latest_idx]),
+        determineSize(info.versions[info.lastapproved_idx])
+      ]).then(() => {
+        delete info.diffinfo;
+      });
+    }
+  }).then(() => {
     return info;
   });
 }
 
 // -- main --
-
-getInfoWithSize(document).then((info) => {
-  // unsafeWindow.amoqueue_info = cloneInto(info, unsafeWindow);
-  chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
-});
+(function() {
+  let info = getInfo(document);
+  chrome.storage.local.set({ ["reviewInfo." + info.id]: info }, () => {
+    updateSize(info).then(() => {
+      chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
+    });
+  });
+})();

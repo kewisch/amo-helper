@@ -291,7 +291,9 @@ function updateReviewInfoDisplay(id, info) {
   // Size cell
   let sizecell = row.querySelector(".amoqueue-helper-size-cell");
   if (sizecell) {
-    if (lastversion && lastversion.size && lastapprovedversion && lastapprovedversion.size) {
+    if (info.diffinfo) {
+      sizecell.textContent = `+${info.diffinfo.insertions}/-${info.diffinfo.deletions}`;
+    } else if (lastversion && lastversion.size && lastapprovedversion && lastapprovedversion.size) {
       let size = lastversion.size - lastapprovedversion.size;
       sizecell.textContent = displaySize(size, true);
     } else if (lastversion && lastversion.size) {

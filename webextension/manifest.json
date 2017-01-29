@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "3.1.3",
+  "version": "3.2.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -87,7 +87,11 @@
       "matches": [
         "https://addons.mozilla.org/en-US/editors/review/*"
       ],
-      "js": ["content/queueinfo/review.js"],
+      "js": [
+        "libs/diff.min.js",
+        "libs/jszip.min.js",
+        "content/queueinfo/review.js"
+      ],
       "run_at": "document_end"
     },{
       "matches": [
