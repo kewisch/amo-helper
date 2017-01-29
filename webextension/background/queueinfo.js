@@ -3,8 +3,8 @@ let per_page_value = 100;
 chrome.webRequest.onBeforeRequest.addListener((details) => {
   let url = new URL(details.url);
   if (!url.search.includes("per_page") && per_page_value != 100) {
-    url.search = "?per_page=" + perPage;
-    return { redirectUrl: url };
+    url.search = "?per_page=" + per_page_value;
+    return { redirectUrl: url.href };
   }
 
   return {};
@@ -17,14 +17,14 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 
   for (let [key, { newValue }] of Object.entries(changes)) {
-    if (key == "queuePerPage") {
+    if (key == "queueinfo-per-page") {
       per_page_value = newValue;
     }
   }
 });
 
-chrome.storage.local.get({ queuePerPage: 100 }, (values) => {
-  per_page_value = values.queuePerPage;
+chrome.storage.local.get({ "queueinfo-per-page": 100 }, (prefs) => {
+  per_page_value = prefs["queueinfo-per-page"];
 });
 
 // TODO cleanup reviewInfo
