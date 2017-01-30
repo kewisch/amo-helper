@@ -232,6 +232,11 @@ function updateSize(info) {
 
 // -- main --
 (function() {
+  // Make file info links open in a new tab
+  document.querySelectorAll(".file-info a").forEach((link) => {
+    link.setAttribute("target", "_blank");
+  });
+
   // Open compare link if options enabled
   chrome.storage.local.get({ "queueinfo-open-compare": false }, (prefs) => {
     if (prefs["queueinfo-open-compare"]) {
