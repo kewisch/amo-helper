@@ -29,9 +29,40 @@ function condenseLines(value) {
   return value;
 }
 
+function changeComments(action) {
+  let actionCanned = {
+    "public": "Thank you for your contribution.\n\n",
+    "reject": "This version didn't pass review because of the following problems:\n\n1) ",
+    "info": "The following information is needed to complete your review:\n\n1) "
+  };
+
+  let commentValue = comments.value || "";
+  let replaceValue = actionCanned[action] || "";
+  let replaced = false;
+
+  for (let existing of Object.values(actionCanned)) {
+    commentValue = commentValue.replace(existing, () => {
+      replaced = true;
+      return replaceValue;
+    });
+  }
+
+  if (!replaced) {
+    commentValue = replaceValue + commentValue;
+  }
+
+  comments.value = commentValue;
+}
+
 let comments = document.getElementById("id_comments");
 comments.addEventListener("paste", (event) => {
   setTimeout(() => {
     comments.value = condenseLines(comments.value);
   }, 0);
+});
+
+let actions = document.getElementById("id_action");
+actions.addEventListener("click", (event) => {
+  changeComments(event.target.value);
+  comments.focus();
 });
