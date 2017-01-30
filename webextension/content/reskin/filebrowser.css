@@ -1,0 +1,5 @@
+/* changed file colors that also work with f.lux, for late night reviewing */
+a.diff > span {
+  background-color: transparent;
+  color: red;
+}

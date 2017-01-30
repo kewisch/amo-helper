@@ -1,0 +1,27 @@
+/* full width reviews */
+.section {
+  margin: 0 1em;
+  max-width: none;
+  width: auto;
+}
+
+/* less padding in the files column */
+#review-files .files {
+  padding: 15px 0 15px 10px;
+}
+
+/* less wide description columns */
+#review-files table.activity th {
+  width: 12.5%;
+}
+
+/* wider notes */
+.history-notes {
+  max-width: none;
+}
+
+/* fixes horizontal overflow */
+h4.author {
+  left: auto;
+  margin-left: 51px;
+}

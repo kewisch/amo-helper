@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -109,6 +109,15 @@
         "content/browseraction/dashboard.js"
       ],
       "run_at": "document_end"
+    },{
+      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "css": [ "content/reskin/review.css" ]
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/firefox/files/compare/*",
+        "https://addons.mozilla.org/en-US/developers/addon/*"
+      ],
+      "css": [ "content/reskin/filebrowser.css" ]
     }
   ]
 }

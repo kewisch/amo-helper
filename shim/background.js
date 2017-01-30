@@ -83,18 +83,26 @@ require("sdk/webextension").startup().then((api) => {
     let matchesAboutBlank = contentScript.match_about_blank ? ["about:blank"] : [];
     let scriptFiles = convertWebExtensionUrls(contentScript.js);
 
-    pageMod.PageMod({
-      include: contentScript.matches.concat(matchesAboutBlank),
-      contentStyleFile: convertWebExtensionUrls(contentScript.css),
-      contentScriptFile: [`resource://${self.id}/shim/content.js`].concat(scriptFiles),
-      contentScriptWhen: runAtMap[contentScript.run_at] || "end",
-      contentScriptOptions: {
-        uuid: webExtension.extension.uuid,
-        manifest: manifest
-      },
-      attachTo: contentScript.all_frames ? ["top", "frame"] : ["top"],
-      // not supporting include/exclude_globs
-      onAttach: pageModAttach
-    });
+    let options = { include: contentScript.matches.concat(matchesAboutBlank) };
+
+    if (contentScript.css) {
+      options.contentStyleFile = convertWebExtensionUrls(contentScript.css);
+    }
+
+    if (contentScript.js) {
+      Object.assign(options, {
+        contentScriptFile: [`resource://${self.id}/shim/content.js`].concat(scriptFiles),
+        contentScriptWhen: runAtMap[contentScript.run_at] || "end",
+        contentScriptOptions: {
+          uuid: webExtension.extension.uuid,
+          manifest: manifest
+        },
+        attachTo: contentScript.all_frames ? ["top", "frame"] : ["top"],
+        // not supporting include/exclude_globs
+        onAttach: pageModAttach
+      });
+    }
+
+    pageMod.PageMod(options);
   }
 });
