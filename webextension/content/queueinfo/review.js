@@ -232,6 +232,14 @@ function updateSize(info) {
 
 // -- main --
 (function() {
+  // Open compare link if options enabled
+  chrome.storage.local.get({ "queueinfo-open-compare": false }, (prefs) => {
+    if (prefs["queueinfo-open-compare"]) {
+      document.querySelector(".listing-body:last-child .file-info a.compare").click();
+    }
+  });
+
+  // Collect review info and set in storage
   let info = getInfo(document);
   chrome.storage.local.set({ ["reviewInfo." + info.id]: info }, () => {
     updateSize(info).then(() => {

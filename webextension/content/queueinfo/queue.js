@@ -107,6 +107,8 @@ function initPageLayout() {
     }
     return null;
   }).then(() => {
+    return addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare", false);
+  }).then(() => {
     // Autocomplete "no results" row
     let queueBody = document.querySelector("#addon-queue > tbody");
 
@@ -185,7 +187,7 @@ function hideBecause(row, reason, state) {
   }
 }
 
-function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUpdater) {
+function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUpdater=() => {}) {
   return new Promise((resolve, reject) => {
     let searchbox = document.querySelector("div.queue-search");
     let fieldset = document.createElement("fieldset");
@@ -214,6 +216,30 @@ function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUp
       fieldset.addEventListener("change", (event) => {
         chrome.storage.local.set({ [prefName]: event.target.value });
         stateUpdater(event.target.value);
+      }, false);
+
+      stateUpdater(initial);
+      resolve();
+    });
+  });
+}
+
+function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() => {}) {
+  return new Promise((resolve, reject) => {
+    let searchbox = document.querySelector("div.queue-search");
+    chrome.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
+      let initial = prefs[prefName];
+      let label = document.createElement("label");
+      let checkbox = document.createElement("input");
+      checkbox.setAttribute("type", "checkbox");
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(labelText));
+      checkbox.checked = initial;
+      searchbox.appendChild(label);
+
+      checkbox.addEventListener("change", (event) => {
+        chrome.storage.local.set({ [prefName]: event.target.checked });
+        stateUpdater(event.target.checked);
       }, false);
 
       stateUpdater(initial);
