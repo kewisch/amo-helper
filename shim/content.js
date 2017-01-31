@@ -27,9 +27,24 @@ var chrome = (function() {
   }
 
   let changedListeners = new Set();
+  let messageListeners = new Set();
 
   self.port.on("__sdk_storage_changed", (changes, area) => {
     changedListeners.forEach(listener => listener(changes, area));
+  });
+
+  self.port.on("__sdk_chrometabs_event", (data) => {
+    function sendReply(result) {
+      if (sendReply.sent) {
+        return;
+      }
+      sendReply.sent = true;
+      self.port.emit("__sdk_chrometabs_response", {
+        result: result,
+        responseId: data.responseId
+      });
+    }
+    messageListeners.forEach(listener => listener(data.message, data.sender, sendReply));
   });
 
   return {
@@ -72,8 +87,11 @@ var chrome = (function() {
       },
 
       onMessage: {
-        addListener: function(callback) {
-          throw new Error("Not implemented");
+        addListener: function(listener) {
+          messageListeners.add(listener);
+        },
+        removeListener: function(listener) {
+          messageListeners.delete(listener);
         }
       },
 

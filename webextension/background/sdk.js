@@ -2,6 +2,7 @@
 
 var sdk = (function() {
   let contentPipeline = browser.runtime.connect({ name: "__sdk_contentscript" });
+  let chrometabsPipeline = browser.runtime.connect({ name: "__sdk_chrometabs" });
   let storagePipeline = browser.runtime.connect({ name: "__sdk_storage" });
 
   let sdkMessageListeners = new Set();
@@ -64,6 +65,31 @@ var sdk = (function() {
         addListener: function(listener) {
           sdkMessageListeners.add(listener);
         }
+      }
+    },
+    tabs: {
+      sendMessage: function(tabId, message, responseCallback) {
+        if (arguments.length == 4) {
+          // optional 3rd argument options not implemented
+          throw new Error("Not implemented");
+        }
+        let responseId = Math.random().toString(36).substr(2, 10);
+
+        if (responseCallback) {
+          let reply = (data) => {
+            if (data.responseId == responseId) {
+              chrometabsPipeline.onMessage.removeListener(reply);
+              responseCallback(data.result);
+            }
+          };
+          chrometabsPipeline.onMessage.addListener(reply);
+        }
+
+        chrometabsPipeline.postMessage({
+          responseId: responseId,
+          tabId: tabId,
+          message: message
+        });
       }
     }
   };

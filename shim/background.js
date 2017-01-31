@@ -9,6 +9,7 @@ var { Management: { global: { TabManager } } } = require("resource://gre/modules
 
 var contentPipeline = defer();
 var storagePipeline = defer();
+var chrometabsPipeline = defer();
 
 const runAtMap = {
   document_start: "start",
@@ -64,6 +65,29 @@ function pageModAttach(worker) {
       pipeline.postMessage(data);
     });
   });
+
+  chrometabsPipeline.promise.then((pipeline) => {
+    let pipelineListener = (data) => {
+      let workerTabId = TabManager.getId(viewFor(worker.tab));
+
+      if (data.tabId == workerTabId) {
+        data.sender = {
+          url: worker.tab.url,
+          tabId: workerTabId
+        };
+        worker.port.emit("__sdk_chrometabs_event", data);
+      }
+    };
+
+    pipeline.onMessage.addListener(pipelineListener);
+    worker.on("detach", () => {
+      pipeline.onMessage.removeListener(pipelineListener);
+    });
+
+    worker.port.on("__sdk_chrometabs_response", (data) => {
+      pipeline.postMessage(data);
+    });
+  });
 }
 
 require("sdk/webextension").startup().then((api) => {
@@ -74,6 +98,8 @@ require("sdk/webextension").startup().then((api) => {
       storagePipeline.resolve(port);
     } else if (port.name == "__sdk_contentscript") {
       contentPipeline.resolve(port);
+    } else if (port.name == "__sdk_chrometabs") {
+      chrometabsPipeline.resolve(port);
     }
   });
 
