@@ -35,3 +35,7 @@ label {
   padding: 0;
   width: 21px;
 }
+
+#canned-select .canned-option-new {
+  opacity: 0.54;
+}
