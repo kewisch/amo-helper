@@ -12,33 +12,60 @@
       line-height: 22px;
       color: #333;
     }
+
+    #canned {
+      display: grid;
+      grid: 30% 70% / 50% 50%;
+      grid-gap: 10px;
+      grid-template-areas: "label  value"
+                           "select value";
+    }
+
+    #canned-label {
+      grid-area: label;
+    }
+    #canned-value {
+      grid-area: value;
+    }
+    #canned-select {
+      grid-area: select;
+    }
+
   </style>
 </head>
 <body>
-  <label>
-    <input type="checkbox" id="tabclose-other-queue">
-    Close other tabs showing the same queue on load
-  </label>
+  <section id="tabclose-section">
+    <h1>Closing Tabs</h1>
+    <label>
+      <input type="checkbox" id="tabclose-other-queue">
+      Close other tabs showing the same queue on load
+    </label>
 
-  <label>
-    <input type="checkbox" id="tabclose-review-child">
-    Close file viewers and validation results when exiting reviews
-  </label>
+    <label>
+      <input type="checkbox" id="tabclose-review-child">
+      Close file viewers and validation results when exiting reviews
+    </label>
+  </section>
 
-  <label>
-    <input type="number" id="browseraction-queue-refresh-period">
-    Number of minutes between refreshing the toolbar icon badge
-  </label>
+  <section id="browseraction-section">
+    <h1>Browser Action</h1>
+    <label>
+      <input type="number" id="browseraction-queue-refresh-period">
+      Number of minutes between refreshing the toolbar icon badge
+    </label>
+  </section>
 
-  <label>
-    <input type="checkbox" id="queueinfo-use-diff">
-    Calculate diffs in the updates queue (slow, and high network load)
-  </label>
+  <section id="queueinfo-section">
+    <h1>Queue Improvements</h1>
+    <label>
+      <input type="checkbox" id="queueinfo-use-diff">
+      Calculate diffs in the updates queue (slow, and high network load)
+    </label>
 
-  <label>
-    <input type="number" id="queueinfo-per-page">
-    Number of queue items to show on one page
-  </label>
+    <label>
+      <input type="number" id="queueinfo-per-page">
+      Number of queue items to show on one page
+    </label>
 
   <!--
   <label>
@@ -46,6 +73,23 @@
     Number of items to show in the queue per page
   </label>
   -->
+  </section>
+
+  <section id="canned-section">
+    <h1>Canned Responses</h1>
+    <section id="canned">
+      <input id="canned-label"/>
+      <select size="5" id="canned-select">
+        <option class="canned-option-new">New Response&hellip;</option>
+      </select>
+      <textarea id="canned-value"></textarea>
+    </section>
+  </section>
+
+  <label>
+    <input type="checkbox" id="canned-use-stock">
+    Include stock canned responses
+  </label>
 
   <script src="options.js"></script>
 </body>

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "3.7.2",
+  "version": "3.8.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -42,6 +42,7 @@
   "background": {
     "scripts": [
       "background/sdk.js",
+      "background/canned.js",
       "background/context.js",
       "background/tabclose.js",
       "background/queueinfo.js",
@@ -122,6 +123,15 @@
         "https://addons.mozilla.org/en-US/developers/addon/*"
       ],
       "css": [ "content/reskin/filebrowser.css" ]
+    },{
+      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "js": [
+        "libs/jquery-3.1.1.min.js",
+        "libs/jquery-ui.min.js",
+        "content/canned/review.js"
+      ],
+      "css": ["libs/jquery-ui.min.css", "content/canned/review.css"],
+      "run_at": "document_end"
     }
   ]
 }
