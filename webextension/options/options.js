@@ -66,14 +66,13 @@ function setup_canned_listeners() {
     select.appendChild(clone);
   }
 
-
-  let select = document.getElementById("canned-select");
-  let label = document.getElementById("canned-label");
-  let value = document.getElementById("canned-value");
-
-  select.addEventListener("change", (event) => {
+  function updateState() {
     let selectedItem = select.options[select.selectedIndex];
-    if (selectedItem.className == "canned-option-new") {
+    let isNewItem = selectedItem.className == "canned-option-new";
+
+    button.disabled = isNewItem;
+
+    if (isNewItem) {
       value.value = "";
       label.value = "";
       label.setAttribute("placeholder", selectedItem.textContent);
@@ -82,7 +81,14 @@ function setup_canned_listeners() {
       label.value = selectedItem.textContent;
       label.removeAttribute("placeholder");
     }
-  });
+  }
+
+  let select = document.getElementById("canned-select");
+  let label = document.getElementById("canned-label");
+  let value = document.getElementById("canned-value");
+  let button = document.getElementById("canned-delete");
+
+  select.addEventListener("change", updateState);
 
   label.addEventListener("keyup", (event) => {
     let selectedItem = select.options[select.selectedIndex];
@@ -93,6 +99,7 @@ function setup_canned_listeners() {
     selectedItem.textContent = label.value;
     save_canned_responses();
   });
+
   value.addEventListener("keyup", (event) => {
     let selectedItem = select.options[select.selectedIndex];
     if (selectedItem.className == "canned-option-new") {
@@ -100,6 +107,15 @@ function setup_canned_listeners() {
     }
 
     selectedItem.value = value.value;
+    save_canned_responses();
+  });
+
+  button.addEventListener("click", (event) => {
+    let selectedItem = select.options[select.selectedIndex];
+    let next = selectedItem.nextElementSibling || selectedItem.previousElementSibling;
+    selectedItem.remove();
+    select.value = next.value;
+    updateState();
     save_canned_responses();
   });
 
@@ -111,6 +127,9 @@ function setup_canned_listeners() {
       option.value = optionData.value;
       select.insertBefore(option, newOption);
     }
+
+    select.selectedIndex = 0;
+    updateState();
   });
 }
 

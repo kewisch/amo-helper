@@ -2,36 +2,7 @@
 <html>
 <head>
   <title>AMO Helper Options</title>
-  <style>
-    body {
-      font: message-box;
-    }
-    label {
-      display: block;
-      font-size: 1.25em;
-      line-height: 22px;
-      color: #333;
-    }
-
-    #canned {
-      display: grid;
-      grid: 30% 70% / 50% 50%;
-      grid-gap: 10px;
-      grid-template-areas: "label  value"
-                           "select value";
-    }
-
-    #canned-label {
-      grid-area: label;
-    }
-    #canned-value {
-      grid-area: value;
-    }
-    #canned-select {
-      grid-area: select;
-    }
-
-  </style>
+  <link rel="stylesheet" type="text/css" href="options.css"/>
 </head>
 <body>
   <section id="tabclose-section">
@@ -79,6 +50,7 @@
     <h1>Canned Responses</h1>
     <section id="canned">
       <input id="canned-label"/>
+      <button id="canned-delete" disabled="true">&times;</button>
       <select size="5" id="canned-select">
         <option class="canned-option-new">New Response&hellip;</option>
       </select>

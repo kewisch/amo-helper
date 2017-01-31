@@ -1,0 +1,37 @@
+body {
+  font: message-box;
+}
+
+label {
+  display: block;
+  font-size: 1.25em;
+  line-height: 22px;
+  color: #333;
+}
+
+#canned {
+  display: grid;
+  grid: 21px auto / 40% 21px auto;
+  grid-gap: 10px;
+  grid-template-areas: "label  delete  value"
+                       "select select  value";
+}
+
+#canned-label {
+  grid-area: label;
+}
+
+#canned-value {
+  grid-area: value;
+  font: message-box;
+}
+
+#canned-select {
+  grid-area: select;
+}
+
+#canned-delete {
+  grid-area: delete;
+  padding: 0;
+  width: 21px;
+}
