@@ -28,22 +28,36 @@ function removeTabsFor(tabId, addonid, closeTabs) {
   */
 }
 
+function copyScrollPosition(from, to) {
+  return new Promise((resolve) => {
+    sdk.tabs.sendMessage(from.id, { action: "getScrollPosition" }, (data) => {
+      data.action = "setScrollPosition";
+      sdk.tabs.sendMessage(to.id, data, resolve);
+    });
+  });
+}
+
 function removeOtherTabs(tabUrl, keepTab) {
   let findTabUrl = tabUrl.split(/\?|#/)[0] + "*";
   chrome.tabs.query({ url: findTabUrl }, (compareTabs) => {
-    let closingActiveTab = false;
+    let closingActiveTab = null;
     let closeTabs = compareTabs.filter(tab => {
       let shouldClose = tab.id != keepTab.id;
       if (shouldClose && tab.active) {
-        closingActiveTab = true;
+        closingActiveTab = tab;
       }
       return shouldClose;
     });
 
+    let promise = Promise.resolve();
     if (closingActiveTab) {
-      chrome.tabs.update(keepTab.id, { active: true });
+      promise = copyScrollPosition(closingActiveTab, keepTab).then(() => {
+        chrome.tabs.update(keepTab.id, { active: true });
+      });
     }
-    chrome.tabs.remove(closeTabs.map(tab => tab.id));
+    promise.then(() => {
+      chrome.tabs.remove(closeTabs.map(tab => tab.id));
+    });
   });
 }
 

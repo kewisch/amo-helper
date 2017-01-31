@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -73,6 +73,10 @@
       ],
       "js": ["content/tabclose/find_addonid.js"],
       "run_at": "document_end"
+    },{
+      "matches": [ "https://addons.mozilla.org/en-US/editors/queue/*" ],
+      "js": ["content/tabclose/queue.js"],
+      "run_at": "document_start"
     },{
       "matches": [
         "https://addons.mozilla.org/en-US/editors/queue/*"
