@@ -37,31 +37,35 @@ function updateQueueNumbers() {
   });
 }
 
-function updateBadgeTotal(numbers) {
-  let total = Object.values(numbers).reduce((prev, queue) => prev + queue.total, 0);
-  chrome.browserAction.setBadgeText({ text: total.toString() });
-}
+function updateBadge(numbers, totalOnly=false) {
+  chrome.storage.local.get({ "browseraction-count-moderator": false }, (prefs) => {
+    if (!prefs["browseraction-count-moderator"]) {
+      delete numbers.reviews;
+    }
 
-function updateBadge(numbers) {
-  let totalnumbers = Object.values(numbers).reduce((result, queue) => {
-    result.low += queue.low;
-    result.med += queue.med;
-    result.high += queue.high;
-    result.total += queue.total;
-    return result;
-  }, { low: 0, med: 0, high: 0, total: 0 });
+    let totalnumbers = Object.values(numbers).reduce((result, queue) => {
+      result.low += queue.low;
+      result.med += queue.med;
+      result.high += queue.high;
+      result.total += queue.total;
+      return result;
+    }, { low: 0, med: 0, high: 0, total: 0 });
 
-  chrome.browserAction.setBadgeText({ text: totalnumbers.total.toString() });
-  if (totalnumbers.high > 0) {
-    chrome.browserAction.setBadgeBackgroundColor({ color: "red" }); // #ffd3d3
-  } else if (totalnumbers.med > 0) {
-    chrome.browserAction.setBadgeBackgroundColor({ color: "yellow" }); // #ffffb4
-  } else if (totalnumbers.low > 0) {
-    chrome.browserAction.setBadgeBackgroundColor({ color: "green" }); // #b8e6b8
-  } else {
-    // like this will ever happen. Not sure what the color was.
-    chrome.browserAction.setBadgeBackgroundColor({ color: "gray" });
-  }
+    chrome.browserAction.setBadgeText({ text: totalnumbers.total.toString() });
+
+    if (!totalOnly) {
+      if (totalnumbers.high > 0) {
+        chrome.browserAction.setBadgeBackgroundColor({ color: "red" }); // #ffd3d3
+      } else if (totalnumbers.med > 0) {
+        chrome.browserAction.setBadgeBackgroundColor({ color: "yellow" }); // #ffffb4
+      } else if (totalnumbers.low > 0) {
+        chrome.browserAction.setBadgeBackgroundColor({ color: "green" }); // #b8e6b8
+      } else {
+        // like this will ever happen. Not sure what the color was.
+        chrome.browserAction.setBadgeBackgroundColor({ color: "gray" });
+      }
+    }
+  });
 }
 
 function setupQueueRefresh() {
@@ -104,11 +108,7 @@ chrome.runtime.onMessage.addListener((data, sender, sendReply) => {
 
 sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "update-badge-numbers") {
-    if (data.totalonly) {
-      updateBadgeTotal(data.numbers);
-    } else {
-      updateBadge(data.numbers);
-    }
+    updateBadge(data.numbers, data.totalonly);
   }
 });
 

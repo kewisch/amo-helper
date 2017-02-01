@@ -21,12 +21,14 @@ function restore_options() {
     "queueinfo-use-diff": false,
     "queueinfo-per-page": 100,
     "browseraction-queue-refresh-period": 60,
+    "browseraction-count-moderator": false,
     "canned-use-stock": true
   }, (prefs) => {
     document.getElementById("tabclose-other-queue").checked = prefs["tabclose-other-queue"];
     document.getElementById("tabclose-review-child").checked = prefs["tabclose-review-child"];
     document.getElementById("queueinfo-use-diff").checked = prefs["queueinfo-use-diff"];
     document.getElementById("queueinfo-per-page").value = prefs["queueinfo-per-page"];
+    document.getElementById("browseraction-count-moderator").value = prefs["browseraction-count-moderator"];
     document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];
     document.getElementById("canned-use-stock").checked = prefs["canned-use-stock"];
   });
