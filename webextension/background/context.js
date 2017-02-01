@@ -17,7 +17,7 @@ const LISTING_URL = "https://addons.mozilla.org/addon/$ADDON";
 const MANAGE_URL = "https://addons.mozilla.org/developers/addon/$ADDON/edit";
 const FEED_URL = "https://addons.mozilla.org/en-US/developers/feed/$ADDON";
 
-function toAddonUrl(target, newTab, info) {
+function toAddonUrl(target, info) {
   let matches = info.linkUrl.match(RE_ADDON_LINKS);
   if (!matches) {
     return;
@@ -27,7 +27,7 @@ function toAddonUrl(target, newTab, info) {
     let activeTab = tabs[0];
     let targetUrl = target.replace("$ADDON", matches[3]);
 
-    if (newTab) {
+    if (info.modifiers && info.modifiers.includes("Ctrl")) {
       // TODO add openerTabId: activeTab.id when supported
       chrome.tabs.create({ url: targetUrl, index: activeTab.index + 1 });
     } else {
@@ -43,7 +43,7 @@ function createLinksContextMenu(contextInfo) {
       title: entry.title,
       contexts: ["link"],
       targetUrlPatterns: MATCH_ADDON_LINKS,
-      onclick: toAddonUrl.bind(undefined, entry.url, entry.newTab)
+      onclick: toAddonUrl.bind(undefined, entry.url)
     });
   });
 }
@@ -53,43 +53,15 @@ createLinksContextMenu([{
   title: "Open Add-on Listing",
   url: LISTING_URL,
 }, {
-  title: "Open Add-on Listing in New Tab",
-  url: LISTING_URL,
-  newTab: true
-}, {
-  type: "separator" /* ---------------- */
-}, {
   title: "Edit Add-on",
   url: MANAGE_URL,
-}, {
-  title: "Edit Add-on in New Tab",
-  url: MANAGE_URL,
-  newTab: true
-}, {
-  type: "separator" /* ---------------- */
 }, {
   title: "Review Add-on",
   url: REVIEW_URL,
 }, {
-  title: "Review Add-on in New Tab",
-  url: REVIEW_URL,
-  newTab: true
-}, {
-  type: "separator" /* ---------------- */
-}, {
   title: "Admin Add-on",
   url: ADMIN_URL,
 }, {
-  title: "Admin Add-on in New Tab",
-  url: ADMIN_URL,
-  newTab: true
-}, {
-  type: "separator" /* ---------------- */
-}, {
   title: "Open Add-on Activity",
   url: FEED_URL,
-}, {
-  title: "Open Add-on Activity in New Tab",
-  url: FEED_URL,
-  newTab: true
 }]);
