@@ -21,3 +21,7 @@ function onclickln(event) {
 
 var last_copy_data = "";
 $("#file-viewer-inner").on("click", ".td-line-number a", onclickln);
+
+window.addEventListener("load", () => {
+  document.querySelectorAll("#files-tree .directory.closed.diff").forEach(node => node.click());
+});
