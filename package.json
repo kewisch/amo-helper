@@ -1,13 +1,13 @@
 {
   "title": "AMO Review Helper",
   "name": "amoqueue",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Enhancements to the AMO review experience",
   "main": "shim/background.js",
   "author": "Philipp Kewisch",
   "hasEmbeddedWebExtension": true,
   "engines": {
-    "firefox": ">=38.0a1"
+    "firefox": ">=51.0"
   },
   "license": "MPL-2.0",
   "keywords": [

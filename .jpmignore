@@ -2,6 +2,7 @@ README.md
 profile
 *.sw*
 *.xpi
+*.diff
 .jpmignore
 .gitignore
 .git
