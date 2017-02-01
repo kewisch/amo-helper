@@ -69,8 +69,8 @@ function setupListeners() {
     let url = data.url.replace("%s", slug);
 
     if (disposition == "currentTab") {
-      chrome.tabs.query({ active: true }, (tab) => {
-        chrome.tabs.update(tab.id, { url: url });
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.update(tabs[0].id, { url: url });
       });
     } else {
       chrome.tabs.create({ url: url, active: disposition == "newForegroundTab" });
