@@ -20,6 +20,7 @@ function restore_options() {
     "tabclose-review-child": true,
     "queueinfo-use-diff": false,
     "queueinfo-per-page": 100,
+    "omnibox-enabled": true,
     "browseraction-queue-refresh-period": 60,
     "browseraction-count-moderator": false,
     "canned-use-stock": true
@@ -28,6 +29,7 @@ function restore_options() {
     document.getElementById("tabclose-review-child").checked = prefs["tabclose-review-child"];
     document.getElementById("queueinfo-use-diff").checked = prefs["queueinfo-use-diff"];
     document.getElementById("queueinfo-per-page").value = prefs["queueinfo-per-page"];
+    document.getElementById("omnibox-enabled").checked = prefs["omnibox-enabled"];
     document.getElementById("browseraction-count-moderator").value = prefs["browseraction-count-moderator"];
     document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];
     document.getElementById("canned-use-stock").checked = prefs["canned-use-stock"];

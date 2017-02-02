@@ -40,45 +40,68 @@ function resetDefaultSuggestion() {
   chrome.omnibox.setDefaultSuggestion({ description: "Visit addons.mozilla.org" });
 }
 
+function inputChangedListener(text, suggest) {
+  chrome.omnibox.setDefaultSuggestion({ description: allSuggestions[""].description.replace("%s", text) });
+
+  suggest(Object.values(allSuggestions).map(({ content, description }) => {
+    return {
+      content: content.replace("%s", text),
+      description: description.replace("%s", text)
+    };
+  }));
+}
+
+function inputEnteredListener(text, disposition) {
+  resetDefaultSuggestion();
+
+  let [action, slug, ...rest] = text.split(/\W+/);
+  if (!slug) {
+    slug = action;
+    action = "";
+  }
+
+  let data = allSuggestions[action];
+  if (!data) {
+    return;
+  }
+
+  let url = data.url.replace("%s", slug);
+
+  if (disposition == "currentTab") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.update(tabs[0].id, { url: url });
+    });
+  } else {
+    chrome.tabs.create({ url: url, active: disposition == "newForegroundTab" });
+  }
+}
+
 function setupListeners() {
-  chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-    chrome.omnibox.setDefaultSuggestion({ description: allSuggestions[""].description.replace("%s", text) });
+  chrome.storage.local.get({ "omnibox-enabled": true }, (prefs) => {
+    chrome.omnibox.onInputChanged.removeListener(inputChangedListener);
+    chrome.omnibox.onInputEntered.removeListener(inputEnteredListener);
+    chrome.omnibox.onInputCancelled.removeListener(resetDefaultSuggestion);
 
-    suggest(Object.values(allSuggestions).map(({ content, description }) => {
-      return {
-        content: content.replace("%s", text),
-        description: description.replace("%s", text)
-      };
-    }));
-  });
-
-  chrome.omnibox.onInputEntered.addListener((text, disposition) => {
-    resetDefaultSuggestion();
-
-    let [action, slug, ...rest] = text.split(/\W+/);
-    if (!slug) {
-      slug = action;
-      action = "";
+    if (prefs["omnibox-enabled"]) {
+      chrome.omnibox.onInputChanged.addListener(inputChangedListener);
+      chrome.omnibox.onInputEntered.addListener(inputEnteredListener);
+      chrome.omnibox.onInputCancelled.addListener(resetDefaultSuggestion);
     }
+  });
+}
 
-    let data = allSuggestions[action];
-    if (!data) {
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area != "local") {
+    return;
+  }
+
+  for (let key of Object.keys(changes)) {
+    if (key == "omnibox-enabled") {
+      setupListeners();
       return;
     }
-
-    let url = data.url.replace("%s", slug);
-
-    if (disposition == "currentTab") {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.update(tabs[0].id, { url: url });
-      });
-    } else {
-      chrome.tabs.create({ url: url, active: disposition == "newForegroundTab" });
-    }
-  });
-
-  chrome.omnibox.onInputCancelled.addListener(resetDefaultSuggestion);
-}
+  }
+});
 
 // -- main --
 
