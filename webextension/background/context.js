@@ -27,7 +27,7 @@ function toAddonUrl(target, info) {
     let activeTab = tabs[0];
     let targetUrl = target.replace("$ADDON", matches[3]);
 
-    if (info.modifiers && info.modifiers.includes("Ctrl")) {
+    if (info.modifiers && (info.modifiers.includes("Command") || info.modifiers.includes("Ctrl"))) {
       // TODO add openerTabId: activeTab.id when supported
       chrome.tabs.create({ url: targetUrl, index: activeTab.index + 1 });
     } else {
