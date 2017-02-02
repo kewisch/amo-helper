@@ -35,12 +35,18 @@ function pageModAttach(worker) {
 
     pipeline.onMessage.addListener(pipelineListener);
     worker.on("detach", () => {
-      pipeline.onMessage.removeListener(pipelineListener);
+      if (pipeline) {
+        pipeline.onMessage.removeListener(pipelineListener);
+      }
     });
 
     worker.port.on("__sdk_storage_request", (data) => {
       data.workerId = workerId;
       pipeline.postMessage(data);
+    });
+
+    pipeline.onDisconnect.addListener(() => {
+      pipeline = null;
     });
   });
 
@@ -53,7 +59,9 @@ function pageModAttach(worker) {
 
     pipeline.onMessage.addListener(pipelineListener);
     worker.on("detach", () => {
-      pipeline.onMessage.removeListener(pipelineListener);
+      if (pipeline) {
+        pipeline.onMessage.removeListener(pipelineListener);
+      }
     });
 
     worker.port.on("__sdk_contentscript_request", (data) => {
@@ -63,6 +71,10 @@ function pageModAttach(worker) {
         tabId: TabManager.getId(viewFor(worker.tab))
       };
       pipeline.postMessage(data);
+    });
+
+    pipeline.onDisconnect.addListener(() => {
+      pipeline = null;
     });
   });
 
@@ -81,11 +93,17 @@ function pageModAttach(worker) {
 
     pipeline.onMessage.addListener(pipelineListener);
     worker.on("detach", () => {
-      pipeline.onMessage.removeListener(pipelineListener);
+      if (pipeline) {
+        pipeline.onMessage.removeListener(pipelineListener);
+      }
     });
 
     worker.port.on("__sdk_chrometabs_response", (data) => {
       pipeline.postMessage(data);
+    });
+
+    pipeline.onDisconnect.addListener(() => {
+      pipeline = null;
     });
   });
 }
