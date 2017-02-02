@@ -19,7 +19,11 @@ function setupLayout(cannedData) {
     delay: 0,
     source: cannedData,
     select: (event, { item }) => {
-      comments.value += item.value;
+      let commentValue = comments.value.substr(0, comments.selectionStart) +
+                         item.value +
+                         comments.value.substr(comments.selectionEnd);
+
+      comments.value = commentValue;
       input.value = "";
       comments.focus();
       event.preventDefault();
