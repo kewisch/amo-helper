@@ -71,8 +71,14 @@ chrome.storage.local.get({
   if (prefs["canned-use-stock"]) {
     let skip = new Set(["Choose a canned response...", "Approved for Public", "Rejected"]);
     let options = document.getElementById("id_canned_response").options;
-    cannedData = [...options].map(elem => ({ label: elem.textContent, value: elem.value }))
-                             .filter(option => !skip.has(option.label));
+
+    cannedData = [...options].reduce((results, elem) => {
+      if (!skip.has(elem.textContent)) {
+        results.push({ label: elem.textContent, value: elem.value });
+      }
+      skip.add(elem.textContent);
+      return results;
+    }, []);
   }
 
   cannedData = cannedData.concat(prefs["canned-responses"]);
