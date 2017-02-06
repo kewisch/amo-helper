@@ -91,6 +91,16 @@ var sdk = (function() {
           message: message
         });
       }
+    },
+
+    // This is a hack until bug 1272869 is fixed
+    _clipboard: {
+      set: function(data) {
+        storagePipeline.postMessage({
+          action: "_clipboard",
+          data: data
+        });
+      }
     }
   };
 })();

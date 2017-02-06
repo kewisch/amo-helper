@@ -1,6 +1,7 @@
 var LegacyExtensionsUtils = require("resource://gre/modules/LegacyExtensionsUtils.jsm").LegacyExtensionsUtils;
 var manifest = require("../webextension/manifest.json");
 var self = require("sdk/self"); // eslint-disable-line consistent-this
+var clipboard = require("sdk/clipboard");
 var pageMod = require("sdk/page-mod");
 var { defer } = require("sdk/core/promise");
 var { viewFor } = require("sdk/view/core");
@@ -30,6 +31,8 @@ function pageModAttach(worker) {
         worker.port.emit("__sdk_storage_response_" + data.responseId, data.result);
       } else if (data.action == "changed") {
         worker.port.emit("__sdk_storage_changed", data.changes, data.area);
+      } else if (data.action == "_clipboard") {
+        clipboard.set(data.data);
       }
     };
 

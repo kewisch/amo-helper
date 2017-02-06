@@ -65,3 +65,16 @@ createLinksContextMenu([{
   title: "Open Add-on Activity",
   url: FEED_URL,
 }]);
+
+chrome.contextMenus.create({
+  type: "normal",
+  title: "Copy file path",
+  contexts: ["link"],
+  targetUrlPatterns: ["https://addons.mozilla.org/en-US/firefox/files/*"],
+  documentUrlPatterns: ["https://addons.mozilla.org/en-US/firefox/files/*"],
+  onclick: (info, tab) => {
+    let regex = /https:\/\/addons.mozilla.org\/en-US\/firefox\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
+    let match = info.linkUrl.match(regex);
+    sdk._clipboard.set(match[3]);
+  }
+});
