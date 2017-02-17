@@ -63,11 +63,12 @@ function removeOtherTabs(tabUrl, keepTab) {
 
 sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "addonid") {
-    chrome.storage.local.get({ closeReviewChild: true }, (prefs) => {
+    chrome.storage.local.get({ "tabclose-review-child": true }, (prefs) => {
       if (!(data.addonid in tabsToClose)) {
         tabsToClose[data.addonid] = {};
       }
       tabsToClose[data.addonid][sender.tab.id] = true;
+      reviewPages[sender.tab.id] = data.addonid;
     });
   } else if (data.action == "tabclose-backtoreview") {
     let url = "https://addons.mozilla.org/en-US/editors/review/" + data.slug;
@@ -106,12 +107,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  chrome.storage.local.get({ closeReviewChild: true }, (prefs) => {
-    chrome.tabs.get(tabId, (tab) => {
-      let matches = tab.url.match(REVIEW_RE);
-      if (matches) {
-        removeTabsFor(tabId, matches[2], prefs.closeReviewChild);
-      }
-    });
+  let slug = reviewPages[tabId];
+  delete reviewPages[tabId];
+
+  chrome.storage.local.get({ "tabclose-review-child": true }, (prefs) => {
+    if (slug) {
+      removeTabsFor(tabId, slug, prefs["tabclose-review-child"]);
+    }
   });
 });
