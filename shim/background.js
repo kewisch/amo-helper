@@ -22,6 +22,17 @@ function convertWebExtensionUrls(urls) {
   return urls ? urls.map(url => `resource://${self.id}/webextension/${url}`) : undefined;
 }
 
+function getTabId(sdkTab) {
+  if (typeof TabManager === "undefined") {
+    // Firefox 54+
+    let webExtension = LegacyExtensionsUtils.getEmbeddedExtensionFor({ id: self.id });
+    return webExtension.extension.tabManager.wrapTab(viewFor(sdkTab)).id;
+  } else {
+    // Firefox < 54
+    return TabManager.getId(viewFor(sdkTab));
+  }
+}
+
 function pageModAttach(worker) {
   let workerId = Math.random().toString(36).substr(2, 10);
 
@@ -71,7 +82,7 @@ function pageModAttach(worker) {
       data.workerId = workerId;
       data.sender = {
         url: worker.tab.url,
-        tabId: TabManager.getId(viewFor(worker.tab))
+        tabId: getTabId(worker.tab)
       };
       pipeline.postMessage(data);
     });
@@ -83,7 +94,7 @@ function pageModAttach(worker) {
 
   chrometabsPipeline.promise.then((pipeline) => {
     let pipelineListener = (data) => {
-      let workerTabId = TabManager.getId(viewFor(worker.tab));
+      let workerTabId = getTabId(worker.tab);
 
       if (data.tabId == workerTabId) {
         data.sender = {
