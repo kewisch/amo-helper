@@ -9,7 +9,7 @@ function setupLayout(cannedData) {
   if (navigator.platform.includes("Mac")) {
     input.setAttribute("placeholder", "⌘+Shift+O for Canned Response");
   } else {
-    input.setAttribute("placeholder", "Ctrl+Shift+O for Canned Response");
+    input.setAttribute("placeholder", "Alt+Shift+O for Canned Response");
   }
   container.appendChild(input);
 
@@ -42,7 +42,7 @@ function setupLayout(cannedData) {
 
 
   window.addEventListener("keypress", (event) => {
-    if (event.metaKey && event.shiftKey && event.key == "o") {
+    if ((event.metaKey || event.altKey) && event.shiftKey && event.key == "o") {
       if (document.activeElement == input) {
         comments.focus();
       } else {
