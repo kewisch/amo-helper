@@ -3,3 +3,11 @@ a.diff > span {
   background-color: transparent;
   color: red;
 }
+
+.file.diff.selected::before {
+  content: "\25B6";
+  margin-left: -0.9em;
+}
+.file.diff.selected {
+  text-decoration: none;
+}
