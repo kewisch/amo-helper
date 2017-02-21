@@ -25,3 +25,8 @@ h4.author {
   left: auto;
   margin-left: 51px;
 }
+
+/* larger text area */
+#review-actions-form textarea {
+  height: 400px;
+}

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "4.4.1",
+  "version": "4.5.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -146,6 +146,11 @@
       ],
       "js": [ "content/filediff/filebrowser.js" ],
       "css": [ "content/filediff/filebrowser.css" ],
+      "run_at": "document_end"
+    },{
+      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "js": [ "content/reviewactions/review.js" ],
+      "css": [ "content/reviewactions/review.css" ],
       "run_at": "document_end"
     }
   ]
