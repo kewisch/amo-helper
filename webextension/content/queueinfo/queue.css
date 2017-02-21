@@ -8,8 +8,28 @@ tr.amoqueue-helper-reviewtime-low td.amoqueue-helper-waitcell {
 tr.amoqueue-helper-reviewtime-medium td.amoqueue-helper-waitcell {
   color: #F39200;
 }
+
+
 tr.amoqueue-helper-reviewtime-high td.amoqueue-helper-waitcell {
   color: #E30613;
+}
+tr.amoqueue-helper-reviewtime-higher td.amoqueue-helper-waitcell {
+  color: #D50529;
+}
+tr.amoqueue-helper-reviewtime-higher2 td.amoqueue-helper-waitcell {
+  color: #C7053F;
+}
+tr.amoqueue-helper-reviewtime-higher3 td.amoqueue-helper-waitcell {
+  color: #B90555;
+}
+tr.amoqueue-helper-reviewtime-higher4 td.amoqueue-helper-waitcell {
+  color: #AB046B;
+}
+tr.amoqueue-helper-reviewtime-higher5 td.amoqueue-helper-waitcell {
+  color: #9D0481;
+}
+tr.amoqueue-helper-reviewtime-highest td.amoqueue-helper-waitcell {
+  color: #900498;
 }
 
 div.amoqueue-queue-buttons {

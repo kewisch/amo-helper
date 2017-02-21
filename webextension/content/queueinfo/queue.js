@@ -65,8 +65,20 @@ function initPageLayout() {
         row.classList.add("amoqueue-helper-reviewtime-low");
       } else if (days < 11) {
         row.classList.add("amoqueue-helper-reviewtime-medium");
-      } else {
+      } else if (days < 20) {
         row.classList.add("amoqueue-helper-reviewtime-high");
+      } else if (days < 30) {
+        row.classList.add("amoqueue-helper-reviewtime-higher");
+      } else if (days < 40) {
+        row.classList.add("amoqueue-helper-reviewtime-higher2");
+      } else if (days < 50) {
+        row.classList.add("amoqueue-helper-reviewtime-higher3");
+      } else if (days < 60) {
+        row.classList.add("amoqueue-helper-reviewtime-higher4");
+      } else if (days < 70) {
+        row.classList.add("amoqueue-helper-reviewtime-higher5");
+      } else {
+        row.classList.add("amoqueue-helper-reviewtime-highest");
       }
 
       // Remove type column, don't see the need for it.
