@@ -56,6 +56,9 @@ function removeOtherTabs(tabUrl, keepTab) {
       });
     }
     promise.then(() => {
+      if (closeTabs.length) {
+        chrome.tabs.move(keepTab.id, { index: closeTabs[0].index });
+      }
       chrome.tabs.remove(closeTabs.map(tab => tab.id));
     });
   });
