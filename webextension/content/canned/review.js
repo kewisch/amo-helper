@@ -42,7 +42,7 @@ function setupLayout(cannedData) {
 
 
   window.addEventListener("keypress", (event) => {
-    if ((event.metaKey || event.altKey) && event.shiftKey && event.key == "o") {
+    if ((event.metaKey || event.altKey) && event.shiftKey && event.key.toLowerCase() == "o") {
       if (document.activeElement == input) {
         comments.focus();
       } else {
