@@ -1,3 +1,20 @@
 body.amoqueue-hide-delete .delete {
   display: none
 }
+
+#amoqueue-copy-slug a {
+  transition: box-shadow 1s ease-in-out;
+  border-radius: 2ex;
+}
+
+#amoqueue-copy-slug a:active {
+  box-shadow: 0px 0px 20px rgba(227,6,19,0.8), 0 0 5px rgba(227,6,19,0.8) inset;
+  transition: box-shadow .05s linear;
+  border-radius: 2ex;
+}
+
+
+#commands tr:not(.amoqueue-no-key) + .amoqueue-no-key > tr,
+#commands tr:not(.amoqueue-no-key) + .amoqueue-no-key > td {
+  padding-top: 2ex;
+}

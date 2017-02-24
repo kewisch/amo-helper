@@ -10,10 +10,14 @@ function createCommand(id, text, key, func) {
   let th = tr.appendChild(document.createElement("th"));
   let td = tr.appendChild(document.createElement("td"));
 
-  let code = document.createElement("code");
-  code.textContent = key;
-  code.setAttribute("title", text);
-  th.appendChild(code);
+  if (key) {
+    let code = document.createElement("code");
+    code.textContent = key;
+    code.setAttribute("title", text);
+    th.appendChild(code);
+  } else {
+    tr.className = "amoqueue-no-key";
+  }
 
   let anchor = document.createElement("a");
   anchor.className = "command";
@@ -27,15 +31,29 @@ function createCommand(id, text, key, func) {
     event.stopPropagation();
   });
 
-  window.addEventListener("keypress", (event) => {
-    if (event.key == key) {
-      func(event);
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  });
+  if (key) {
+    window.addEventListener("keypress", (event) => {
+      if (event.key == key) {
+        func(event);
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
+  }
 }
 
 createCommand("amoqueue-hide-delete", "Toggle deleted lines", "+", () => {
   document.body.classList.toggle("amoqueue-hide-delete");
+});
+
+createCommand("amoqueue-copy-slug", "Copy Slug", null, () => {
+  let slug = document.querySelector("a.command[href*='editors/review']").getAttribute("href").split("/")[4];
+
+  let textarea = document.createElement("textarea");
+  textarea.value = decodeURIComponent(slug);
+
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  textarea.remove();
 });
