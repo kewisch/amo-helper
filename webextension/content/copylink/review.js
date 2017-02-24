@@ -29,6 +29,11 @@ function condenseLines(value) {
   return value;
 }
 
+function renumber(value) {
+  let comment = 0;
+  return value.replace(/^[0-9]+\) /mg, val => ++comment + ") ");
+}
+
 function changeComments(action) {
   let actionCanned = {
     "public": "Thank you for your contribution.\n\n",
@@ -57,7 +62,7 @@ function changeComments(action) {
 let comments = document.getElementById("id_comments");
 comments.addEventListener("paste", (event) => {
   setTimeout(() => {
-    comments.value = condenseLines(comments.value);
+    comments.value = renumber(condenseLines(comments.value));
   }, 0);
 });
 
