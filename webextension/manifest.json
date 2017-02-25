@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "4.7.0",
+  "version": "4.7.1",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -126,8 +126,8 @@
       "css": [ "content/reskin/review.css" ]
     },{
       "matches": [
-        "https://addons.mozilla.org/en-US/firefox/files/compare/*",
-        "https://addons.mozilla.org/en-US/developers/addon/*"
+        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
+        "https://addons.mozilla.org/en-US/firefox/files/compare/*"
       ],
       "css": [ "content/reskin/filebrowser.css" ]
     },{
@@ -141,8 +141,8 @@
       "run_at": "document_end"
     },{
       "matches": [
-        "https://addons.mozilla.org/en-US/firefox/files/compare/*",
-        "https://addons.mozilla.org/en-US/developers/addon/*"
+        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
+        "https://addons.mozilla.org/en-US/firefox/files/compare/*"
       ],
       "js": [ "content/filediff/filebrowser.js" ],
       "css": [ "content/filediff/filebrowser.css" ],
