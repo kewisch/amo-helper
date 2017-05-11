@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2016 */
 
-const RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^\/]*)\/(editors\/review|admin\/addon\/manage|[^\/]*\/addon|developers\/feed)\/([^\/#?]*)(\/edit)?/;
+const RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
 const MATCH_ADDON_LINKS = [
   "https://addons.mozilla.org/*/editors/review/*",
   "https://addons.mozilla.org/*/admin/manage/*",

@@ -1,7 +1,7 @@
 "use strict";
 
-const REVIEW_RE = /https:\/\/addons.mozilla.org\/([^\/]+)\/editors\/review\/(.*)/;
-const QUEUE_RE = /https:\/\/addons.mozilla.org\/([^\/]+)\/editors\/queue\/(.*)/;
+const REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review\/(.*)/;
+const QUEUE_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/queue\/(.*)/;
 
 // const FILEBROWSER_MATCH = "https://addons.mozilla.org/en-US/firefox/files/browse/*";
 // const COMPARE_MATCH = "https://addons.mozilla.org/en-US/firefox/files/compare/*";

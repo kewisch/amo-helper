@@ -1,6 +1,6 @@
 function condenseLines(value) {
-  const regex = /([A-Za-z0-9_\.\/]+) line ([0-9, ]+), ([A-Za-z0-9_\.\/]+) line (\d+)/g;
-  const regex2 = /([A-Za-z0-9_\.\/]+) line ([0-9, ]+)/g;
+  const regex = /([A-Za-z0-9_./]+) line ([0-9, ]+), ([A-Za-z0-9_./]+) line (\d+)/g;
+  const regex2 = /([A-Za-z0-9_./]+) line ([0-9, ]+)/g;
   let replaced;
 
   do {

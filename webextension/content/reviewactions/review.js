@@ -17,7 +17,7 @@ function createAction(label, funcOrDest, className) {
 
 createAction("Copy Slug", (event) => {
   let textarea = document.createElement("textarea");
-  textarea.value = decodeURIComponent(document.location.href.match(/\/([^\/]+)$/)[1]);
+  textarea.value = decodeURIComponent(document.location.href.match(/\/([^/]+)$/)[1]);
 
   document.body.appendChild(textarea);
   textarea.select();
