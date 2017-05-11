@@ -1,19 +1,24 @@
-/* exported chrome, fetch */
+/* exported browser, chrome, fetch */
 
-var chrome = (function() {
+var browser = (function() {
   function generateStorageArea(areaName) {
     function forwardAPI(methodName, items, callback) {
-      let responseId = Math.random().toString(36).substr(2, 10);
-      if (callback) {
-        self.port.once("__sdk_storage_response_" + responseId, callback);
-      }
+      return new Promise((resolve, reject) => {
+        let responseId = Math.random().toString(36).substr(2, 10);
+        self.port.once("__sdk_storage_response_" + responseId, (resp) => {
+          resolve(resp);
+          if (callback) {
+            callback(resp);
+          }
+        });
 
-      self.port.emit("__sdk_storage_request", {
-        responseId: responseId,
+        self.port.emit("__sdk_storage_request", {
+          responseId: responseId,
 
-        area: areaName,
-        method: methodName,
-        items: items
+          area: areaName,
+          method: methodName,
+          items: items
+        });
       });
     }
 
@@ -133,6 +138,7 @@ var chrome = (function() {
     i18n: { /* Not implemented, since methods are mostly synchronous */ }
   };
 })();
+var chrome = browser;
 
 /**
  * The add-on SDK does not handle CORS for fetch, so minimally shim this via XHR.
