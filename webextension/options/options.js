@@ -23,7 +23,8 @@ function restore_options() {
     "omnibox-enabled": true,
     "browseraction-queue-refresh-period": 60,
     "browseraction-count-moderator": false,
-    "canned-use-stock": true
+    "canned-use-stock": true,
+    "reviewinfo-dangerous-permissions": "webRequest, cookies, history, logins, nativeMessaging"
   }, (prefs) => {
     document.getElementById("tabclose-other-queue").checked = prefs["tabclose-other-queue"];
     document.getElementById("tabclose-review-child").checked = prefs["tabclose-review-child"];
@@ -33,6 +34,7 @@ function restore_options() {
     document.getElementById("browseraction-count-moderator").value = prefs["browseraction-count-moderator"];
     document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];
     document.getElementById("canned-use-stock").checked = prefs["canned-use-stock"];
+    document.getElementById("reviewinfo-dangerous-permissions").value = prefs["reviewinfo-dangerous-permissions"];
   });
 }
 

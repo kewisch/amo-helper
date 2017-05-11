@@ -181,6 +181,10 @@ function getInfo(doc) {
     let installanchor = listbody.querySelector(".editors-install");
     let sourceanchor = listbody.querySelector("a[href^='/firefox/downloads/source']");
     let status = headerparts[3].trim().split(",")[0];
+    let permissions = listbody.querySelector(".file-info div strong");
+    if (permissions) {
+      permissions = permissions.nextSibling.textContent.trim().split(", ");
+    }
 
     if (status == "Approved") {
       lastapproved_idx = idx;
@@ -194,7 +198,8 @@ function getInfo(doc) {
       installurl: installanchor ? (new URL(installanchor.getAttribute("href"), location.href)).href : null,
       sourceurl: sourceanchor ? (new URL(sourceanchor.getAttribute("href"), location.href)).href : null,
 
-      activities: activities
+      activities: activities,
+      permissions: permissions
     };
   });
 

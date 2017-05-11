@@ -9,6 +9,14 @@ label {
   color: #333;
 }
 
+label.expand {
+  display: flex;
+}
+
+label.expand input {
+  flex: 1;
+}
+
 #canned {
   display: grid;
   grid: 21px auto / 40% 21px auto;
