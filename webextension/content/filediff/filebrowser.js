@@ -57,3 +57,14 @@ createCommand("amoqueue-copy-slug", "Copy Slug", null, () => {
   document.execCommand("copy");
   textarea.remove();
 });
+
+// TODO move this to downloads when there is a simple import mechanism
+createCommand("amoqueue-download", "Download", null, () => {
+  let version = document.getElementById("metadata").getAttribute("data-version");
+  let slug = document.getElementById("metadata").getAttribute("data-slug");
+
+  chrome.storage.local.get({ ["slugInfo." + slug]: null }, (prefs) => {
+    let id = prefs["slugInfo." + slug];
+    chrome.runtime.sendMessage({ action: "download", addonid: id, version: version });
+  });
+});

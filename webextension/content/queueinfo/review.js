@@ -179,6 +179,7 @@ function getInfo(doc) {
     }
 
     let installanchor = listbody.querySelector(".editors-install");
+    let sourceanchor = listbody.querySelector("a[href^='/firefox/downloads/source']");
     let status = headerparts[3].trim().split(",")[0];
 
     if (status == "Approved") {
@@ -190,7 +191,8 @@ function getInfo(doc) {
       date: submissiondate,
       status: status,
 
-      installurl: installanchor ? installanchor.getAttribute("href") : null,
+      installurl: installanchor ? (new URL(installanchor.getAttribute("href"), location.href)).href : null,
+      sourceurl: sourceanchor ? (new URL(sourceanchor.getAttribute("href"), location.href)).href : null,
 
       activities: activities
     };
@@ -198,7 +200,7 @@ function getInfo(doc) {
 
   return {
     id: doc.querySelector("#addon").getAttribute("data-id"),
-    slug: doc.location.href.match(/\/([^\/]+)$/)[1],
+    slug: doc.location.pathname.match(/\/([^/]+)$/)[1],
     lastupdate: new Date().toISOString(),
 
     versions: versions,
@@ -230,11 +232,34 @@ function updateSize(info) {
   });
 }
 
+function findParent(node, className) {
+  let current = node;
+  while (current && !current.classList.contains(className)) {
+    current = current.parentNode;
+  }
+  return current;
+}
+
 // -- main --
 (function() {
   // Make file info links open in a new tab
   document.querySelectorAll(".file-info a").forEach((link) => {
     link.setAttribute("target", "_blank");
+  });
+
+  // Make editors install link trigger a download
+  // TODO move this to content/downloads
+  document.getElementById("review-files").addEventListener("click", (event) => {
+    if (event.target.classList.contains("editors-install")) {
+      let listbody = findParent(event.target, "listing-body");
+      let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
+      let version = headerparts[1].trim();
+      let id = document.querySelector("#addon").getAttribute("data-id");
+      chrome.runtime.sendMessage({ action: "download", addonid: id, version: version });
+
+      event.preventDefault();
+      event.stopPropagation();
+    }
   });
 
   // Open compare link if options enabled
@@ -246,9 +271,11 @@ function updateSize(info) {
 
   // Collect review info and set in storage
   let info = getInfo(document);
-  chrome.storage.local.set({ ["reviewInfo." + info.id]: info }, () => {
-    updateSize(info).then(() => {
-      chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
+  chrome.storage.local.set({ ["slugInfo." + info.slug]: info.id }, () => {
+    chrome.storage.local.set({ ["reviewInfo." + info.id]: info }, () => {
+      updateSize(info).then(() => {
+        chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
+      });
     });
   });
 })();

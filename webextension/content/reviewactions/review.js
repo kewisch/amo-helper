@@ -1,4 +1,4 @@
-function createAction(label, funcOrDest, className) {
+function createAction(label, funcOrDest, className="") {
   let actions = document.getElementById("actions-addon");
   let dest = typeof funcOrDest == "string" ? funcOrDest : "#";
   let func = typeof funcOrDest == "string" ? null : funcOrDest;
@@ -23,6 +23,14 @@ createAction("Copy Slug", (event) => {
   textarea.select();
   document.execCommand("copy");
   textarea.remove();
+
+  event.preventDefault();
+  event.stopPropagation();
+}, "click-feedback");
+
+createAction("Download", (event) => {
+  let id = document.querySelector("#addon").getAttribute("data-id");
+  chrome.runtime.sendMessage({ action: "download", addonid: id, version: "latest" });
 
   event.preventDefault();
   event.stopPropagation();
