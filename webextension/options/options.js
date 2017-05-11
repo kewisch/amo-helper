@@ -24,7 +24,9 @@ function restore_options() {
     "browseraction-queue-refresh-period": 60,
     "browseraction-count-moderator": false,
     "canned-use-stock": true,
-    "reviewinfo-dangerous-permissions": "webRequest, cookies, history, logins, nativeMessaging"
+    "reviewinfo-dangerous-permissions": "webRequest, cookies, history, logins, nativeMessaging",
+    "reviewtimer-display": true,
+    "reviewtimer-notify-interval": 10
   }, (prefs) => {
     document.getElementById("tabclose-other-queue").checked = prefs["tabclose-other-queue"];
     document.getElementById("tabclose-review-child").checked = prefs["tabclose-review-child"];
@@ -35,6 +37,8 @@ function restore_options() {
     document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];
     document.getElementById("canned-use-stock").checked = prefs["canned-use-stock"];
     document.getElementById("reviewinfo-dangerous-permissions").value = prefs["reviewinfo-dangerous-permissions"];
+    document.getElementById("reviewtimer-display").checked = prefs["reviewtimer-display"];
+    document.getElementById("reviewtimer-notify-interval").value = prefs["reviewtimer-notify-interval"];
   });
 }
 

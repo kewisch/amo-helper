@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -15,6 +15,7 @@
     "clipboardWrite",
     "contextMenus",
     "downloads",
+    "notifications",
     "tabs",
     "storage",
     "webRequest",
@@ -46,6 +47,7 @@
       "background/canned.js",
       "background/context.js",
       "background/download.js",
+      "background/reviewtimer.js",
       "background/tabclose.js",
       "background/queueinfo.js",
       "background/omnibox.js",
@@ -158,6 +160,11 @@
       "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
       "js": [ "content/reviewinfo/review.js" ],
       "css": [ "content/reviewinfo/review.css" ],
+      "run_at": "document_end"
+    },{
+      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "js": [ "content/reviewtimer/review.js" ],
+      "css": [ "content/reviewtimer/review.css" ],
       "run_at": "document_end"
     }
   ]

@@ -1,0 +1,20 @@
+#amoqueue-timer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 2px 10px;
+  background: black;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: normal;
+  box-shadow: none;
+  border-radius: 0;
+  border-bottom-left-radius: 10px;
+}
+
+#amoqueue-timer span {
+  color: gray;
+  margin: 0 12px 0 0;
+  padding: 0;
+  border: 0;
+}
