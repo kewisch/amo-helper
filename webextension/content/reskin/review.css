@@ -30,3 +30,8 @@ h4.author {
 #review-actions-form textarea {
   height: 400px;
 }
+
+/* hide contributions */
+#contribution {
+  display: none;
+}

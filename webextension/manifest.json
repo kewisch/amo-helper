@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
