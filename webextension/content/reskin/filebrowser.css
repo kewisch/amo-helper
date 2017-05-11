@@ -11,3 +11,45 @@ a.diff > span {
 .file.diff.selected {
   text-decoration: none;
 }
+
+/* condensed file browser */
+.header-bg {
+  display: none;
+}
+
+body.file-viewer div.section {
+  width: 99%;
+}
+
+body.file-viewer div.section h3 {
+  display: inline;
+  line-height: 2.027em;
+}
+
+#breadcrumbs-wrapper {
+  display: inline;
+}
+
+.featured-inner {
+  padding: 0;
+}
+
+#footer {
+  display: none;
+}
+
+.featured {
+  margin-bottom: 0;
+}
+
+#file-viewer div.featured-inner {
+  padding-bottom: 0;
+}
+
+.restyle .notification-box, .restyle .site-balloon {
+  padding: 5px 15px;
+}
+
+.highlighter-column-line-numbers {
+  width: 4.4ex !important;
+}
