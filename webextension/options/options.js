@@ -1,3 +1,18 @@
+const DEFAULT_DANGEROUS_PERMISSIONS = [
+  "webRequest",
+  "cookies",
+  "history",
+  "logins",
+  "nativeMessaging"
+].join(", ");
+
+const DEFAULT_DANGEROUS_MESSAGES = [
+  "Unsafe assignment to outerHTML",
+  "Unsafe call to insertAdjacentHTML",
+  "Unsafe assignment to innerHTML",
+  "The Function constructor is eval."
+].join(", ");
+
 // https://davidwalsh.name/javascript-debounce-function
 function debounce(func, wait) {
   let timeout;
@@ -24,7 +39,10 @@ function restore_options() {
     "browseraction-queue-refresh-period": 60,
     "browseraction-count-moderator": false,
     "canned-use-stock": true,
-    "reviewinfo-dangerous-permissions": "webRequest, cookies, history, logins, nativeMessaging",
+    "reviewinfo-dangerous-permissions": DEFAULT_DANGEROUS_PERMISSIONS,
+    "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
+    "reviewinfo-show-permissions": false,
+    "reviewinfo-show-validator": false,
     "reviewtimer-display": true,
     "reviewtimer-notify-interval": 10
   }, (prefs) => {
@@ -37,6 +55,9 @@ function restore_options() {
     document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];
     document.getElementById("canned-use-stock").checked = prefs["canned-use-stock"];
     document.getElementById("reviewinfo-dangerous-permissions").value = prefs["reviewinfo-dangerous-permissions"];
+    document.getElementById("reviewinfo-dangerous-messages").value = prefs["reviewinfo-dangerous-messages"];
+    document.getElementById("reviewinfo-show-permissions").checked = prefs["reviewinfo-show-permissions"];
+    document.getElementById("reviewinfo-show-validator").checked = prefs["reviewinfo-show-validator"];
     document.getElementById("reviewtimer-display").checked = prefs["reviewtimer-display"];
     document.getElementById("reviewtimer-notify-interval").value = prefs["reviewtimer-notify-interval"];
   });

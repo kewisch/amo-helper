@@ -1,3 +1,17 @@
-.amoqueue-permissions-list li[dangerous] {
+.amoqueue-permissions-list li[dangerous], .amoqueue-validator-list div[dangerous] {
   color: #ff4040;
+}
+
+.amoqueue-validator-list {
+  list-style-type: disc;
+}
+
+.amoqueue-file:first-of-type {
+  margin-inline-start: 20px;
+}
+
+.amoqueue-file {
+  font-size: 0.8em;
+  display: inline-block;
+  margin-inline-end: 5px;
 }
