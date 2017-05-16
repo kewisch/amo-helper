@@ -13,6 +13,9 @@ function parseQueueNumbers(doc) {
     }
   }
 
+  // The auto-approval queue does not make sense to count since it is completed
+  delete numbers.auto_approved;
+
   return numbers;
 }
 
