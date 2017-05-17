@@ -38,6 +38,7 @@ function restore_options() {
     "browseraction-queue-refresh-period": 60,
     "browseraction-count-moderator": false,
     "canned-use-stock": true,
+    "canned-include-body": true,
     "reviewinfo-dangerous-permissions": DEFAULT_DANGEROUS_PERMISSIONS,
     "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
     "reviewinfo-show-permissions": false,
@@ -53,6 +54,7 @@ function restore_options() {
     document.getElementById("browseraction-count-moderator").value = prefs["browseraction-count-moderator"];
     document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];
     document.getElementById("canned-use-stock").checked = prefs["canned-use-stock"];
+    document.getElementById("canned-include-body").checked = prefs["canned-include-body"];
     document.getElementById("reviewinfo-dangerous-permissions").value = prefs["reviewinfo-dangerous-permissions"];
     document.getElementById("reviewinfo-dangerous-messages").value = prefs["reviewinfo-dangerous-messages"];
     document.getElementById("reviewinfo-show-permissions").checked = prefs["reviewinfo-show-permissions"];

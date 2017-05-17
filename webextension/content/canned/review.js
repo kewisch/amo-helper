@@ -1,4 +1,4 @@
-function setupLayout(cannedData) {
+function setupLayout(cannedData, includeBody) {
   let container = document.querySelector("#review-actions-form .review-actions-canned");
   let comments = document.getElementById("id_comments");
   container.textContent = "";
@@ -17,7 +17,14 @@ function setupLayout(cannedData) {
     appendTo: "#review-actions-form .review-actions-canned",
     autoFocus: true,
     delay: 0,
-    source: cannedData,
+    source: (request, response) => {
+      let matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+
+      response($.grep(cannedData, (value) => {
+        return matcher.test(value.label) ||
+               (includeBody && matcher.test(value.value));
+      }));
+    },
     select: (event, { item }) => {
       let commentValue = comments.value.substr(0, comments.selectionStart) +
                          item.value +
@@ -65,7 +72,8 @@ function setupLayout(cannedData) {
 
 chrome.storage.local.get({
   "canned-responses": [],
-  "canned-use-stock": true
+  "canned-use-stock": true,
+  "canned-include-body": true
 }, (prefs) => {
   let cannedData = [];
   if (prefs["canned-use-stock"]) {
@@ -82,5 +90,5 @@ chrome.storage.local.get({
   }
 
   cannedData = cannedData.concat(prefs["canned-responses"]);
-  setupLayout(cannedData);
+  setupLayout(cannedData, prefs["canned-include-body"]);
 });
