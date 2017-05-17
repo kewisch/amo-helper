@@ -1,6 +1,5 @@
 // TODO the prefs won't update on upgrade. Figure out something smart
 const DEFAULT_DANGEROUS_PERMISSIONS = [
-  "webRequest",
   "cookies",
   "history",
   "logins",
@@ -8,10 +7,10 @@ const DEFAULT_DANGEROUS_PERMISSIONS = [
 ].join(", ");
 
 const DEFAULT_DANGEROUS_MESSAGES = [
-  "Unsafe assignment to outerHTML",
-  "Unsafe call to insertAdjacentHTML",
-  "Unsafe assignment to innerHTML",
-  "The Function constructor is eval."
+  "outerHTML",
+  "insertAdjacentHTML",
+  "innerHTML",
+  "eval"
 ].join(", ");
 
 const SKIP_MESSAGES = new Set([
@@ -61,7 +60,9 @@ async function initTopPermissions() {
     }
   });
 
-  createSummaryRow("amoqueue-permissions-list", "Latest Permissions", permissions, dangerous);
+  createSummaryRow("amoqueue-permissions-list", "Latest Permissions", permissions, (value) => {
+    return dangerous.has(value);
+  });
 }
 
 
@@ -94,14 +95,12 @@ async function retrieveValidation() {
       container = document.createElement("div");
       container.message = msg.message;
       let label = container.appendChild(document.createElement("div"));
-      label.textContent = msg.message.replace(/&#34;/g, '"');
-
-      if (dangerous.has(msg.message)) {
-        label.setAttribute("dangerous", "true");
-      }
+      let message = msg.message.replace(/&#34;/g, '"');
+      label.textContent = message;
+      label.className = "amoqueue-message";
 
       container.files = new Set();
-      messageMap.set(msg.message, container);
+      messageMap.set(message, container);
     }
 
     if (!container.files.has(msg.file)) {
@@ -115,7 +114,7 @@ async function retrieveValidation() {
 
   let messages = [...messageMap.values()];
   messages.sort((a, b) => {
-    let dangerousA = dangerous.has(a.message), dangerousB = dangerous.has(b.message);
+    let dangerousA = a.getAttribute("dangerous") == "true", dangerousB = b.getAttribute("dangerous") == "true";
 
     if (dangerousA && !dangerousB) {
       return -1;
@@ -126,10 +125,21 @@ async function retrieveValidation() {
     }
   });
 
-  createSummaryRow("amoqueue-validator-list", "Validator Messages Summary", messages);
+  createSummaryRow("amoqueue-validator-list", "Validator Messages Summary", messages, (value) => {
+    return setHasSubstring(dangerous, value.textContent);
+  });
 }
 
-function createSummaryRow(className, label, values, dangerous=null) {
+function setHasSubstring(set, value) {
+  for (let item of set) {
+    if (value.includes(item)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function createSummaryRow(className, label, values, isDangerous=null) {
   let tbody = document.querySelector("#addon-summary table tbody");
   let row = tbody.appendChild(document.createElement("tr"));
   let head = row.appendChild(document.createElement("th"));
@@ -146,7 +156,7 @@ function createSummaryRow(className, label, values, dangerous=null) {
       listitem.appendChild(value);
     }
 
-    if (dangerous && dangerous.has(value)) {
+    if (isDangerous && isDangerous(value)) {
       listitem.setAttribute("dangerous", "true");
     }
   }
