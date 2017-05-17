@@ -3,6 +3,8 @@ profile
 *.sw*
 *.xpi
 *.diff
+*.orig
+*.rej
 .jpmignore
 .gitignore
 .git
