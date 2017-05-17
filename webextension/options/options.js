@@ -1,5 +1,4 @@
 const DEFAULT_DANGEROUS_PERMISSIONS = [
-  "webRequest",
   "cookies",
   "history",
   "logins",
@@ -7,10 +6,10 @@ const DEFAULT_DANGEROUS_PERMISSIONS = [
 ].join(", ");
 
 const DEFAULT_DANGEROUS_MESSAGES = [
-  "Unsafe assignment to outerHTML",
-  "Unsafe call to insertAdjacentHTML",
-  "Unsafe assignment to innerHTML",
-  "The Function constructor is eval."
+  "outerHTML",
+  "insertAdjacentHTML",
+  "innerHTML",
+  "eval"
 ].join(", ");
 
 // https://davidwalsh.name/javascript-debounce-function

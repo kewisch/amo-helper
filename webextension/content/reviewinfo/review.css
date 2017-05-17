@@ -1,4 +1,4 @@
-.amoqueue-permissions-list li[dangerous], .amoqueue-validator-list div[dangerous] {
+.amoqueue-permissions-list li[dangerous], .amoqueue-validator-list li[dangerous] .amoqueue-message {
   color: #ff4040;
 }
 
