@@ -103,6 +103,19 @@ function initPageLayout() {
       });
     });
   }).then(() => {
+    return addSearchRadio("Show Add-ons", "show-webext", "both", ["Both", "WebExtensions", "Legacy"], (state) => {
+      document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
+        let iswebext = row.classList.contains("amoqueue-helper-iconclass-webextension");
+        if (state == "both") {
+          hideBecause(row, "webextension", false);
+        } else if (state == "webextensions") {
+          hideBecause(row, "webextension", !iswebext);
+        } else if (state == "legacy") {
+          hideBecause(row, "webextension", iswebext);
+        }
+      });
+    });
+  }).then(() => {
     if (IS_ADMIN) {
       return addSearchRadio("Show Reviews", "show-admin", "both", ["Both", "Admin", "Regular"], (state) => {
         document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
