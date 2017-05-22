@@ -21,7 +21,16 @@ async function initLayout() {
 
     timerNode.addEventListener("click", togglePause);
 
-    startTimer();
+
+    if (document.hidden) {
+      let continueSetup = () => {
+        window.removeEventListener("focus", continueSetup);
+        startTimer();
+      };
+      window.addEventListener("focus", continueSetup);
+    } else {
+      startTimer();
+    }
   }
 }
 
