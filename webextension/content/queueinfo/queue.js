@@ -88,6 +88,39 @@ function initPageLayout() {
     // Remove header for type column
     header.children[2].remove();
 
+    // Counting filtered results requires the pagination node to always be around
+    let filterCountContainerTop = document.querySelector(".data-grid-content.data-grid-top");
+    let numResults = document.querySelector(".data-grid-content.data-grid-top .num-results");
+    if (filterCountContainerTop) {
+      filterCountContainerTop.querySelector(".num-results strong:nth-of-type(1)").className = "amoqueue-results-pagestart";
+      filterCountContainerTop.querySelector(".num-results strong:nth-of-type(2)").className = "amoqueue-results-pageend";
+      filterCountContainerTop.querySelector(".num-results strong:nth-of-type(3)").className = "amoqueue-results-total";
+      numResults.id = "amoqueue-num-results";
+    } else {
+      let addonQueue = document.getElementById("addon-queue");
+      filterCountContainerTop = document.createElement("div");
+      filterCountContainerTop.className = "data-grid-content data-grid-top";
+      addonQueue.before(filterCountContainerTop);
+
+      numResults = document.createElement("div");
+      numResults.className = "num-results";
+      numResults.id = "amoqueue-num-results";
+      numResults.innerHTML = "Results <strong class='amoqueue-results-pagestart'>1</strong>" +
+                             "–<strong class='amoqueue-results-pageend'></strong> of " +
+                             "<strong class='amoqueue-results-total'></strong>";
+
+      let numRows = document.querySelectorAll("#addon-queue .addon-row").length;
+      numResults.querySelector(".amoqueue-results-pageend").textContent = numRows;
+      numResults.querySelector(".amoqueue-results-total").textContent = numRows;
+
+      filterCountContainerTop.appendChild(numResults);
+    }
+
+    let filteredSpan = document.createElement("span");
+    filteredSpan.id = "amoqueue-filtered-results";
+    filteredSpan.className = "amoqueue-hide";
+    filteredSpan.innerHTML = " (filtered <strong id='amoqueue-filtered-count'>1</strong>)";
+    numResults.appendChild(filteredSpan);
 
     // Search box enhancements
     return addSearchRadio("Show Information requests", "show-info", "both", ["Both", "Only", "None"], (state) => {
@@ -101,6 +134,7 @@ function initPageLayout() {
           hideBecause(row, "info", needinfo);
         }
       });
+      updateQueueRows();
     });
   }).then(() => {
     return addSearchRadio("Show Add-ons", "show-webext", "both", ["Both", "WebExtensions", "Legacy"], (state) => {
@@ -114,6 +148,7 @@ function initPageLayout() {
           hideBecause(row, "webextension", iswebext);
         }
       });
+      updateQueueRows();
     });
   }).then(() => {
     if (IS_ADMIN) {
@@ -128,6 +163,7 @@ function initPageLayout() {
             hideBecause(row, "adminstate", isadmin);
           }
         });
+        updateQueueRows();
       });
     }
     return null;
@@ -206,9 +242,9 @@ function hideBecause(row, reason, state) {
   }
 
   if (row.amoqueue_helper_hidebecause.size == 0) {
-    row.style.display = "";
+    row.classList.remove("amoqueue-hidden-row");
   } else {
-    row.style.display = "none";
+    row.classList.add("amoqueue-hidden-row");
   }
 }
 
@@ -274,14 +310,35 @@ function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() =>
 }
 
 function updateQueueInfo() {
-  let ids = Array.from(document.querySelectorAll("#addon-queue .addon-row"))
-                 .map((row) => "reviewInfo." + row.getAttribute("data-addon"));
+  let prefs = [];
+  for (let row of document.querySelectorAll("#addon-queue .addon-row")) {
+    prefs.push("reviewInfo." + row.getAttribute("data-addon"));
+  }
 
-  chrome.storage.local.get(ids, (data) => {
+  browser.storage.local.get(prefs, (data) => {
     for (let reviewInfo of Object.values(data)) {
       updateReviewInfoDisplay(reviewInfo.id, reviewInfo);
     }
   });
+
+  updateQueueRows();
+}
+
+function updateQueueRows() {
+  let showing = 0;
+  let rows = [...document.querySelectorAll("#addon-queue .addon-row")];
+  for (let row of rows) {
+    if (row.amoqueue_helper_hidebecause && row.amoqueue_helper_hidebecause.size == 0) {
+      showing++;
+    }
+  }
+
+  if (showing == rows.length) {
+    document.querySelector("#amoqueue-filtered-results").classList.add("amoqueue-hide");
+  } else {
+    document.querySelector("#amoqueue-filtered-count").textContent = showing;
+    document.querySelector("#amoqueue-filtered-results").classList.remove("amoqueue-hide");
+  }
 }
 
 function clearReviews() {

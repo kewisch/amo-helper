@@ -66,3 +66,12 @@ button.amoqueue-queue-button[disabled] span.image {
 button.amoqueue-queue-button[disabled] span.label {
   visibility: hidden;
 }
+
+.amoqueue-hidden-row, .amoqueue-hide {
+  display: none;
+}
+
+.num-results {
+    float: right;
+    line-height: 2em;
+}
