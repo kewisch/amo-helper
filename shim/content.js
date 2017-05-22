@@ -107,15 +107,20 @@ var browser = (function() {
           throw new Error("Only support passing message and responseCallback");
         }
 
-        let responseId = Math.random().toString(36).substr(2, 10);
+        return new Promise((resolve) => {
+          let responseId = Math.random().toString(36).substr(2, 10);
 
-        if (responseCallback) {
-          self.port.once("__sdk_contentscript_response_" + responseId, responseCallback);
-        }
+          self.port.once("__sdk_contentscript_response_" + responseId, (res) => {
+            if (responseCallback) {
+              responseCallback(res);
+            }
+            resolve(res);
+          });
 
-        self.port.emit("__sdk_contentscript_request", {
-          responseId: responseId,
-          message: message,
+          self.port.emit("__sdk_contentscript_request", {
+            responseId: responseId,
+            message: message,
+          });
         });
       }
     },
