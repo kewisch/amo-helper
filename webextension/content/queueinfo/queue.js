@@ -436,6 +436,7 @@ function updateAutocomplete() {
     if (!hide) {
       foundsome = true;
     }
+    updateQueueRows();
   });
 
   let noResults = document.getElementById("amoqueue-helper-autocomplete-noresults");
