@@ -30,6 +30,7 @@ function debounce(func, wait) {
 
 function restore_options() {
   chrome.storage.local.get({
+    "is-admin": false,
     "tabclose-other-queue": true,
     "tabclose-review-child": true,
     "queueinfo-use-diff": false,
@@ -44,8 +45,12 @@ function restore_options() {
     "reviewinfo-show-permissions": false,
     "reviewinfo-show-validator": false,
     "reviewtimer-display": true,
-    "reviewtimer-notify-interval": 10
+    "reviewtimer-notify-interval": 10,
+    "tinderbar-show": false,
+    "tinderbar-approve-text": "Thank you for your contribution. This version has been approved using a streamlined review process.",
+    "tinderbar-preload-tabs": 3
   }, (prefs) => {
+    document.documentElement.classList.toggle("is-admin", prefs["is-admin"]);
     document.getElementById("tabclose-other-queue").checked = prefs["tabclose-other-queue"];
     document.getElementById("tabclose-review-child").checked = prefs["tabclose-review-child"];
     document.getElementById("queueinfo-use-diff").checked = prefs["queueinfo-use-diff"];
@@ -61,6 +66,9 @@ function restore_options() {
     document.getElementById("reviewinfo-show-validator").checked = prefs["reviewinfo-show-validator"];
     document.getElementById("reviewtimer-display").checked = prefs["reviewtimer-display"];
     document.getElementById("reviewtimer-notify-interval").value = prefs["reviewtimer-notify-interval"];
+    document.getElementById("tinderbar-show").checked = prefs["tinderbar-show"];
+    document.getElementById("tinderbar-approve-text").value = prefs["tinderbar-approve-text"];
+    document.getElementById("tinderbar-preload-tabs").value = prefs["tinderbar-preload-tabs"];
   });
 }
 

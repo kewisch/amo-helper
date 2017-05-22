@@ -8,6 +8,8 @@ function initPageLayout() {
   let header = document.querySelector("#addon-queue > thead > .listing-header");
 
   return Promise.resolve().then(() => {
+    browser.storage.local.set({ "is-admin": IS_ADMIN });
+
     // Last update column
     let column = document.createElement("th");
     column.className = "amoqueue-helper-lastupdate";
@@ -325,10 +327,12 @@ function updateQueueInfo() {
 }
 
 function updateQueueRows() {
+  let slugs = [];
   let showing = 0;
   let rows = [...document.querySelectorAll("#addon-queue .addon-row")];
   for (let row of rows) {
     if (row.amoqueue_helper_hidebecause && row.amoqueue_helper_hidebecause.size == 0) {
+      slugs.push(row.querySelector("a").getAttribute("href").split("/").pop());
       showing++;
     }
   }
@@ -339,6 +343,15 @@ function updateQueueRows() {
     document.querySelector("#amoqueue-filtered-count").textContent = showing;
     document.querySelector("#amoqueue-filtered-results").classList.remove("amoqueue-hide");
   }
+
+  // Save current queue page in background
+  let queue = document.querySelector(".tabnav > li.selected > a").getAttribute("href").split("/").pop();
+  browser.runtime.sendMessage({
+    action: "queueinfo",
+    method: "set",
+    queue: queue,
+    addons: slugs
+  });
 }
 
 function clearReviews() {

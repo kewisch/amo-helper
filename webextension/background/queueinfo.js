@@ -1,4 +1,22 @@
 let per_page_value = 100;
+let last_queue_page = {};
+
+/* exported getLastQueue, queueByAddon */
+
+function getLastQueue(queue) {
+  return last_queue_page[queue] || [];
+}
+function queueByAddon(slug) {
+  // Not great performance, this can be optimized later
+  for (let [queue, addons] of Object.entries(last_queue_page)) {
+    let index = addons.findIndex(addon => addon == slug);
+    if (index > -1) {
+      return { index: index, queue: queue, addons: addons };
+    }
+  }
+
+  return { index: -1, queue: null, addons: [] };
+}
 
 chrome.webRequest.onBeforeRequest.addListener((details) => {
   let url = new URL(details.url);
@@ -25,6 +43,18 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 chrome.storage.local.get({ "queueinfo-per-page": 100 }, (prefs) => {
   per_page_value = prefs["queueinfo-per-page"];
+});
+
+sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
+  if (data.action != "queueinfo") {
+    return;
+  }
+
+  if (data.method == "set") {
+    last_queue_page[data.queue] = data.addons;
+  } else if (data.method == "get") {
+    sendReply({ queue: data.queue, addons: last_queue_page[data.queue] });
+  }
 });
 
 // TODO cleanup reviewInfo
