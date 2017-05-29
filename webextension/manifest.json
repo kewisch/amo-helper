@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "5.5.1",
+  "version": "5.5.2",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -67,7 +67,9 @@
       "run_at": "document_end"
     },{
       "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*"
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
       ],
       "js": ["content/copylink/review.js"],
       "run_at": "document_end"
@@ -102,7 +104,9 @@
       "run_at": "document_end"
     },{
       "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*"
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
       ],
       "js": [
         "libs/diff.min.js",
@@ -127,7 +131,11 @@
       ],
       "run_at": "document_end"
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
       "css": [ "content/reskin/review.css" ]
     },{
       "matches": [
@@ -136,7 +144,11 @@
       ],
       "css": [ "content/reskin/filebrowser.css" ]
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
       "js": [
         "libs/jquery-3.1.1.min.js",
         "libs/jquery-ui.min.js",
@@ -153,22 +165,38 @@
       "css": [ "content/filediff/filebrowser.css" ],
       "run_at": "document_end"
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
       "js": [ "content/reviewactions/review.js" ],
       "css": [ "content/reviewactions/review.css" ],
       "run_at": "document_end"
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
       "js": [ "content/reviewinfo/review.js" ],
       "css": [ "content/reviewinfo/review.css" ],
       "run_at": "document_end"
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
       "js": [ "content/reviewtimer/review.js" ],
       "css": [ "content/reviewtimer/review.css" ],
       "run_at": "document_end"
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/review/*" ],
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
       "js": [ "content/tinderbar/review.js" ],
       "css": [ "content/tinderbar/review.css" ],
       "run_at": "document_end"

@@ -3,9 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2016 */
 
-const RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
+const RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
 const MATCH_ADDON_LINKS = [
   "https://addons.mozilla.org/*/editors/review/*",
+  "https://addons.mozilla.org/*/editors/review-listed/*",
+  "https://addons.mozilla.org/*/editors/review-unlisted/*",
   "https://addons.mozilla.org/*/admin/manage/*",
   "https://addons.mozilla.org/*/*/addon/*", /* catches listing and manage url */
   "https://addons.mozilla.org/*/developers/feed/*",
@@ -25,7 +27,7 @@ function toAddonUrl(target, info) {
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     let activeTab = tabs[0];
-    let targetUrl = target.replace("$ADDON", matches[3]);
+    let targetUrl = target.replace("$ADDON", matches[4]);
 
     if (info.modifiers && (info.modifiers.includes("Command") || info.modifiers.includes("Ctrl"))) {
       // TODO add openerTabId: activeTab.id when supported

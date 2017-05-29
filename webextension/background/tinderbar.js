@@ -1,5 +1,5 @@
 const ADDON_REVIEW_URL = "https://addons.mozilla.org/editors/review/$ADDON";
-const ADDON_REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review\/(.*)/;
+const ADDON_REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review(|-listed|-unlisted)\/(.*)/;
 
 let tinder_current_tabs = [];
 let tinder_running = false;
@@ -9,7 +9,7 @@ async function getLastTab() {
   if (len == 0) {
     let currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
     let matchCurrentTab = currentTabs[0].url.match(ADDON_REVIEW_RE);
-    return { slug: matchCurrentTab ? matchCurrentTab[2] : null, tab: currentTabs[0] };
+    return { slug: matchCurrentTab ? matchCurrentTab[3] : null, tab: currentTabs[0] };
   } else {
     return tinder_current_tabs[tinder_current_tabs.length - 1];
   }

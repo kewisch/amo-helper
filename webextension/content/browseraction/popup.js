@@ -29,7 +29,7 @@ function setupMenuClick() {
 function setupMenuState() {
   // set up switch action
   browser.tabs.query({ active: true, currentWindow: true }).then(([tab, ...rest]) => {
-    let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
+    let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
     hideElement(document.getElementById("page-action-gotoreview"), !tab.url.match(RE_ADDON_LINKS));
   }).then(() => {
     // Remove the separator if there are no remaining actions
