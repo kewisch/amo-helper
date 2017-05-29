@@ -1,6 +1,6 @@
 "use strict";
 
-const REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review\/(.*)/;
+const REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review(|-listed|-unlisted)\/(.*)/;
 const QUEUE_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/queue\/(.*)/;
 
 // const FILEBROWSER_MATCH = "https://addons.mozilla.org/en-US/firefox/files/browse/*";
@@ -96,7 +96,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     let isQueue = tab.url.match(QUEUE_RE);
 
     if (isReview) {
-      reviewPages[tabId] = isReview[2];
+      reviewPages[tabId] = isReview[3];
     } else if (isQueue) {
       if (tabId in reviewPages) {
         removeTabsFor(tabId, reviewPages[tabId], prefs["tabclose-review-child"]);

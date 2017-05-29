@@ -80,11 +80,11 @@ function setupQueueRefresh() {
 }
 
 function switchToReviewPage() {
-  let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
+  let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab, ...rest]) => {
     let match = tab.url.match(RE_ADDON_LINKS);
     if (match) {
-      chrome.tabs.update(tab.id, { url: "https://addons.mozilla.org/en-US/editors/review/" + match[3] });
+      chrome.tabs.update(tab.id, { url: "https://addons.mozilla.org/en-US/editors/review/" + match[4] });
     }
   });
 }
