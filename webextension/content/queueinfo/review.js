@@ -155,7 +155,7 @@ function getInfo(doc) {
       let state = activityrow.firstElementChild.textContent.trim();
       let author = stateHasAuthor(state) ? activityrow.querySelector("td > div > a") : null;
 
-      if (state && activityrow.firstElementChild.className != "no-activity") {
+      if (state && state != "Not Auto Approved Because" && activityrow.firstElementChild.className != "no-activity") {
         results.push({
           state: state,
           type: stateToType(state),
