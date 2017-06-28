@@ -1,0 +1,41 @@
+window.addEventListener("load", () => {
+  // Moderated reviews
+  $(".review-flagged p:not(.description)").each(function() {
+    var reviewNode = $(this);
+    reviewNode.append(
+      $("<a />").text(" translate").click(function() {
+        translate(reviewNode.next(), $(this));
+      })
+    );
+  });
+
+  // Listed/Unlisted reviews
+  $("#addon-summary").prepend(
+    $("<a />").text("(Translate summary)").click(function() {
+      translate($("#addon-summary p:not(.addon-rating)"), $(this));
+    })
+  );
+
+  $(".article").prepend(
+    $("<a />").text("(Translate description)").click(function() {
+      translate($(".article p"), $(this));
+    })
+  );
+
+  function translate(textNode, clickedNode) {
+    var sending = browser.runtime.sendMessage({
+      action: "translate",
+      text: textNode.text(),
+      from: "translate"
+    });
+
+    sending.then((data) => {
+      if (data.error) {
+        clickedNode.text("Error : Key not set. See addon's options page.");
+      } else {
+        clickedNode.remove();
+        textNode.text(data.text);
+      }
+    });
+  }
+});

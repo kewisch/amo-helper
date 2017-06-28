@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "5.5.3",
+  "version": "5.6.2",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -22,7 +22,9 @@
     "webRequestBlocking",
 
     "https://addons.mozilla.org/*",
-    "https://addons.cdn.mozilla.net/*"
+    "https://addons.cdn.mozilla.net/*",
+    "https://api.cognitive.microsoft.com/*",
+    "https://api.microsofttranslator.com/*"
   ],
 
   "options_ui": {
@@ -52,7 +54,8 @@
       "background/tinderbar.js",
       "background/queueinfo.js",
       "background/omnibox.js",
-      "background/browseraction.js"
+      "background/browseraction.js",
+      "background/translation.js"
     ]
   },
 
@@ -81,6 +84,13 @@
       ],
       "js": ["content/tabclose/find_addonid.js"],
       "run_at": "document_end"
+    },{
+      "matches": [ "https://addons.mozilla.org/en-US/editors/queue/reviews*" ],
+      "js": [
+        "libs/jquery-3.1.1.min.js",
+        "content/translate/moderatedreviews.js"
+      ],
+      "run_at": "document_start"
     },{
       "matches": [ "https://addons.mozilla.org/en-US/editors/queue/*" ],
       "js": ["content/tabclose/queue.js"],
@@ -199,6 +209,17 @@
       ],
       "js": [ "content/tinderbar/review.js" ],
       "css": [ "content/tinderbar/review.css" ],
+      "run_at": "document_end"
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
+      "js": [ 
+        "libs/jquery-3.1.1.min.js",
+        "content/translate/moderatedreviews.js" 
+      ],
       "run_at": "document_end"
     }
   ]
