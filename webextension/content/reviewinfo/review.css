@@ -15,3 +15,8 @@
   display: inline-block;
   margin-inline-end: 5px;
 }
+
+.amoqueue-permissions-list {
+  max-height: 26.5em;
+  overflow: auto;
+}
