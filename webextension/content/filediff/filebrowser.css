@@ -2,12 +2,12 @@ body.amoqueue-hide-delete .delete {
   display: none
 }
 
-#amoqueue-copy-slug a {
+#amoqueue-copy-slug a, #amoqueue-download a, #amoqueue-filewindow-savepos a {
   transition: box-shadow 1s ease-in-out;
   border-radius: 2ex;
 }
 
-#amoqueue-copy-slug a:active {
+#amoqueue-copy-slug a:active, #amoqueue-download a:active, #amoqueue-filewindow-savepos a:active {
   box-shadow: 0px 0px 20px rgba(227,6,19,0.8), 0 0 5px rgba(227,6,19,0.8) inset;
   transition: box-shadow .05s linear;
   border-radius: 2ex;

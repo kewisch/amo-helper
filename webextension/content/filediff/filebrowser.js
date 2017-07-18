@@ -68,3 +68,17 @@ createCommand("amoqueue-download", "Download", null, () => {
     chrome.runtime.sendMessage({ action: "download", addonid: id, version: version });
   });
 });
+
+// TODO move this to filewindow when there is a simple import mechanism
+Promise.all([
+  browser.storage.local.get({ "filewindow-enabled": false }),
+  browser.runtime.sendMessage({ action: "filewindow-isfilewindow" })
+]).then(([prefs, isfilewindow]) => {
+  if (!prefs["filewindow-enabled"] || !isfilewindow) {
+    return;
+  }
+
+  createCommand("amoqueue-filewindow-savepos", "Save Window Position", null, () => {
+    chrome.runtime.sendMessage({ action: "filewindow-position" });
+  });
+});

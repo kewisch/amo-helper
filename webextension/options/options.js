@@ -49,7 +49,8 @@ function restore_options() {
     "translation-secret-key": "",
     "tinderbar-show": false,
     "tinderbar-approve-text": "Thank you for your contribution. This version has been approved using a streamlined review process.",
-    "tinderbar-preload-tabs": 3
+    "tinderbar-preload-tabs": 3,
+    "filewindow-enabled": false
   }, (prefs) => {
     document.documentElement.classList.toggle("is-admin", prefs["is-admin"]);
     document.getElementById("tabclose-other-queue").checked = prefs["tabclose-other-queue"];
@@ -71,6 +72,7 @@ function restore_options() {
     document.getElementById("tinderbar-show").checked = prefs["tinderbar-show"];
     document.getElementById("tinderbar-approve-text").value = prefs["tinderbar-approve-text"];
     document.getElementById("tinderbar-preload-tabs").value = prefs["tinderbar-preload-tabs"];
+    document.getElementById("filewindow-enabled").checked = prefs["filewindow-enabled"];
   });
 }
 
@@ -175,6 +177,16 @@ function setup_canned_listeners() {
   });
 }
 
+function setup_filewindow_listeners() {
+  let resetButton = document.getElementById("filewindow-position-reset");
+
+  resetButton.addEventListener("click", (event) => {
+    browser.storage.local.set({ "filewindow-position": {} });
+    resetButton.disabled = true;
+  });
+}
+
 document.addEventListener("DOMContentLoaded", restore_options);
 document.addEventListener("DOMContentLoaded", setup_canned_listeners);
+document.addEventListener("DOMContentLoaded", setup_filewindow_listeners);
 document.body.addEventListener("change", change_options);

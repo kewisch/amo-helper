@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "5.6.3",
+  "version": "5.7.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -55,7 +55,8 @@
       "background/queueinfo.js",
       "background/omnibox.js",
       "background/browseraction.js",
-      "background/translation.js"
+      "background/translation.js",
+      "background/filewindow.js"
     ]
   },
 
@@ -220,6 +221,14 @@
         "libs/jquery-3.1.1.min.js",
         "content/translate/moderatedreviews.js" 
       ],
+      "run_at": "document_end"
+    },{
+      "matches": [
+        "https://addons.mozilla.org/en-US/editors/review/*",
+        "https://addons.mozilla.org/en-US/editors/review-listed/*",
+        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+      ],
+      "js": ["libs/jquery-3.1.1.min.js", "content/filewindow/review.js"],
       "run_at": "document_end"
     }
   ]
