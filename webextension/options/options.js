@@ -46,6 +46,7 @@ function restore_options() {
     "reviewinfo-show-validator": false,
     "reviewtimer-display": true,
     "reviewtimer-notify-interval": 10,
+    "translation-secret-key": "",
     "tinderbar-show": false,
     "tinderbar-approve-text": "Thank you for your contribution. This version has been approved using a streamlined review process.",
     "tinderbar-preload-tabs": 3
@@ -66,6 +67,7 @@ function restore_options() {
     document.getElementById("reviewinfo-show-validator").checked = prefs["reviewinfo-show-validator"];
     document.getElementById("reviewtimer-display").checked = prefs["reviewtimer-display"];
     document.getElementById("reviewtimer-notify-interval").value = prefs["reviewtimer-notify-interval"];
+    document.getElementById("translation-secret-key").value = prefs["translation-secret-key"];
     document.getElementById("tinderbar-show").checked = prefs["tinderbar-show"];
     document.getElementById("tinderbar-approve-text").value = prefs["tinderbar-approve-text"];
     document.getElementById("tinderbar-preload-tabs").value = prefs["tinderbar-preload-tabs"];
