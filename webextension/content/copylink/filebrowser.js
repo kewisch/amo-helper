@@ -23,5 +23,11 @@ var last_copy_data = "";
 $("#file-viewer-inner").on("click", ".td-line-number a", onclickln);
 
 window.addEventListener("load", () => {
-  document.querySelectorAll("#files-tree .directory.closed.diff").forEach(node => node.click());
+  document.querySelectorAll("#files-tree .directory.closed.diff").forEach(node => {
+    let children = node.parentNode.nextElementSibling;
+
+    node.classList.remove("closed");
+    node.classList.add("open");
+    children.style.display = "block";
+  });
 });
