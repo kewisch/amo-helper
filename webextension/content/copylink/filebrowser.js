@@ -24,6 +24,10 @@ $("#file-viewer-inner").on("click", ".td-line-number a", onclickln);
 
 window.addEventListener("load", () => {
   document.querySelectorAll("#files-tree .directory.closed.diff").forEach(node => {
+    if (node.getAttribute("href").endsWith("/file/_locales")) {
+      return;
+    }
+
     let children = node.parentNode.nextElementSibling;
 
     node.classList.remove("closed");
