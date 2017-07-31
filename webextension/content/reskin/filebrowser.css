@@ -53,3 +53,7 @@ body.file-viewer div.section h3 {
 .highlighter-column-line-numbers {
   width: 4.4ex !important;
 }
+
+#files-wrapper {
+  min-height: 60vh;
+}
