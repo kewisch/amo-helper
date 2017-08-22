@@ -36,6 +36,7 @@ function restore_options() {
     "queueinfo-use-diff": false,
     "queueinfo-show-weeklines": false,
     "queueinfo-per-page": 100,
+    "queueinfo-partner-addons": [],
     "omnibox-enabled": true,
     "browseraction-queue-refresh-period": 60,
     "browseraction-count-moderator": false,
@@ -59,6 +60,7 @@ function restore_options() {
     document.getElementById("queueinfo-use-diff").checked = prefs["queueinfo-use-diff"];
     document.getElementById("queueinfo-show-weeklines").checked = prefs["queueinfo-show-weeklines"];
     document.getElementById("queueinfo-per-page").value = prefs["queueinfo-per-page"];
+    document.getElementById("queueinfo-partner-addons").value = prefs["queueinfo-partner-addons"];
     document.getElementById("omnibox-enabled").checked = prefs["omnibox-enabled"];
     document.getElementById("browseraction-count-moderator").value = prefs["browseraction-count-moderator"];
     document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];

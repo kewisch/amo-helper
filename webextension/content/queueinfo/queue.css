@@ -86,3 +86,7 @@ button.amoqueue-queue-button[disabled] span.label {
 .amoqueue-search-checkbox-label {
     display: block;
 }
+
+#addon-queue .amoqueue-is-partner {
+  background-color: rgba(255, 0, 0, 0.1);
+}

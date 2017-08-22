@@ -37,6 +37,8 @@ function initPageLayout() {
     let lastRelWeek = -1;
 
     for (let row of rows) {
+      let slug = row.querySelector("a").getAttribute("href").split("/").pop();
+
       // Last Update column
       // reuse the last column because there is an extra column on AMO
       let cell = row.lastElementChild; // document.createElement("td");
@@ -89,6 +91,11 @@ function initPageLayout() {
       if (prefs["queueinfo-show-weeklines"] && (lastRelWeek == -1 || relweekCache[days] != lastRelWeek)) {
         row.classList.add("amoqueue-new-week");
         lastRelWeek = relweekCache[days];
+      }
+
+      // Partner addon status
+      if (isPartnerAddon(slug)) {
+        row.classList.add("amoqueue-is-partner");
       }
 
       // Remove type column, don't see the need for it.
@@ -257,6 +264,16 @@ function initPageLayout() {
     clearButton.addEventListener("click", clearReviews, false);
     queueButtons.appendChild(clearButton);
   });
+}
+
+function initPartnerAddons() {
+  return chrome.storage.local.get({ "queueinfo-partner-addons": "" }, (prefs) => {
+    initPartnerAddons.addons = new Set(prefs["queueinfo-partner-addons"].split(/,\s*/));
+  });
+}
+function isPartnerAddon(slug) {
+  let addons = initPartnerAddons.addons || new Set();
+  return addons.has(slug);
 }
 
 function isSortedByBusinessDays() {
@@ -491,11 +508,22 @@ function updateSort(rows=null) {
     }
   }
 
+  function sortByPartner(a, b) {
+    let partnerA = isPartnerAddon(a.querySelector("a").getAttribute("href").split("/").pop());
+    let partnerB = isPartnerAddon(b.querySelector("a").getAttribute("href").split("/").pop());
+    return (partnerA < partnerB) - (partnerB < partnerA);
+  }
+
   if (!rows) {
     rows = [...document.querySelectorAll(".addon-row")];
   }
 
   rows.sort((a, b) => {
+    let partner = sortByPartner(a, b);
+    if (partner != 0) {
+      return partner;
+    }
+
     return sortByWaitTime(a, b);
   });
 
@@ -630,15 +658,18 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-(function() {
-  initPageLayout().then(() => {
-    document.getElementById("id_text_query")
-            .addEventListener("keyup", updateAutocomplete, false);
+(async function() {
+  await initPartnerAddons();
+  await initPageLayout();
 
-    window.addEventListener("pageshow", updateQueueInfo, false);
-    updateQueueInfo();
+  document.getElementById("id_text_query")
+          .addEventListener("keyup", updateAutocomplete, false);
 
-    window.addEventListener("pageshow", updateAutocomplete, false);
-    updateAutocomplete();
-  });
+  window.addEventListener("pageshow", updateQueueInfo, false);
+  updateQueueInfo();
+
+  window.addEventListener("pageshow", updateAutocomplete, false);
+  updateAutocomplete();
+
+  updateSort();
 })();
