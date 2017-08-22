@@ -32,6 +32,13 @@ tr.amoqueue-helper-reviewtime-highest td.amoqueue-helper-waitcell {
   color: #900498;
 }
 
+tr.amoqueue-new-week {
+  border-top: 1px solid black;
+}
+tr.amoqueue-new-week:first-child {
+  border: 0;
+}
+
 div.amoqueue-queue-buttons {
   text-align: right;
 }
@@ -67,7 +74,7 @@ button.amoqueue-queue-button[disabled] span.label {
   visibility: hidden;
 }
 
-.amoqueue-hidden-row, .amoqueue-hide {
+.amoqueue-hidden-row td, .amoqueue-hide {
   display: none;
 }
 

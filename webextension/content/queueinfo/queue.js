@@ -7,7 +7,7 @@ function initPageLayout() {
   // TODO async/await enabled starting Firefox 52
   let header = document.querySelector("#addon-queue > thead > .listing-header");
 
-  return Promise.resolve().then(() => {
+  return browser.storage.local.get({ "queueinfo-show-weeklines": false }).then((prefs) => {
     browser.storage.local.set({ "is-admin": IS_ADMIN });
 
     // Last update column
@@ -33,6 +33,8 @@ function initPageLayout() {
     let rows = document.querySelectorAll(".addon-row");
     let now = new Date();
     let bizdayCache = {};
+    let relweekCache = {};
+    let lastRelWeek = -1;
 
     for (let row of rows) {
       // Last Update column
@@ -75,6 +77,7 @@ function initPageLayout() {
         let submission = new Date(now);
         submission.setDate(submission.getDate() - days);
         bizdayCache[days] = workingDaysBetweenDates(submission, now);
+        relweekCache[days] = relweek(submission, now);
       }
       daycell.dataset.businessDays = bizdayCache[days];
       daycell.dataset.fullText = daycell.textContent;
@@ -83,6 +86,10 @@ function initPageLayout() {
       daycell.dataset.fullMinutes = toMinutes(size, unit);
       daycell.dataset.businessMinutes = unit.startsWith("day") ? toMinutes(bizdayCache[days], unit) : daycell.dataset.fullMinutes;
 
+      if (prefs["queueinfo-show-weeklines"] && (lastRelWeek == -1 || relweekCache[days] != lastRelWeek)) {
+        row.classList.add("amoqueue-new-week");
+        lastRelWeek = relweekCache[days];
+      }
 
       // Remove type column, don't see the need for it.
       row.querySelector("td:nth-of-type(3)").remove();
@@ -573,6 +580,19 @@ function workingDaysBetweenDates(startDate, endDate) {
   }
 
   return days;
+}
+
+function relweek(startDate, endDate) {
+  let sow = new Date(endDate);
+  sow.setDate(sow.getDate() - sow.getDay() - 1);
+  sow.setHours(0, 0, 0, 0);
+  let days = Math.ceil((sow - startDate) / 86400000);
+
+  if (startDate > sow) {
+    return 0;
+  } else {
+    return Math.ceil(days / 7);
+  }
 }
 
 function displaySize(size, relative=false) {
