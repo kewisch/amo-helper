@@ -31,6 +31,9 @@ function initPageLayout() {
     }
 
     let rows = document.querySelectorAll(".addon-row");
+    let now = new Date();
+    let bizdayCache = {};
+
     for (let row of rows) {
       // Last Update column
       // reuse the last column because there is an extra column on AMO
@@ -62,26 +65,24 @@ function initPageLayout() {
       let daycell = row.querySelector("td:nth-of-type(4)");
       daycell.classList.add("amoqueue-helper-waitcell");
       let parts = row.querySelector("td:nth-of-type(4)").textContent.split(" ");
-      let days = parts[1] == "days" ? parseInt(parts[0], 10) : 0;
-      if (days < 5) {
-        row.classList.add("amoqueue-helper-reviewtime-low");
-      } else if (days < 11) {
-        row.classList.add("amoqueue-helper-reviewtime-medium");
-      } else if (days < 20) {
-        row.classList.add("amoqueue-helper-reviewtime-high");
-      } else if (days < 30) {
-        row.classList.add("amoqueue-helper-reviewtime-higher");
-      } else if (days < 40) {
-        row.classList.add("amoqueue-helper-reviewtime-higher2");
-      } else if (days < 50) {
-        row.classList.add("amoqueue-helper-reviewtime-higher3");
-      } else if (days < 60) {
-        row.classList.add("amoqueue-helper-reviewtime-higher4");
-      } else if (days < 70) {
-        row.classList.add("amoqueue-helper-reviewtime-higher5");
-      } else {
-        row.classList.add("amoqueue-helper-reviewtime-highest");
+      let unit = parts[1];
+      let size = parseInt(parts[0], 10);
+      let days = unit.startsWith("day") ? size : 0;
+      updateReviewTimeClass(row, days);
+
+      // Business day waiting time
+      if (!(days in bizdayCache)) {
+        let submission = new Date(now);
+        submission.setDate(submission.getDate() - days);
+        bizdayCache[days] = workingDaysBetweenDates(submission, now);
       }
+      daycell.dataset.businessDays = bizdayCache[days];
+      daycell.dataset.fullText = daycell.textContent;
+      daycell.dataset.fullDays = days;
+      daycell.dataset.fullUnit = unit;
+      daycell.dataset.fullMinutes = toMinutes(size, unit);
+      daycell.dataset.businessMinutes = unit.startsWith("day") ? toMinutes(bizdayCache[days], unit) : daycell.dataset.fullMinutes;
+
 
       // Remove type column, don't see the need for it.
       row.querySelector("td:nth-of-type(3)").remove();
@@ -172,6 +173,25 @@ function initPageLayout() {
   }).then(() => {
     return addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare", false);
   }).then(() => {
+    return addSearchCheckbox("Show waiting time in business days", "queueinfo-business-days", false, (checked) => {
+      let rows = [...document.querySelectorAll(".addon-row")];
+      for (let row of rows) {
+        let cell = row.querySelector(".amoqueue-helper-waitcell");
+        let days;
+        if (checked && cell.dataset.fullUnit.startsWith("day")) {
+          cell.textContent = cell.dataset.businessDays + " business days";
+          days = cell.dataset.businessDays;
+        } else {
+          cell.textContent = cell.dataset.fullText;
+          days = cell.dataset.fullDays;
+        }
+        updateReviewTimeClass(row, days);
+      }
+
+      isSortedByBusinessDays.yep = checked;
+      updateSort(rows);
+    });
+  }).then(() => {
     // Autocomplete "no results" row
     let queueBody = document.querySelector("#addon-queue > tbody");
 
@@ -230,6 +250,10 @@ function initPageLayout() {
     clearButton.addEventListener("click", clearReviews, false);
     queueButtons.appendChild(clearButton);
   });
+}
+
+function isSortedByBusinessDays() {
+  return isSortedByBusinessDays.yep;
 }
 
 function hideBecause(row, reason, state) {
@@ -295,6 +319,7 @@ function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() =>
       let label = document.createElement("label");
       let checkbox = document.createElement("input");
       checkbox.setAttribute("type", "checkbox");
+      label.className = "amoqueue-search-checkbox-label";
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(labelText));
       checkbox.checked = initial;
@@ -443,6 +468,36 @@ function updateAutocomplete() {
   noResults.style.display = foundsome ? "none" : "";
 }
 
+function updateSort(rows=null) {
+  function sortByWaitTime(a, b) {
+    let wca = a.querySelector(".amoqueue-helper-waitcell");
+    let wcb = b.querySelector(".amoqueue-helper-waitcell");
+
+    if (isSortedByBusinessDays()) {
+      let bizA = wca.dataset.businessMinutes;
+      let bizB = wcb.dataset.businessMinutes;
+      return bizB - bizA;
+    } else {
+      let fullA = wca.dataset.fullMinutes;
+      let fullB = wcb.dataset.fullMinutes;
+      return fullB - fullA;
+    }
+  }
+
+  if (!rows) {
+    rows = [...document.querySelectorAll(".addon-row")];
+  }
+
+  rows.sort((a, b) => {
+    return sortByWaitTime(a, b);
+  });
+
+  let rowparent = rows[0].parentNode;
+  for (let row of rows) {
+    rowparent.appendChild(row);
+  }
+}
+
 /* Unfortunately this does not work due to cookies not being set on the XHR request
 function downloadReviewInfo(ids) {
 
@@ -461,11 +516,86 @@ function downloadReviewInfo(ids) {
 }
 */
 
+
+function updateReviewTimeClass(row, days) {
+  row.className = row.className.replace(/amoqueue-helper-reviewtime-\w+/g, "");
+
+  if (days < 5) {
+    row.classList.add("amoqueue-helper-reviewtime-low");
+  } else if (days < 11) {
+    row.classList.add("amoqueue-helper-reviewtime-medium");
+  } else if (days < 20) {
+    row.classList.add("amoqueue-helper-reviewtime-high");
+  } else if (days < 30) {
+    row.classList.add("amoqueue-helper-reviewtime-higher");
+  } else if (days < 40) {
+    row.classList.add("amoqueue-helper-reviewtime-higher2");
+  } else if (days < 50) {
+    row.classList.add("amoqueue-helper-reviewtime-higher3");
+  } else if (days < 60) {
+    row.classList.add("amoqueue-helper-reviewtime-higher4");
+  } else if (days < 70) {
+    row.classList.add("amoqueue-helper-reviewtime-higher5");
+  } else {
+    row.classList.add("amoqueue-helper-reviewtime-highest");
+  }
+}
+
+
+// https://stackoverflow.com/questions/37069186/calculate-working-days-between-two-dates-in-javascript-excepts-holidays
+function workingDaysBetweenDates(startDate, endDate) {
+  // Validate input
+  if (endDate < startDate) {
+    return 0;
+  }
+
+  // Calculate days between dates
+  let days = Math.ceil((endDate - startDate) / 86400000);
+
+  // Subtract two weekend days for every week in between
+  days -= Math.floor(days / 7) * 2;
+
+  // Handle special cases
+  let startDay = startDate.getDay();
+  let endDay = endDate.getDay();
+
+  // Remove weekend not previously removed.
+  if (startDay - endDay > 1) {
+    days -= 2;
+  }
+  // Remove start day if span starts on Sunday but ends before Saturday
+  if (startDay == 0 && endDay != 6) {
+    days--;
+  }
+  // Remove end day if span ends on Saturday but starts after Sunday
+  if (endDay == 6 && startDay != 0) {
+    days--;
+  }
+
+  return days;
+}
+
 function displaySize(size, relative=false) {
   let prefix = size < 0 ? "-" : (relative ? "+" : "");
   let asize = Math.abs(size);
   let i = Math.floor(Math.log(asize) / Math.log(1024));
   return prefix + Number((asize / Math.pow(1024, i)).toFixed(2)) + " " + ["B", "kB", "MB", "GB", "TB"][i];
+}
+
+function toMinutes(size, unit) {
+  switch (unit) {
+    case "day":
+    case "days":
+      return size * 24 * 60;
+    case "hour":
+    case "hours":
+      return size * 60;
+    case "minute":
+    case "minutes":
+      return size;
+    default:
+      return 0;
+  }
 }
 
 chrome.storage.onChanged.addListener((changes, area) => {

@@ -75,3 +75,7 @@ button.amoqueue-queue-button[disabled] span.label {
     float: right;
     line-height: 2em;
 }
+
+.amoqueue-search-checkbox-label {
+    display: block;
+}
