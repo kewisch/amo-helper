@@ -12,6 +12,43 @@ const DEFAULT_DANGEROUS_MESSAGES = [
   "eval"
 ].join(", ");
 
+const DEFAULT_PREFERENCES = {
+  "is-admin": false,
+  "tabclose-other-queue": true,
+  "tabclose-review-child": true,
+  "queueinfo-use-diff": false,
+  "queueinfo-show-weeklines": false,
+  "queueinfo-per-page": 100,
+  "queueinfo-partner-addons": "",
+  "omnibox-enabled": true,
+  "browseraction-queue-refresh-period": 60,
+  "browseraction-count-moderator": false,
+  "canned-use-stock": true,
+  "canned-include-body": true,
+  "reviewinfo-dangerous-permissions": DEFAULT_DANGEROUS_PERMISSIONS,
+  "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
+  "reviewinfo-show-permissions": false,
+  "reviewinfo-show-validator": false,
+  "reviewtimer-display": true,
+  "reviewtimer-notify-interval": 10,
+  "translation-secret-key": "",
+  "tinderbar-show": false,
+  "tinderbar-approve-text": "Thank you for your contribution. This version has been approved using a streamlined review process.",
+  "tinderbar-preload-tabs": 3,
+  "filewindow-enabled": false
+};
+
+const HIDDEN_PREFERENCES = {
+  "is-admin": false,
+  "filewindow-position": {},
+  "queueinfo-business-days": false,
+  "canned-responses": [],
+  "show-info": "both",
+  "show-webext": "both",
+  "show-admin": "both",
+  "queueinfo-open-compare": false
+};
+
 // https://davidwalsh.name/javascript-debounce-function
 function debounce(func, wait) {
   let timeout;
@@ -29,60 +66,28 @@ function debounce(func, wait) {
 }
 
 function restore_options() {
-  chrome.storage.local.get({
-    "is-admin": false,
-    "tabclose-other-queue": true,
-    "tabclose-review-child": true,
-    "queueinfo-use-diff": false,
-    "queueinfo-show-weeklines": false,
-    "queueinfo-per-page": 100,
-    "queueinfo-partner-addons": [],
-    "omnibox-enabled": true,
-    "browseraction-queue-refresh-period": 60,
-    "browseraction-count-moderator": false,
-    "canned-use-stock": true,
-    "canned-include-body": true,
-    "reviewinfo-dangerous-permissions": DEFAULT_DANGEROUS_PERMISSIONS,
-    "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
-    "reviewinfo-show-permissions": false,
-    "reviewinfo-show-validator": false,
-    "reviewtimer-display": true,
-    "reviewtimer-notify-interval": 10,
-    "translation-secret-key": "",
-    "tinderbar-show": false,
-    "tinderbar-approve-text": "Thank you for your contribution. This version has been approved using a streamlined review process.",
-    "tinderbar-preload-tabs": 3,
-    "filewindow-enabled": false
-  }, (prefs) => {
+  chrome.storage.local.get(DEFAULT_PREFERENCES, (prefs) => {
     document.documentElement.classList.toggle("is-admin", prefs["is-admin"]);
-    document.getElementById("tabclose-other-queue").checked = prefs["tabclose-other-queue"];
-    document.getElementById("tabclose-review-child").checked = prefs["tabclose-review-child"];
-    document.getElementById("queueinfo-use-diff").checked = prefs["queueinfo-use-diff"];
-    document.getElementById("queueinfo-show-weeklines").checked = prefs["queueinfo-show-weeklines"];
-    document.getElementById("queueinfo-per-page").value = prefs["queueinfo-per-page"];
-    document.getElementById("queueinfo-partner-addons").value = prefs["queueinfo-partner-addons"];
-    document.getElementById("omnibox-enabled").checked = prefs["omnibox-enabled"];
-    document.getElementById("browseraction-count-moderator").value = prefs["browseraction-count-moderator"];
-    document.getElementById("browseraction-queue-refresh-period").value = prefs["browseraction-queue-refresh-period"];
-    document.getElementById("canned-use-stock").checked = prefs["canned-use-stock"];
-    document.getElementById("canned-include-body").checked = prefs["canned-include-body"];
-    document.getElementById("reviewinfo-dangerous-permissions").value = prefs["reviewinfo-dangerous-permissions"];
-    document.getElementById("reviewinfo-dangerous-messages").value = prefs["reviewinfo-dangerous-messages"];
-    document.getElementById("reviewinfo-show-permissions").checked = prefs["reviewinfo-show-permissions"];
-    document.getElementById("reviewinfo-show-validator").checked = prefs["reviewinfo-show-validator"];
-    document.getElementById("reviewtimer-display").checked = prefs["reviewtimer-display"];
-    document.getElementById("reviewtimer-notify-interval").value = prefs["reviewtimer-notify-interval"];
-    document.getElementById("translation-secret-key").value = prefs["translation-secret-key"];
-    document.getElementById("tinderbar-show").checked = prefs["tinderbar-show"];
-    document.getElementById("tinderbar-approve-text").value = prefs["tinderbar-approve-text"];
-    document.getElementById("tinderbar-preload-tabs").value = prefs["tinderbar-preload-tabs"];
-    document.getElementById("filewindow-enabled").checked = prefs["filewindow-enabled"];
+    for (let key of Object.keys(prefs)) {
+      let elem = document.getElementById(key);
+      if (!elem) {
+        continue;
+      }
+
+      if (elem.type == "checkbox") {
+        elem.checked = prefs[key];
+      } else {
+        elem.value = prefs[key];
+      }
+    }
   });
+
+  restore_canned_options();
 }
 
 function change_options(event) {
   let node = event.target;
-  if (!node.id) {
+  if (!node.id || node.localName != "input" || !Object.keys(DEFAULT_PREFERENCES).includes(node.id)) {
     return;
   }
 
@@ -90,10 +95,18 @@ function change_options(event) {
     chrome.storage.local.set({ [node.id]: node.checked });
   } else if (node.getAttribute("type") == "number") {
     chrome.storage.local.set({ [node.id]: parseInt(node.value, 10) });
-  } else if (node.localName == "input") {
+  } else if (node.getAttribute("type") == "text") {
     chrome.storage.local.set({ [node.id]: node.value });
   }
 }
+
+function setup_listeners() {
+  setup_canned_listeners();
+  setup_filewindow_listeners();
+  setup_import_export_listeners();
+}
+
+/* --- canned responses --- */
 
 var save_canned_responses = debounce(() => {
   let select = document.getElementById("canned-select");
@@ -114,29 +127,13 @@ function setup_canned_listeners() {
     select.appendChild(clone);
   }
 
-  function updateState() {
-    let selectedItem = select.options[select.selectedIndex];
-    let isNewItem = selectedItem.className == "canned-option-new";
-
-    button.disabled = isNewItem;
-
-    if (isNewItem) {
-      value.value = "";
-      label.value = "";
-      label.setAttribute("placeholder", selectedItem.textContent);
-    } else {
-      value.value = selectedItem.value;
-      label.value = selectedItem.textContent;
-      label.removeAttribute("placeholder");
-    }
-  }
 
   let select = document.getElementById("canned-select");
   let label = document.getElementById("canned-label");
   let value = document.getElementById("canned-value");
   let button = document.getElementById("canned-delete");
 
-  select.addEventListener("change", updateState);
+  select.addEventListener("change", update_canned_state);
 
   label.addEventListener("keyup", (event) => {
     let selectedItem = select.options[select.selectedIndex];
@@ -163,11 +160,42 @@ function setup_canned_listeners() {
     let next = selectedItem.nextElementSibling || selectedItem.previousElementSibling;
     selectedItem.remove();
     select.value = next.value;
-    updateState();
+    update_canned_state();
     save_canned_responses();
   });
+}
+
+function update_canned_state() {
+  let select = document.getElementById("canned-select");
+  let label = document.getElementById("canned-label");
+  let value = document.getElementById("canned-value");
+  let button = document.getElementById("canned-delete");
+
+  let selectedItem = select.options[select.selectedIndex];
+  let isNewItem = selectedItem.className == "canned-option-new";
+
+  button.disabled = isNewItem;
+
+  if (isNewItem) {
+    value.value = "";
+    label.value = "";
+    label.setAttribute("placeholder", selectedItem.textContent);
+  } else {
+    value.value = selectedItem.value;
+    label.value = selectedItem.textContent;
+    label.removeAttribute("placeholder");
+  }
+}
+
+function restore_canned_options() {
+  let select = document.getElementById("canned-select");
 
   chrome.storage.local.get({ "canned-responses": [] }, (prefs) => {
+    let previousOptions = document.querySelectorAll("#canned option:not(.canned-option-new)");
+    for (let option of previousOptions) {
+      option.remove();
+    }
+
     let newOption = document.querySelector("#canned .canned-option-new");
     for (let optionData of prefs["canned-responses"]) {
       let option = document.createElement("option");
@@ -177,9 +205,11 @@ function setup_canned_listeners() {
     }
 
     select.selectedIndex = 0;
-    updateState();
+    update_canned_state();
   });
 }
+
+/* --- filewindow position --- */
 
 function setup_filewindow_listeners() {
   let resetButton = document.getElementById("filewindow-position-reset");
@@ -190,7 +220,95 @@ function setup_filewindow_listeners() {
   });
 }
 
+/* --- import export --- */
+
+function setup_import_export_listeners() {
+  let importButton = document.getElementById("import-button");
+  let exportButton = document.getElementById("export-button");
+  let importFile = document.getElementById("import-file");
+
+  exportButton.addEventListener("click", async (event) => {
+    let prefs = await browser.storage.local.get(null);
+
+    let deleteKeys = Object.keys(prefs).filter(key => {
+      if (key.startsWith("reviewInfo.") || key.startsWith("slugInfo.")) {
+        return true;
+      }
+
+      if (DEFAULT_PREFERENCES.hasOwnProperty(key) && prefs[key] == DEFAULT_PREFERENCES[key]) {
+        // Filter out prefs that have not been changed from the default
+        return true;
+      }
+
+      if (HIDDEN_PREFERENCES.hasOwnProperty(key) && prefs[key] == HIDDEN_PREFERENCES[key]) {
+        // Filter out prefs that have not been changed from the default
+        return true;
+      }
+
+      return false;
+    });
+
+    deleteKeys.forEach(key => delete prefs[key]);
+
+    let url = URL.createObjectURL(new Blob([JSON.stringify(prefs, null, 2)], { type: "application/json" }));
+
+    let downloadId = null;
+    let completeListener = (delta) => {
+      if (delta.id != downloadId) {
+        return;
+      }
+
+      if (delta.state.current == "complete") {
+        URL.revokeObjectURL(url);
+        browser.downloads.onChanged.removeListener(completeListener);
+      }
+    };
+    browser.downloads.onChanged.addListener(completeListener);
+
+    downloadId = await browser.downloads.download({
+      url: url,
+      filename: "amoqueue.json",
+      saveAs: true
+    });
+  });
+
+  importFile.addEventListener("change", (event) => {
+    let file = importFile.files[0];
+
+    let reader = new FileReader();
+    reader.addEventListener("loadend", async () => {
+      let newPrefs = JSON.parse(reader.result);
+
+      let safePrefs = {};
+      for (let key of Object.keys(DEFAULT_PREFERENCES)) {
+        if (newPrefs.hasOwnProperty(key) && typeof newPrefs[key] == typeof DEFAULT_PREFERENCES[key]) {
+          safePrefs[key] = newPrefs[key];
+        }
+      }
+      for (let key of Object.keys(HIDDEN_PREFERENCES)) {
+        if (newPrefs.hasOwnProperty(key) && typeof newPrefs[key] == typeof HIDDEN_PREFERENCES[key]) {
+          safePrefs[key] = newPrefs[key];
+        }
+      }
+
+      let clearStorage = document.getElementById("import-clear-storage");
+      if (clearStorage.checked) {
+        await browser.storage.local.clear();
+        clearStorage.checked = false;
+      }
+
+      await browser.storage.local.set(safePrefs);
+      restore_options();
+    });
+    reader.readAsText(file);
+  });
+
+  importButton.addEventListener("click", (event) => {
+    importFile.click();
+    event.preventDefault();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", setup_listeners);
 document.addEventListener("DOMContentLoaded", restore_options);
-document.addEventListener("DOMContentLoaded", setup_canned_listeners);
-document.addEventListener("DOMContentLoaded", setup_filewindow_listeners);
 document.body.addEventListener("change", change_options);

@@ -51,3 +51,10 @@ label.expand input {
 #canned-select .canned-option-new {
   opacity: 0.54;
 }
+
+#import-file {
+  display: block;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}
