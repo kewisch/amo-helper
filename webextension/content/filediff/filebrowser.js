@@ -59,14 +59,14 @@ createCommand("amoqueue-copy-slug", "Copy Slug", null, () => {
 });
 
 // TODO move this to downloads when there is a simple import mechanism
-createCommand("amoqueue-download", "Download", null, () => {
+createCommand("amoqueue-download", "Download", null, async () => {
   let version = document.getElementById("metadata").getAttribute("data-version");
   let slug = document.getElementById("metadata").getAttribute("data-slug");
 
-  chrome.storage.local.get({ ["slugInfo." + slug]: null }, (prefs) => {
-    let id = prefs["slugInfo." + slug];
-    chrome.runtime.sendMessage({ action: "download", addonid: id, version: version });
-  });
+  let prefs = await browser.runtime.sendMessage({ action: "infostorage", op: "get", storage: "slug", keys: ["slugInfo." + slug] });
+  let id = prefs["slugInfo." + slug];
+
+  chrome.runtime.sendMessage({ action: "download", addonid: id, version: version });
 });
 
 // TODO move this to filewindow when there is a simple import mechanism

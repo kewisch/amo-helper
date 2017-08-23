@@ -366,7 +366,7 @@ function updateQueueInfo() {
     prefs.push("reviewInfo." + row.getAttribute("data-addon"));
   }
 
-  browser.storage.local.get(prefs, (data) => {
+  browser.runtime.sendMessage({ action: "infostorage", op: "get", storage: "review", keys: prefs }).then((data) => {
     for (let reviewInfo of Object.values(data)) {
       updateReviewInfoDisplay(reviewInfo.id, reviewInfo);
     }
@@ -404,10 +404,7 @@ function updateQueueRows() {
 }
 
 function clearReviews() {
-  chrome.storage.local.get(null, (data) => {
-    let keys = Object.keys(data).filter(key => key.startsWith("reviewInfo."));
-    chrome.storage.local.remove(keys);
-  });
+  browser.runtime.sendMessage({ action: "infostorage", op: "clear", storage: "review" });
 }
 
 function updateReviewInfoDisplay(id, info) {
@@ -646,15 +643,18 @@ function toMinutes(size, unit) {
   }
 }
 
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area != "local") {
+browser.storage.onChanged.addListener(async (changes, area) => {
+  if (area != "local" || !changes["notify-infostorage"]) {
     return;
   }
 
-  for (let [key, { newValue: reviewInfo }] of Object.entries(changes)) {
-    if (key.startsWith("reviewInfo.")) {
-      updateReviewInfoDisplay(key.substr(11), reviewInfo || {});
-    }
+  let notification = changes["notify-infostorage"].newValue;
+  if (notification.storage != "review") {
+    return;
+  }
+
+  for (let [key, reviewInfo] of Object.entries(notification.keys)) {
+    updateReviewInfoDisplay(key.substr(11), reviewInfo || {});
   }
 });
 

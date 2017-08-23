@@ -25,6 +25,7 @@ const DEFAULT_PREFERENCES = {
   "browseraction-count-moderator": false,
   "canned-use-stock": true,
   "canned-include-body": true,
+  "persist-info-storage": false,
   "reviewinfo-dangerous-permissions": DEFAULT_DANGEROUS_PERMISSIONS,
   "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
   "reviewinfo-show-permissions": false,

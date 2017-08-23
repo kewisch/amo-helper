@@ -246,7 +246,7 @@ function findParent(node, className) {
 }
 
 // -- main --
-(function() {
+(async function() {
   // Make file info links open in a new tab
   document.querySelectorAll(".file-info a").forEach((link) => {
     link.setAttribute("target", "_blank");
@@ -268,7 +268,7 @@ function findParent(node, className) {
   });
 
   // Open compare link if options enabled
-  chrome.storage.local.get({ "queueinfo-open-compare": false }, (prefs) => {
+  browser.storage.local.get({ "queueinfo-open-compare": false }).then((prefs) => {
     if (prefs["queueinfo-open-compare"]) {
       document.querySelector(".listing-body:last-child .file-info a.compare").click();
     }
@@ -276,11 +276,11 @@ function findParent(node, className) {
 
   // Collect review info and set in storage
   let info = getInfo(document);
-  chrome.storage.local.set({ ["slugInfo." + info.slug]: info.id }, () => {
-    chrome.storage.local.set({ ["reviewInfo." + info.id]: info }, () => {
-      updateSize(info).then(() => {
-        chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
-      });
-    });
-  });
+
+  await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "slug", keys: { ["slugInfo." + info.slug]: info.id } });
+  await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "review", keys: { ["reviewInfo." + info.id]: info } });
+
+  // Update the size (takes longer) and update storage again
+  await updateSize(info);
+  await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "review", keys: { ["reviewInfo." + info.id]: info } });
 })();
