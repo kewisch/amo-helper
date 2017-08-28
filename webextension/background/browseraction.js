@@ -79,6 +79,20 @@ function setupQueueRefresh() {
   });
 }
 
+async function closeAMOTabs() {
+  let results = await Promise.all([
+    // Editor pages
+    browser.tabs.query({ url: "https://addons.mozilla.org/en-US/editors/*" }),
+    browser.tabs.query({ url: "https://addons.mozilla.org/en-US/firefox/addon/*/privacy/" }),
+
+    // File browsers
+    browser.tabs.query({ url: "https://addons.mozilla.org/en-US/firefox/files/*" })
+  ]);
+
+  let tabIds = [].concat(...results).map(tab => tab.id);
+  await browser.tabs.remove(tabIds);
+}
+
 function switchToReviewPage() {
   let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab, ...rest]) => {
@@ -113,6 +127,8 @@ chrome.storage.onChanged.addListener((changes, area) => {
 chrome.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "popup-action-refreshcount") {
     updateQueueNumbers().then(updateBadge);
+  } else if (data.action == "popup-action-closetabs") {
+    closeAMOTabs();
   } else if (data.action == "popup-action-gotoreview") {
     switchToReviewPage();
   }

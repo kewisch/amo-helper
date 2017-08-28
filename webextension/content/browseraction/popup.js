@@ -23,6 +23,7 @@ function setupMenuClick() {
     }
 
     promise.then(() => window.close());
+    event.preventDefault();
   });
 }
 
@@ -31,10 +32,6 @@ function setupMenuState() {
   browser.tabs.query({ active: true, currentWindow: true }).then(([tab, ...rest]) => {
     let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
     hideElement(document.getElementById("page-action-gotoreview"), !tab.url.match(RE_ADDON_LINKS));
-  }).then(() => {
-    // Remove the separator if there are no remaining actions
-    let separator = document.getElementById("page-action-separator");
-    hideElement(separator, !document.querySelector("#page-action-separator ~ li:not([hidden])"));
   });
 }
 
