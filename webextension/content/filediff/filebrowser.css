@@ -1,4 +1,5 @@
-body.amoqueue-hide-delete .delete {
+body.amoqueue-hide-delete .delete,
+body.amoqueue-hide-comments .amoqueue-comment-only {
   display: none
 }
 
