@@ -42,13 +42,77 @@ function createCommand(id, text, key, func) {
   }
 }
 
+
+// TODO move this to beautify when there is a simple import mechanism
+createCommand("amoqueue-beautify", "Toggle Beautify", "o", () => {
+  function prettyPrepare(node, attr) {
+    let ucfAttr = attr[0].toUpperCase() + attr.substr(1);
+    if (!node.dataset["amoqueuePretty" + ucfAttr]) {
+      node.dataset["amoqueueOrig" + ucfAttr] = node.dataset[attr];
+
+      let pretty = prettyFast(node.dataset[attr], {
+        url: document.location.href,
+        indent: "    "
+      });
+      node.dataset["amoqueuePretty" + ucfAttr] = pretty.code;
+    }
+
+    let prettyContent = node.dataset["amoqueuePretty" + ucfAttr];
+    let origContent = node.dataset["amoqueueOrig" + ucfAttr];
+    let targetContent;
+
+    if (node.dataset.amoqueueMode == "pretty") {
+      node.dataset[attr] = targetContent = origContent;
+    } else {
+      node.dataset[attr] = targetContent = prettyContent;
+    }
+
+    return { prettyContent, origContent, targetContent };
+  }
+
+  function prettyRevert(node, attr, { prettyContent, origContent, targetContent }) {
+    let ucfAttr = attr[0].toUpperCase() + attr.substr(1);
+
+    // The highlighter removes the content and style attributes
+    node.dataset["amoqueueOrig" + ucfAttr] = origContent;
+    node.dataset["amoqueuePretty" + ucfAttr] = prettyContent;
+    node.dataset[attr] = targetContent;
+  }
+
+  let amownd = window.wrappedJSObject;
+
+
+  let node = document.getElementById("content") || document.getElementById("diff");
+  let previousMode = node.dataset.amoqueueMode;
+  let brush = node.dataset.brush;
+
+  if (document.getElementById("content")) {
+    let content = prettyPrepare(node, "content");
+    amownd.Highlighter.highlight(amownd.$("#content"));
+    prettyRevert(node, "content", content);
+  } else if (document.getElementById("diff")) {
+    let left = prettyPrepare(node, "left");
+    let right = prettyPrepare(node, "right");
+
+    amownd.Highlighter.highlight(amownd.$("#diff"));
+
+    prettyRevert(node, "left", left);
+    prettyRevert(node, "right", right);
+  }
+
+  node.dataset.amoqueueMode = previousMode == "pretty" ? "orig" : "pretty";
+  node.dataset.brush = brush;
+  node.style.MozTabSize = 4;
+
+  amownd.viewer.compute_messages(amownd.$("#content-wrapper"));
+});
+
 createCommand("amoqueue-hide-delete", "Toggle deleted lines", "+", () => {
   document.body.classList.toggle("amoqueue-hide-delete");
 });
 
-var commentLazyInitialized = false;
 createCommand("amoqueue-hide-delete", "Toggle comment lines", "*", () => {
-  if (!commentLazyInitialized) {
+  if (!document.querySelector("tr[amoqueue-comment-only]")) {
     for (let row of document.querySelectorAll(".tr-line")) {
       let linecode = row.querySelector(".line-code");
 
@@ -65,8 +129,6 @@ createCommand("amoqueue-hide-delete", "Toggle comment lines", "*", () => {
         row.classList.add("amoqueue-comment-only");
       }
     }
-
-    commentLazyInitialized = true;
   }
 
   let content = document.getElementById("content") || document.getElementById("diff");

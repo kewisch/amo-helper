@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -174,7 +174,12 @@
         "https://addons.mozilla.org/en-US/firefox/files/browse/*",
         "https://addons.mozilla.org/en-US/firefox/files/compare/*"
       ],
-      "js": [ "content/filediff/filebrowser.js" ],
+      "js": [
+        "libs/acorn.min.js",
+        "libs/source-map.min.js",
+        "libs/pretty-fast.js",
+        "content/filediff/filebrowser.js"
+      ],
       "css": [ "content/filediff/filebrowser.css" ],
       "run_at": "document_end"
     },{
