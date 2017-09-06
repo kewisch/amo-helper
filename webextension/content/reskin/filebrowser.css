@@ -57,3 +57,9 @@ body.file-viewer div.section h3 {
 #files-wrapper {
   min-height: 60vh;
 }
+
+#files-inner > h3 {
+  display: block;
+  border-bottom: 1px dotted #ccc;
+  margin: 0;
+}
