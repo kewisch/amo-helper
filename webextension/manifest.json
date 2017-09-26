@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "6.5.1",
+  "version": "6.5.2",
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -133,14 +133,6 @@
       ],
       "js": [
         "content/browseraction/queue.js"
-      ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/"
-      ],
-      "js": [
-        "content/browseraction/dashboard.js"
       ],
       "run_at": "document_end"
     },{

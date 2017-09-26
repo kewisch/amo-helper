@@ -47,14 +47,14 @@ function createCommand(id, text, key, func) {
 createCommand("amoqueue-beautify", "Toggle Beautify", "o", () => {
   function prettyPrepare(node, attr) {
     let ucfAttr = attr[0].toUpperCase() + attr.substr(1);
-    if (!node.dataset["amoqueuePretty" + ucfAttr]) {
-      node.dataset["amoqueueOrig" + ucfAttr] = node.dataset[attr];
+    if (node.dataset[attr] && !node.dataset["amoqueuePretty" + ucfAttr]) {
+      node.dataset["amoqueueOrig" + ucfAttr] = node.dataset[attr] || "";
 
       let pretty = prettyFast(node.dataset[attr], {
         url: document.location.href,
         indent: "    "
       });
-      node.dataset["amoqueuePretty" + ucfAttr] = pretty.code;
+      node.dataset["amoqueuePretty" + ucfAttr] = pretty.code || "";
     }
 
     let prettyContent = node.dataset["amoqueuePretty" + ucfAttr];
@@ -62,9 +62,9 @@ createCommand("amoqueue-beautify", "Toggle Beautify", "o", () => {
     let targetContent;
 
     if (node.dataset.amoqueueMode == "pretty") {
-      node.dataset[attr] = targetContent = origContent;
+      node.dataset[attr] = targetContent = origContent || "";
     } else {
-      node.dataset[attr] = targetContent = prettyContent;
+      node.dataset[attr] = targetContent = prettyContent || "";
     }
 
     return { prettyContent, origContent, targetContent };
@@ -74,9 +74,9 @@ createCommand("amoqueue-beautify", "Toggle Beautify", "o", () => {
     let ucfAttr = attr[0].toUpperCase() + attr.substr(1);
 
     // The highlighter removes the content and style attributes
-    node.dataset["amoqueueOrig" + ucfAttr] = origContent;
-    node.dataset["amoqueuePretty" + ucfAttr] = prettyContent;
-    node.dataset[attr] = targetContent;
+    node.dataset["amoqueueOrig" + ucfAttr] = origContent || "";
+    node.dataset["amoqueuePretty" + ucfAttr] = prettyContent || "";
+    node.dataset[attr] = targetContent || "";
   }
 
   let amownd = window.wrappedJSObject;
@@ -104,6 +104,9 @@ createCommand("amoqueue-beautify", "Toggle Beautify", "o", () => {
   node.dataset.brush = brush;
   node.style.MozTabSize = 4;
 
+  for (let msg of document.querySelector("#content-wrapper > div > .notification-box")) {
+    msg.remove();
+  }
   amownd.viewer.compute_messages(amownd.$("#content-wrapper"));
 });
 

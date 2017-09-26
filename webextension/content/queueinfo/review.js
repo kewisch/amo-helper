@@ -37,6 +37,11 @@ function stateHasAuthor(state) {
     case "More information requested":
     case "Comment":
     case "Super review requested":
+    case "Source code uploaded":
+    case "Approval notes changed":
+    case "Developer Reply":
+    case "Reviewer Reply":
+    case "Auto-Approval confirmed":
       return true;
   }
   return false;
@@ -150,15 +155,28 @@ function getInfo(doc) {
   var versions = Array.from(doc.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
     let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
     let submissiondate = floatingtime(headerparts[2].trim(), true);
+    let hasAutoApproval = false;
+    let hasConfirmApproval = false;
 
     let activities = Array.from(listbody.querySelectorAll(".activity tr")).reduce((results, activityrow) => {
       let state = activityrow.firstElementChild.textContent.trim();
       let author = stateHasAuthor(state) ? activityrow.querySelector("td > div > a") : null;
 
+      if (state == "Approved" && author && author.getAttribute("href").endsWith("mozilla/")) {
+        // This is an auto-approval, mark it for later.
+        hasAutoApproval = true;
+      }
+
+      if (state == "Auto-Approval confirmed") {
+        // ...and the approval was confirmed
+        hasConfirmApproval = true;
+      }
+
       if (state && state != "Not Auto Approved Because" && activityrow.firstElementChild.className != "no-activity") {
         results.push({
           state: state,
           type: stateToType(state),
+          automatic: author && author.getAttribute("href").endsWith("mozilla/"),
           author: authorInfo(author),
           date: author ? floatingtime(author.nextSibling.textContent.replace(" on ", "")) : submissiondate,
           comment: activityrow.lastElementChild.textContent.trim()
@@ -186,7 +204,8 @@ function getInfo(doc) {
       permissions = permissions.nextSibling.textContent.trim().split(", ");
     }
 
-    if (status == "Approved") {
+    // Only the last manual approval
+    if (status == "Approved" && (!hasAutoApproval || hasConfirmApproval)) {
       lastapproved_idx = idx;
     }
 

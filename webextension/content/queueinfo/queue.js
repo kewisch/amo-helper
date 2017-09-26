@@ -2,69 +2,75 @@
 
 const OVERDUE_SOURCES = 7;
 const IS_ADMIN = !!document.getElementById("unlisted-queues");
+const QUEUE = document.location.pathname.split("/").pop();
 
-function initPageLayout() {
-  // TODO async/await enabled starting Firefox 52
+
+async function initPageLayout() {
   let header = document.querySelector("#addon-queue > thead > .listing-header");
 
-  return browser.storage.local.get({ "queueinfo-show-weeklines": false }).then((prefs) => {
-    browser.storage.local.set({ "is-admin": IS_ADMIN });
+  let prefs = await browser.storage.local.get({ "queueinfo-show-weeklines": false });
+  browser.storage.local.set({ "is-admin": IS_ADMIN });
 
-    // Last update column
-    let column = document.createElement("th");
-    column.className = "amoqueue-helper-lastupdate";
-    column.textContent = "Last Update";
+  // Last update column
+  let column = document.createElement("th");
+  column.className = "amoqueue-helper-lastupdate";
+  column.textContent = "Last Update";
+  header.appendChild(column);
+
+  // Info column
+  column = document.createElement("th");
+  column.className ="amoqueue-helper-info-column";
+  column.textContent = "Last Action";
+  header.appendChild(column);
+
+  // Size column
+  if (IS_ADMIN) {
+    column = document.createElement("th");
+    column.className ="amoqueue-helper-size-column";
+    column.textContent = "Size";
     header.appendChild(column);
+  }
+
+  let rows = document.querySelectorAll(".addon-row");
+  let now = new Date();
+  let bizdayCache = {};
+  let relweekCache = {};
+  let lastRelWeek = -1;
+
+  let hasTypeColumn = document.querySelector(".listing-header > th > a[href$='addon_type_id']");
+  let hasWaitingColumn = document.querySelector(".listing-header > th > a[href$='waiting_time_min']");
+
+  for (let row of rows) {
+    let slug = row.querySelector("a").getAttribute("href").split("/").pop();
+
+    // Last Update column
+    // reuse the last column because there is an extra column on AMO
+    let cell = row.lastElementChild; // document.createElement("td");
+    cell.className = "amoqueue-helper-cell amoqueue-helper-lastupdate-cell";
+    row.appendChild(cell);
 
     // Info column
-    column = document.createElement("th");
-    column.className ="amoqueue-helper-info-column";
-    column.textContent = "Last Action";
-    header.appendChild(column);
+    cell = document.createElement("td");
+    cell.className = "amoqueue-helper-cell amoqueue-helper-info-cell";
+    row.appendChild(cell);
 
     // Size column
     if (IS_ADMIN) {
-      column = document.createElement("th");
-      column.className ="amoqueue-helper-size-column";
-      column.textContent = "Size";
-      header.appendChild(column);
+      cell = document.createElement("td");
+      cell.className = "amoqueue-helper-cell amoqueue-helper-size-cell";
+      row.appendChild(cell);
     }
 
-    let rows = document.querySelectorAll(".addon-row");
-    let now = new Date();
-    let bizdayCache = {};
-    let relweekCache = {};
-    let lastRelWeek = -1;
-
-    for (let row of rows) {
-      let slug = row.querySelector("a").getAttribute("href").split("/").pop();
-
-      // Last Update column
-      // reuse the last column because there is an extra column on AMO
-      let cell = row.lastElementChild; // document.createElement("td");
-      cell.className = "amoqueue-helper-cell amoqueue-helper-lastupdate-cell";
-      row.appendChild(cell);
-
-      // Info column
-      cell = document.createElement("td");
-      cell.className = "amoqueue-helper-cell amoqueue-helper-info-cell";
-      row.appendChild(cell);
-
-      // Size column
-      if (IS_ADMIN) {
-        cell = document.createElement("td");
-        cell.className = "amoqueue-helper-cell amoqueue-helper-size-cell";
-        row.appendChild(cell);
+    // Add css classes for app icons. Should probably add this in product.
+    for (let icon of row.querySelectorAll(".app-icon")) {
+      let match = icon.className.match(/ed-sprite-([^ ]*)/);
+      if (match) {
+        row.classList.add("amoqueue-helper-iconclass-" + match[1]);
       }
+    }
 
-      // Add css classes for app icons. Should probably add this in product.
-      for (let icon of row.querySelectorAll(".app-icon")) {
-        let match = icon.className.match(/ed-sprite-([^ ]*)/);
-        if (match) {
-          row.classList.add("amoqueue-helper-iconclass-" + match[1]);
-        }
-      }
-
+    // Various cases on waiting time, only for queues that actually show it
+    if (hasWaitingColumn) {
       // Add classes for review time categories. Probably best in product
       let daycell = row.querySelector("td:nth-of-type(4)");
       daycell.classList.add("amoqueue-helper-waitcell");
@@ -92,69 +98,86 @@ function initPageLayout() {
         row.classList.add("amoqueue-new-week");
         lastRelWeek = relweekCache[days];
       }
+    }
 
-      // Partner addon status
-      if (isPartnerAddon(slug)) {
-        row.classList.add("amoqueue-is-partner");
-      }
+    // Partner addon status
+    if (isPartnerAddon(slug)) {
+      row.classList.add("amoqueue-is-partner");
+    }
 
+    if (hasTypeColumn) {
       // Remove type column, don't see the need for it.
       row.querySelector("td:nth-of-type(3)").remove();
     }
+  }
 
-    // Remove header for type column
-    header.children[2].remove();
+  // Remove header for type column
+  if (hasTypeColumn) {
+    hasTypeColumn.parentNode.remove();
+  }
 
-    // Counting filtered results requires the pagination node to always be around
-    let filterCountContainerTop = document.querySelector(".data-grid-content.data-grid-top");
-    let numResults = document.querySelector(".data-grid-content.data-grid-top .num-results");
-    if (filterCountContainerTop) {
-      filterCountContainerTop.querySelector(".num-results strong:nth-of-type(1)").className = "amoqueue-results-pagestart";
-      filterCountContainerTop.querySelector(".num-results strong:nth-of-type(2)").className = "amoqueue-results-pageend";
-      filterCountContainerTop.querySelector(".num-results strong:nth-of-type(3)").className = "amoqueue-results-total";
-      numResults.id = "amoqueue-num-results";
-    } else {
-      let addonQueue = document.getElementById("addon-queue");
-      filterCountContainerTop = document.createElement("div");
-      filterCountContainerTop.className = "data-grid-content data-grid-top";
-      addonQueue.before(filterCountContainerTop);
+  // Counting filtered results requires the pagination node to always be around
+  let filterCountContainerTop = document.querySelector(".data-grid-content.data-grid-top");
+  let numResults = document.querySelector(".data-grid-content.data-grid-top .num-results");
+  if (filterCountContainerTop) {
+    filterCountContainerTop.querySelector(".num-results strong:nth-of-type(1)").className = "amoqueue-results-pagestart";
+    filterCountContainerTop.querySelector(".num-results strong:nth-of-type(2)").className = "amoqueue-results-pageend";
+    filterCountContainerTop.querySelector(".num-results strong:nth-of-type(3)").className = "amoqueue-results-total";
+    numResults.id = "amoqueue-num-results";
+  } else {
+    let addonQueue = document.getElementById("addon-queue");
+    filterCountContainerTop = document.createElement("div");
+    filterCountContainerTop.className = "data-grid-content data-grid-top";
+    addonQueue.before(filterCountContainerTop);
 
-      numResults = document.createElement("div");
-      numResults.className = "num-results";
-      numResults.id = "amoqueue-num-results";
-      numResults.innerHTML = "Results <strong class='amoqueue-results-pagestart'>1</strong>" +
-                             "–<strong class='amoqueue-results-pageend'></strong> of " +
-                             "<strong class='amoqueue-results-total'></strong>";
+    numResults = document.createElement("div");
+    numResults.className = "num-results";
+    numResults.id = "amoqueue-num-results";
+    numResults.innerHTML = "Results <strong class='amoqueue-results-pagestart'>1</strong>" +
+                           "–<strong class='amoqueue-results-pageend'></strong> of " +
+                           "<strong class='amoqueue-results-total'></strong>";
 
-      let numRows = document.querySelectorAll("#addon-queue .addon-row").length;
-      numResults.querySelector(".amoqueue-results-pageend").textContent = numRows;
-      numResults.querySelector(".amoqueue-results-total").textContent = numRows;
+    let numRows = document.querySelectorAll("#addon-queue .addon-row").length;
+    numResults.querySelector(".amoqueue-results-pageend").textContent = numRows;
+    numResults.querySelector(".amoqueue-results-total").textContent = numRows;
 
-      filterCountContainerTop.appendChild(numResults);
-    }
+    filterCountContainerTop.appendChild(numResults);
+  }
 
-    let filteredSpan = document.createElement("span");
-    filteredSpan.id = "amoqueue-filtered-results";
-    filteredSpan.className = "amoqueue-hide";
-    filteredSpan.innerHTML = " (filtered <strong id='amoqueue-filtered-count'>1</strong>)";
-    numResults.appendChild(filteredSpan);
+  let filteredSpan = document.createElement("span");
+  filteredSpan.id = "amoqueue-filtered-results";
+  filteredSpan.className = "amoqueue-hide";
+  filteredSpan.innerHTML = " (filtered <strong id='amoqueue-filtered-count'>1</strong>)";
+  numResults.appendChild(filteredSpan);
 
-    // Search box enhancements
-    return addSearchRadio("Show Information requests", "show-info", "both", ["Both", "Only", "None"], (state) => {
-      document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
-        let needinfo = row.classList.contains("amoqueue-helper-iconclass-info");
-        if (state == "both") {
-          hideBecause(row, "info", false);
-        } else if (state == "only") {
-          hideBecause(row, "info", !needinfo);
-        } else if (state == "none") {
-          hideBecause(row, "info", needinfo);
-        }
-      });
-      updateQueueRows();
+  // Search box enhancements
+  let searchbox = document.querySelector("div.queue-search");
+  if (!searchbox) {
+    // auto-approval queue does not have a searchbox
+    searchbox = document.createElement("div");
+    searchbox.className = "queue-search";
+
+    let queue = document.getElementById("addon-queue");
+    document.querySelector(".queue-inner").insertBefore(searchbox, queue);
+  }
+
+
+  await addSearchRadio("Show Information requests", "show-info", "both", ["Both", "Only", "None"], (state) => {
+    document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
+      let needinfo = row.classList.contains("amoqueue-helper-iconclass-info");
+      if (state == "both") {
+        hideBecause(row, "info", false);
+      } else if (state == "only") {
+        hideBecause(row, "info", !needinfo);
+      } else if (state == "none") {
+        hideBecause(row, "info", needinfo);
+      }
     });
-  }).then(() => {
-    return addSearchRadio("Show Add-ons", "show-webext", "both", ["Both", "WebExtensions", "Legacy"], (state) => {
+    updateQueueRows();
+  });
+
+  if (QUEUE != "auto_approved") {
+    await addSearchRadio("Show Add-ons", "show-webext", "both", ["Both", "WebExtensions", "Legacy"], (state) => {
       document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
         let iswebext = row.classList.contains("amoqueue-helper-iconclass-webextension");
         if (state == "both") {
@@ -167,29 +190,30 @@ function initPageLayout() {
       });
       updateQueueRows();
     });
-  }).then(() => {
-    if (IS_ADMIN) {
-      return addSearchRadio("Show Reviews", "show-admin", "both", ["Both", "Admin", "Regular"], (state) => {
-        document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
-          let isadmin = row.classList.contains("amoqueue-helper-iconclass-admin-review");
-          if (state == "both") {
-            hideBecause(row, "adminstate", false);
-          } else if (state == "admin") {
-            hideBecause(row, "adminstate", !isadmin);
-          } else if (state == "regular") {
-            hideBecause(row, "adminstate", isadmin);
-          }
-        });
-        updateQueueRows();
+  }
+
+  if (IS_ADMIN) {
+    await addSearchRadio("Show Reviews", "show-admin", "both", ["Both", "Admin", "Regular"], (state) => {
+      document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
+        let isadmin = row.classList.contains("amoqueue-helper-iconclass-admin-review");
+        if (state == "both") {
+          hideBecause(row, "adminstate", false);
+        } else if (state == "admin") {
+          hideBecause(row, "adminstate", !isadmin);
+        } else if (state == "regular") {
+          hideBecause(row, "adminstate", isadmin);
+        }
       });
-    }
-    return null;
-  }).then(() => {
-    return addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare", false);
-  }).then(() => {
-    return addSearchCheckbox("Show waiting time in business days", "queueinfo-business-days", false, (checked) => {
-      let rows = [...document.querySelectorAll(".addon-row")];
-      for (let row of rows) {
+      updateQueueRows();
+    });
+  }
+
+  await addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare", false);
+
+  if (QUEUE != "auto_approved") {
+    await addSearchCheckbox("Show waiting time in business days", "queueinfo-business-days", false, (checked) => {
+      let addonRows = [...document.querySelectorAll(".addon-row")];
+      for (let row of addonRows) {
         let cell = row.querySelector(".amoqueue-helper-waitcell");
         let days;
         if (checked && cell.dataset.fullUnit.startsWith("day")) {
@@ -203,67 +227,64 @@ function initPageLayout() {
       }
 
       isSortedByBusinessDays.yep = checked;
-      updateSort(rows);
+      updateSort(addonRows);
     });
-  }).then(() => {
-    // Autocomplete "no results" row
-    let queueBody = document.querySelector("#addon-queue > tbody");
+  }
 
-    let noResultsRow = document.createElement("tr");
-    noResultsRow.id = "amoqueue-helper-autocomplete-noresults";
-    noResultsRow.style.display = "none";
+  // Autocomplete "no results" row
+  let queueBody = document.querySelector("#addon-queue > tbody");
 
-    let noResultsCell = document.createElement("td");
-    noResultsCell.setAttribute("colspan", header.children.length);
-    noResultsCell.style.textAlign = "center";
-    noResultsCell.textContent = "no results";
+  let noResultsRow = document.createElement("tr");
+  noResultsRow.id = "amoqueue-helper-autocomplete-noresults";
+  noResultsRow.style.display = "none";
 
-    noResultsRow.appendChild(noResultsCell);
-    queueBody.appendChild(noResultsRow);
+  let noResultsCell = document.createElement("td");
+  noResultsCell.setAttribute("colspan", header.children.length);
+  noResultsCell.style.textAlign = "center";
+  noResultsCell.textContent = "no results";
 
-    // Queue buttons container
-    let searchbox = document.querySelector("div.queue-search");
-    let queueButtons = document.createElement("div");
-    queueButtons.className = "amoqueue-queue-buttons";
-    searchbox.appendChild(queueButtons);
+  noResultsRow.appendChild(noResultsCell);
+  queueBody.appendChild(noResultsRow);
 
-    /* TODO disabled this feature since XHR doesn't do cookies correctly.
-    if (IS_ADMIN) {
-      // Load button
-      let loadButton = document.createElement("button");
-      loadButton.id = "amoqueue-load-button";
-      loadButton.className = "amoqueue-queue-button";
-      loadButton.appendChild(document.createElement("span")).className = "image";
+  // Queue buttons container
+  let queueButtons = document.createElement("div");
+  queueButtons.className = "amoqueue-queue-buttons";
+  searchbox.appendChild(queueButtons);
 
-      let loadLabel = loadButton.appendChild(document.createElement("span"));
-      loadLabel.textContent = "Load";
-      loadLabel.className = "label";
+  /* TODO disabled this feature since XHR doesn't do cookies correctly.
+  if (IS_ADMIN) {
+    // Load button
+    let loadButton = document.createElement("button");
+    loadButton.id = "amoqueue-load-button";
+    loadButton.className = "amoqueue-queue-button";
+    loadButton.appendChild(document.createElement("span")).className = "image";
 
-      loadButton.addEventListener("click", () => {
-        chrome.storage.local.get("addons-per-load", (prefs) => {
-          let noinfo = Array.from(document.querySelectorAll("#addon-queue .addon-row:not(.amoqueue-has-info)"))
-                            .slice(0, prefs["addons-per-load"])
-                            .map((row) => row.getAttribute("data-addon"));
-          loadButton.setAttribute("disabled", "true");
-          window.localStorage["dont_poll"] = true;
+    let loadLabel = loadButton.appendChild(document.createElement("span"));
+    loadLabel.textContent = "Load";
+    loadLabel.className = "label";
 
-          downloadReviewInfo(noinfo).then(() => {
-            delete window.localStorage["dont_poll"];
-            loadButton.removeAttribute("disabled");
-          });
-        });
-      }, false);
-      queueButtons.appendChild(loadButton);
-    }
-    */
+    loadButton.addEventListener("click", async () => {
+      let prefs = await chrome.storage.local.get("addons-per-load");
+      let noinfo = Array.from(document.querySelectorAll("#addon-queue .addon-row:not(.amoqueue-has-info)"))
+                        .slice(0, prefs["addons-per-load"])
+                        .map((row) => row.getAttribute("data-addon"));
+      loadButton.setAttribute("disabled", "true");
+      window.localStorage["dont_poll"] = true;
 
-    // Clear button
-    let clearButton = document.createElement("button");
-    clearButton.className = "amoqueue-queue-button";
-    clearButton.textContent = "Clear";
-    clearButton.addEventListener("click", clearReviews, false);
-    queueButtons.appendChild(clearButton);
-  });
+      await downloadReviewInfo(noinfo);
+      delete window.localStorage["dont_poll"];
+      loadButton.removeAttribute("disabled");
+    }, false);
+    queueButtons.appendChild(loadButton);
+  }
+  */
+
+  // Clear button
+  let clearButton = document.createElement("button");
+  clearButton.className = "amoqueue-queue-button";
+  clearButton.textContent = "Clear";
+  clearButton.addEventListener("click", clearReviews, false);
+  queueButtons.appendChild(clearButton);
 }
 
 function initPartnerAddons() {
@@ -301,6 +322,7 @@ function hideBecause(row, reason, state) {
 function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUpdater=() => {}) {
   return new Promise((resolve, reject) => {
     let searchbox = document.querySelector("div.queue-search");
+
     let fieldset = document.createElement("fieldset");
     chrome.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
       let initial = prefs[prefName];
@@ -360,17 +382,16 @@ function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() =>
   });
 }
 
-function updateQueueInfo() {
+async function updateQueueInfo() {
   let prefs = [];
   for (let row of document.querySelectorAll("#addon-queue .addon-row")) {
     prefs.push("reviewInfo." + row.getAttribute("data-addon"));
   }
 
-  browser.runtime.sendMessage({ action: "infostorage", op: "get", storage: "review", keys: prefs }).then((data) => {
-    for (let reviewInfo of Object.values(data)) {
-      updateReviewInfoDisplay(reviewInfo.id, reviewInfo);
-    }
-  });
+  let data = await browser.runtime.sendMessage({ action: "infostorage", op: "get", storage: "review", keys: prefs });
+  for (let reviewInfo of Object.values(data)) {
+    updateReviewInfoDisplay(reviewInfo.id, reviewInfo);
+  }
 
   updateQueueRows();
 }
@@ -505,6 +526,12 @@ function updateSort(rows=null) {
     }
   }
 
+  function sortByWeight(a, b) {
+    let wca = a.querySelector("td:nth-of-type(5)");
+    let wcb = b.querySelector("td:nth-of-type(5)");
+    return parseInt(wcb.textContent, 10) - parseInt(wca.textContent, 10);
+  }
+
   function sortByPartner(a, b) {
     let partnerA = isPartnerAddon(a.querySelector("a").getAttribute("href").split("/").pop());
     let partnerB = isPartnerAddon(b.querySelector("a").getAttribute("href").split("/").pop());
@@ -515,14 +542,20 @@ function updateSort(rows=null) {
     rows = [...document.querySelectorAll(".addon-row")];
   }
 
+  let usesWaitTime = document.querySelector(".amoqueue-helper-waitcell");
   rows.sort((a, b) => {
     let partner = sortByPartner(a, b);
     if (partner != 0) {
       return partner;
     }
 
-    return sortByWaitTime(a, b);
+    if (usesWaitTime) {
+      return sortByWaitTime(a, b);
+    } else {
+      return sortByWeight(a, b);
+    }
   });
+
 
   let rowparent = rows[0].parentNode;
   for (let row of rows) {
@@ -531,20 +564,17 @@ function updateSort(rows=null) {
 }
 
 /* Unfortunately this does not work due to cookies not being set on the XHR request
-function downloadReviewInfo(ids) {
+async function downloadReviewInfo(ids) {
 
   let id = ids[0]; // temporary
-  return fetch("https://addons.mozilla.org/en-US/editors/review/" + id).then((response) => {
-    return response.text();
-  }).then((responseText) => {
-    let parser = new DOMParser();
-    let doc = parser.parseFromString(responseText, "text/html");
-    return getInfoWithSize(doc);
-  }).then((info) => {
-    chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
-  }, (err) => {
-    return err;
-  });
+  let response = await fetch("https://addons.mozilla.org/en-US/editors/review/" + id);
+  let responseText = await response.text();
+
+  let parser = new DOMParser();
+  let doc = parser.parseFromString(responseText, "text/html");
+  let info = await getInfoWithSize(doc);
+
+  await chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
 }
 */
 
@@ -623,7 +653,7 @@ function relweek(startDate, endDate) {
 function displaySize(size, relative=false) {
   let prefix = size < 0 ? "-" : (relative ? "+" : "");
   let asize = Math.abs(size);
-  let i = Math.floor(Math.log(asize) / Math.log(1024));
+  let i = asize ? Math.floor(Math.log(asize) / Math.log(1024)) : 0;
   return prefix + Number((asize / Math.pow(1024, i)).toFixed(2)) + " " + ["B", "kB", "MB", "GB", "TB"][i];
 }
 
@@ -662,14 +692,15 @@ browser.storage.onChanged.addListener(async (changes, area) => {
   await initPartnerAddons();
   await initPageLayout();
 
-  document.getElementById("id_text_query")
-          .addEventListener("keyup", updateAutocomplete, false);
+  let textquery = document.getElementById("id_text_query");
+  if (textquery) {
+    textquery.addEventListener("keyup", updateAutocomplete, false);
+    window.addEventListener("pageshow", updateAutocomplete, false);
+    updateAutocomplete();
+  }
 
   window.addEventListener("pageshow", updateQueueInfo, false);
   updateQueueInfo();
-
-  window.addEventListener("pageshow", updateAutocomplete, false);
-  updateAutocomplete();
 
   updateSort();
 })();

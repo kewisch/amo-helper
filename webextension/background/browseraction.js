@@ -1,34 +1,23 @@
-// TODO this is also used in the content script, too bad es6 imports don't work
-// as expected.
 function parseQueueNumbers(doc) {
-  let queues = [...doc.querySelectorAll("#editors-stats-charts .editor-stats-table .editor-waiting")];
-  let countre = /::\s*(\d+) add-ons/;
+  let queues = [...doc.querySelectorAll("#main-wrapper .tabnav li a")];
+  let countre = /\((\d+)\)/;
   let numbers = {};
 
-  for (let queueName of ["new", "updates"]) {
-    let parent = queues.shift();
+  for (let queue of queues) {
+    let queueNameParts = queue.getAttribute("href").split("/");
+    let queueName = queueNameParts[queueNameParts.length - 1];
+    let match = queue.textContent.match(countre);
 
-    numbers[queueName] = {
-      low: parseInt(parent.querySelector(".waiting_new").getAttribute("title").match(countre)[1], 10),
-      med: parseInt(parent.querySelector(".waiting_med").getAttribute("title").match(countre)[1], 10),
-      high: parseInt(parent.querySelector(".waiting_old").getAttribute("title").match(countre)[1], 10),
-      url: "https://addons.mozilla.org/en-US/editors/queue/" + queueName
-    };
-    numbers[queueName].total = numbers[queueName]["low"] + numbers[queueName]["med"] + numbers[queueName]["high"];
-  }
-
-
-  let reviewsQueue = doc.querySelector("#editors_main .listing-header a[href='/en-US/editors/queue/reviews']");
-  let match = reviewsQueue.textContent.match(/\((\d+)\)/);
-  if (match) {
-    numbers.reviews = { low: 0, med: 0, high: 0, total: parseInt(match[1], 10) };
+    if (match) {
+      numbers[queueName] = { total: parseInt(match[1], 10) };
+    }
   }
 
   return numbers;
 }
 
 function updateQueueNumbers() {
-  return fetch("https://addons.mozilla.org/en-US/editors/", { mode: "cors", credentials: "include" }).then((response) => {
+  return fetch("https://addons.mozilla.org/en-US/editors/queue/auto_approved", { mode: "cors", credentials: "include" }).then((response) => {
     return response.text();
   }).then((text) => {
     let parser = new DOMParser();
@@ -37,34 +26,17 @@ function updateQueueNumbers() {
   });
 }
 
-function updateBadge(numbers, totalOnly=false) {
+function updateBadge(numbers) {
   chrome.storage.local.get({ "browseraction-count-moderator": false }, (prefs) => {
     if (!prefs["browseraction-count-moderator"]) {
       delete numbers.reviews;
     }
 
-    let totalnumbers = Object.values(numbers).reduce((result, queue) => {
-      result.low += queue.low;
-      result.med += queue.med;
-      result.high += queue.high;
-      result.total += queue.total;
-      return result;
-    }, { low: 0, med: 0, high: 0, total: 0 });
+    let total = Object.values(numbers).reduce((result, queue) => {
+      return result + queue.total;
+    }, 0);
 
-    chrome.browserAction.setBadgeText({ text: totalnumbers.total.toString() });
-
-    if (!totalOnly) {
-      if (totalnumbers.high > 0) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: "red" }); // #ffd3d3
-      } else if (totalnumbers.med > 0) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: "yellow" }); // #ffffb4
-      } else if (totalnumbers.low > 0) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: "green" }); // #b8e6b8
-      } else {
-        // like this will ever happen. Not sure what the color was.
-        chrome.browserAction.setBadgeBackgroundColor({ color: "gray" });
-      }
-    }
+    chrome.browserAction.setBadgeText({ text: total.toString() });
   });
 }
 
@@ -136,7 +108,7 @@ chrome.runtime.onMessage.addListener((data, sender, sendReply) => {
 
 sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "update-badge-numbers") {
-    updateBadge(data.numbers, data.totalonly);
+    updateBadge(data.numbers);
   }
 });
 
