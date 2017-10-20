@@ -8,7 +8,7 @@ const EDITOR_REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review
 let mostActiveReview = null;
 let mostActiveTab = null;
 
-sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action != "reviewtimer-notify" || data.slug != mostActiveReview) {
     return;
   }

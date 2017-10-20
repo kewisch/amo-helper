@@ -54,7 +54,7 @@ var infostorage = {
   review: createInfoStorage("reviewInfo", "review")
 };
 
-sdk.runtime.onMessage.addListener(async (data, sender, sendReply) => {
+browser.runtime.onMessage.addListener(async (data, sender, sendReply) => {
   if (data.action == "infostorage") {
     let res = await infostorage[data.storage][data.op](data.keys);
     sendReply(res);

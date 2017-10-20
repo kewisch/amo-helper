@@ -1,5 +1,4 @@
-data/lib/
-webextension/libs/
+libs/
 profile/
 junk/
 package.json

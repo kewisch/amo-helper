@@ -1,4 +1,4 @@
-sdk.runtime.onMessage.addListener(async (data, sender, sendReply) => {
+browser.runtime.onMessage.addListener(async (data, sender, sendReply) => {
   if (data.action != "download") {
     return;
   }

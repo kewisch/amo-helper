@@ -36,7 +36,7 @@ async function saveWindowPosition(windowId) {
   await browser.storage.local.set({ "filewindow-position": position });
 }
 
-sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "filewindow-open" && (new URL(data.url)).hostname == "addons.mozilla.org") {
     openFileBrowser(data.url);
   } else if (data.action == "filewindow-position") {

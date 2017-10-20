@@ -96,18 +96,14 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "popup-action-refreshcount") {
     updateQueueNumbers().then(updateBadge);
   } else if (data.action == "popup-action-closetabs") {
     closeAMOTabs();
   } else if (data.action == "popup-action-gotoreview") {
     switchToReviewPage();
-  }
-});
-
-sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
-  if (data.action == "update-badge-numbers") {
+  } else if (data.action == "update-badge-numbers") {
     updateBadge(data.numbers);
   }
 });

@@ -28,13 +28,10 @@ function removeTabsFor(tabId, addonid, closeTabs) {
   */
 }
 
-function copyScrollPosition(from, to) {
-  return new Promise((resolve) => {
-    sdk.tabs.sendMessage(from.id, { action: "getScrollPosition" }, (data) => {
-      data.action = "setScrollPosition";
-      sdk.tabs.sendMessage(to.id, data, resolve);
-    });
-  });
+async function copyScrollPosition(from, to) {
+  let data = await browser.tabs.sendMessage(from.id, { action: "getScrollPosition" });
+  data.action = "setScrollPosition";
+  await browser.tabs.sendMessage(to.id, data);
 }
 
 function removeOtherTabs(tabUrl, keepTab) {
@@ -64,7 +61,7 @@ function removeOtherTabs(tabUrl, keepTab) {
   });
 }
 
-sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "addonid") {
     chrome.storage.local.get({ "tabclose-review-child": true }, (prefs) => {
       if (!(data.addonid in tabsToClose)) {

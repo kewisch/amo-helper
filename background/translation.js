@@ -2,7 +2,7 @@ var authToken;
 var tokenttl = 1000*60*10;
 var tokenTimeout = 0;
 
-sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action !== "translate") {
     return;
   }

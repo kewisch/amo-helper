@@ -77,6 +77,15 @@ chrome.contextMenus.create({
   onclick: (info, tab) => {
     let regex = /https:\/\/addons.mozilla.org\/en-US\/firefox\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
     let match = info.linkUrl.match(regex);
-    sdk._clipboard.set(match[3]);
+    let code = `
+      var node = document.createElement('textarea');
+      node.setAttribute('style', 'position: fixed; top: 0; left: -1000px; z-index: -1;');
+      node.value = ${JSON.stringify(match[3])};
+      document.body.appendChild(node);
+      node.select();
+      document.execCommand('copy');
+      document.body.removeChild(node);
+    `;
+    browser.tabs.executeScript(tab.id, { code: code });
   }
 });

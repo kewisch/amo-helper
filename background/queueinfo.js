@@ -45,7 +45,7 @@ chrome.storage.local.get({ "queueinfo-per-page": 100 }, (prefs) => {
   per_page_value = prefs["queueinfo-per-page"];
 });
 
-sdk.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action != "queueinfo") {
     return;
   }

@@ -46,7 +46,6 @@
 
   "background": {
     "scripts": [
-      "background/sdk.js",
       "background/info.js",
       "background/canned.js",
       "background/context.js",
@@ -62,7 +61,7 @@
     ]
   },
 
-  "sdk_content_scripts": [
+  "content_scripts": [
     {
       "matches": [
         "https://addons.mozilla.org/en-US/firefox/files/browse/*",
