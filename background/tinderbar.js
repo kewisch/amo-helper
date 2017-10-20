@@ -43,7 +43,7 @@ function createCompleteTab(createOptions) {
 
 
 // function tinderstart(addons, preload=TABS_PRELOAD) {
-//   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+//   browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 //     let tabIndex = tabs[0].index;
 //     let active = true;
 //
@@ -54,7 +54,7 @@ function createCompleteTab(createOptions) {
 //         break;
 //       }
 //
-//       chrome.tabs.create({
+//       browser.tabs.create({
 //         index: ++tabIndex,
 //         active: active,
 //         url: ADDON_REVIEW_URL.replace("$ADDON", curaddon)

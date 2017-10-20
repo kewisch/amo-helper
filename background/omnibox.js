@@ -42,11 +42,11 @@ const allSuggestions = {
 };
 
 function resetDefaultSuggestion() {
-  chrome.omnibox.setDefaultSuggestion({ description: "Visit addons.mozilla.org" });
+  browser.omnibox.setDefaultSuggestion({ description: "Visit addons.mozilla.org" });
 }
 
 function inputChangedListener(text, suggest) {
-  chrome.omnibox.setDefaultSuggestion({ description: allSuggestions[""].description.replace("%s", text) });
+  browser.omnibox.setDefaultSuggestion({ description: allSuggestions[""].description.replace("%s", text) });
 
   suggest(Object.values(allSuggestions).map(({ content, description }) => {
     return {
@@ -73,29 +73,29 @@ function inputEnteredListener(text, disposition) {
   let url = data.url.replace("%s", slug);
 
   if (disposition == "currentTab") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.update(tabs[0].id, { url: url });
+    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      browser.tabs.update(tabs[0].id, { url: url });
     });
   } else {
-    chrome.tabs.create({ url: url, active: disposition == "newForegroundTab" });
+    browser.tabs.create({ url: url, active: disposition == "newForegroundTab" });
   }
 }
 
 function setupListeners() {
-  chrome.storage.local.get({ "omnibox-enabled": true }, (prefs) => {
-    chrome.omnibox.onInputChanged.removeListener(inputChangedListener);
-    chrome.omnibox.onInputEntered.removeListener(inputEnteredListener);
-    chrome.omnibox.onInputCancelled.removeListener(resetDefaultSuggestion);
+  browser.storage.local.get({ "omnibox-enabled": true }, (prefs) => {
+    browser.omnibox.onInputChanged.removeListener(inputChangedListener);
+    browser.omnibox.onInputEntered.removeListener(inputEnteredListener);
+    browser.omnibox.onInputCancelled.removeListener(resetDefaultSuggestion);
 
     if (prefs["omnibox-enabled"]) {
-      chrome.omnibox.onInputChanged.addListener(inputChangedListener);
-      chrome.omnibox.onInputEntered.addListener(inputEnteredListener);
-      chrome.omnibox.onInputCancelled.addListener(resetDefaultSuggestion);
+      browser.omnibox.onInputChanged.addListener(inputChangedListener);
+      browser.omnibox.onInputEntered.addListener(inputEnteredListener);
+      browser.omnibox.onInputCancelled.addListener(resetDefaultSuggestion);
     }
   });
 }
 
-chrome.storage.onChanged.addListener((changes, area) => {
+browser.storage.onChanged.addListener((changes, area) => {
   if (area != "local") {
     return;
   }

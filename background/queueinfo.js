@@ -23,7 +23,7 @@ function queueByAddon(slug) {
   return { index: -1, queue: null, addons: [] };
 }
 
-chrome.webRequest.onBeforeRequest.addListener((details) => {
+browser.webRequest.onBeforeRequest.addListener((details) => {
   let url = new URL(details.url);
   if (!url.search.includes("per_page") && per_page_value != 100) {
     url.search = "?per_page=" + per_page_value;
@@ -34,7 +34,7 @@ chrome.webRequest.onBeforeRequest.addListener((details) => {
 }, { urls: ["https://addons.mozilla.org/en-US/editors/queue/*"] }, ["blocking"]);
 
 
-chrome.storage.onChanged.addListener((changes, area) => {
+browser.storage.onChanged.addListener((changes, area) => {
   if (area != "local") {
     return;
   }
@@ -46,7 +46,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-chrome.storage.local.get({ "queueinfo-per-page": 100 }, (prefs) => {
+browser.storage.local.get({ "queueinfo-per-page": 100 }, (prefs) => {
   per_page_value = prefs["queueinfo-per-page"];
 });
 

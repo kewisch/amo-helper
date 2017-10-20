@@ -72,7 +72,7 @@ function debounce(func, wait) {
 }
 
 function restore_options() {
-  chrome.storage.local.get(DEFAULT_PREFERENCES, (prefs) => {
+  browser.storage.local.get(DEFAULT_PREFERENCES, (prefs) => {
     document.documentElement.classList.toggle("is-admin", prefs["is-admin"]);
     for (let key of Object.keys(prefs)) {
       let elem = document.getElementById(key);
@@ -98,11 +98,11 @@ function change_options(event) {
   }
 
   if (node.getAttribute("type") == "checkbox") {
-    chrome.storage.local.set({ [node.id]: node.checked });
+    browser.storage.local.set({ [node.id]: node.checked });
   } else if (node.getAttribute("type") == "number") {
-    chrome.storage.local.set({ [node.id]: parseInt(node.value, 10) });
+    browser.storage.local.set({ [node.id]: parseInt(node.value, 10) });
   } else if (node.getAttribute("type") == "text") {
-    chrome.storage.local.set({ [node.id]: node.value });
+    browser.storage.local.set({ [node.id]: node.value });
   }
 }
 
@@ -121,7 +121,7 @@ var save_canned_responses = debounce(() => {
   options.pop();
 
   let canned = options.map((option) => ({ label: option.textContent, value: option.value }));
-  chrome.storage.local.set({ "canned-responses": canned });
+  browser.storage.local.set({ "canned-responses": canned });
 }, 500);
 
 
@@ -196,7 +196,7 @@ function update_canned_state() {
 function restore_canned_options() {
   let select = document.getElementById("canned-select");
 
-  chrome.storage.local.get({ "canned-responses": [] }, (prefs) => {
+  browser.storage.local.get({ "canned-responses": [] }, (prefs) => {
     let previousOptions = document.querySelectorAll("#canned option:not(.canned-option-new)");
     for (let option of previousOptions) {
       option.remove();

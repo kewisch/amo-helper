@@ -25,22 +25,22 @@ function toAddonUrl(target, info) {
     return;
   }
 
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     let activeTab = tabs[0];
     let targetUrl = target.replace("$ADDON", matches[4]);
 
     if (info.modifiers && (info.modifiers.includes("Command") || info.modifiers.includes("Ctrl"))) {
       // TODO add openerTabId: activeTab.id when supported
-      chrome.tabs.create({ url: targetUrl, index: activeTab.index + 1 });
+      browser.tabs.create({ url: targetUrl, index: activeTab.index + 1 });
     } else {
-      chrome.tabs.update(activeTab.id, { url: targetUrl });
+      browser.tabs.update(activeTab.id, { url: targetUrl });
     }
   });
 }
 
 function createLinksContextMenu(contextInfo) {
   contextInfo.forEach((entry) => {
-    chrome.contextMenus.create({
+    browser.menus.create({
       type: entry.type || "normal",
       title: entry.title,
       contexts: ["link"],
@@ -68,7 +68,7 @@ createLinksContextMenu([{
   url: FEED_URL,
 }]);
 
-chrome.contextMenus.create({
+browser.menus.create({
   type: "normal",
   title: "Copy file path",
   contexts: ["link"],

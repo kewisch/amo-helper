@@ -32,7 +32,7 @@ function updateQueueNumbers() {
 }
 
 function updateBadge(numbers) {
-  chrome.storage.local.get({ "browseraction-count-moderator": false }, (prefs) => {
+  browser.storage.local.get({ "browseraction-count-moderator": false }, (prefs) => {
     if (!prefs["browseraction-count-moderator"]) {
       delete numbers.reviews;
     }
@@ -41,14 +41,14 @@ function updateBadge(numbers) {
       return result + queue.total;
     }, 0);
 
-    chrome.browserAction.setBadgeText({ text: total.toString() });
+    browser.browserAction.setBadgeText({ text: total.toString() });
   });
 }
 
 function setupQueueRefresh() {
-  chrome.storage.local.get({ "browseraction-queue-refresh-period": 60 }, (prefs) => {
-    chrome.alarms.clear("queuelength", () => {
-      chrome.alarms.create("queuelength", {
+  browser.storage.local.get({ "browseraction-queue-refresh-period": 60 }, (prefs) => {
+    browser.alarms.clear("queuelength", () => {
+      browser.alarms.create("queuelength", {
         delayInMinutes: 0,
         periodInMinutes: prefs["browseraction-queue-refresh-period"]
       });
@@ -72,23 +72,23 @@ async function closeAMOTabs() {
 
 function switchToReviewPage() {
   let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
-  chrome.tabs.query({ active: true, currentWindow: true }, ([tab, ...rest]) => {
+  browser.tabs.query({ active: true, currentWindow: true }, ([tab, ...rest]) => {
     let match = tab.url.match(RE_ADDON_LINKS);
     if (match) {
-      chrome.tabs.update(tab.id, { url: "https://addons.mozilla.org/en-US/editors/review/" + match[4] });
+      browser.tabs.update(tab.id, { url: "https://addons.mozilla.org/en-US/editors/review/" + match[4] });
     }
   });
 }
 
 // -- main --
 
-chrome.alarms.onAlarm.addListener((alarm) => {
+browser.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name == "queuelength") {
     updateQueueNumbers().then(updateBadge);
   }
 });
 
-chrome.storage.onChanged.addListener((changes, area) => {
+browser.storage.onChanged.addListener((changes, area) => {
   if (area != "local") {
     return;
   }

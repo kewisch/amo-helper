@@ -26,7 +26,7 @@ browser.runtime.onMessage.addListener(async (data, sender, sendReply) => {
 
   let filename = `${prefs["downloads.basedir"]}/${info.slug}/${version.version}/addon.xpi`;
 
-  chrome.downloads.download({
+  browser.downloads.download({
     url: version.installurl,
     filename: filename,
     conflictAction: "overwrite",
@@ -36,7 +36,7 @@ browser.runtime.onMessage.addListener(async (data, sender, sendReply) => {
   if (version.sourceurl) {
     // TODO use correct extension after bug 1245652 is fixed
     let sourcename = `${prefs["downloads.basedir"]}/${info.slug}/${version.version}/sources.zip`;
-    chrome.downloads.download({
+    browser.downloads.download({
       url: version.sourceurl,
       filename: sourcename,
       conflictAction: "overwrite",

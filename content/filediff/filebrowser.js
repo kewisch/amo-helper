@@ -162,7 +162,7 @@ createCommand("amoqueue-download", "Download", null, async () => {
   let prefs = await browser.runtime.sendMessage({ action: "infostorage", op: "get", storage: "slug", keys: ["slugInfo." + slug] });
   let id = prefs["slugInfo." + slug];
 
-  chrome.runtime.sendMessage({ action: "download", addonid: id, version: version });
+  browser.runtime.sendMessage({ action: "download", addonid: id, version: version });
 });
 
 // TODO move this to filewindow when there is a simple import mechanism
@@ -175,6 +175,6 @@ Promise.all([
   }
 
   createCommand("amoqueue-filewindow-savepos", "Save Window Position", null, () => {
-    chrome.runtime.sendMessage({ action: "filewindow-position" });
+    browser.runtime.sendMessage({ action: "filewindow-position" });
   });
 });

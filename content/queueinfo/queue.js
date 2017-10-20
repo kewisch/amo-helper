@@ -269,7 +269,7 @@ async function initPageLayout() {
     loadLabel.className = "label";
 
     loadButton.addEventListener("click", async () => {
-      let prefs = await chrome.storage.local.get("addons-per-load");
+      let prefs = await browser.storage.local.get("addons-per-load");
       let noinfo = Array.from(document.querySelectorAll("#addon-queue .addon-row:not(.amoqueue-has-info)"))
                         .slice(0, prefs["addons-per-load"])
                         .map((row) => row.getAttribute("data-addon"));
@@ -293,7 +293,7 @@ async function initPageLayout() {
 }
 
 function initPartnerAddons() {
-  return chrome.storage.local.get({ "queueinfo-partner-addons": "" }, (prefs) => {
+  return browser.storage.local.get({ "queueinfo-partner-addons": "" }, (prefs) => {
     initPartnerAddons.addons = new Set(prefs["queueinfo-partner-addons"].split(/,\s*/));
   });
 }
@@ -329,7 +329,7 @@ function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUp
     let searchbox = document.querySelector("div.queue-search");
 
     let fieldset = document.createElement("fieldset");
-    chrome.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
+    browser.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
       let initial = prefs[prefName];
       let legend = document.createElement("legend");
       legend.textContent = labelText;
@@ -352,7 +352,7 @@ function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUp
       searchbox.appendChild(fieldset);
 
       fieldset.addEventListener("change", (event) => {
-        chrome.storage.local.set({ [prefName]: event.target.value });
+        browser.storage.local.set({ [prefName]: event.target.value });
         stateUpdater(event.target.value);
       }, false);
 
@@ -365,7 +365,7 @@ function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUp
 function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() => {}) {
   return new Promise((resolve, reject) => {
     let searchbox = document.querySelector("div.queue-search");
-    chrome.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
+    browser.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
       let initial = prefs[prefName];
       let label = document.createElement("label");
       let checkbox = document.createElement("input");
@@ -377,7 +377,7 @@ function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() =>
       searchbox.appendChild(label);
 
       checkbox.addEventListener("change", (event) => {
-        chrome.storage.local.set({ [prefName]: event.target.checked });
+        browser.storage.local.set({ [prefName]: event.target.checked });
         stateUpdater(event.target.checked);
       }, false);
 
@@ -579,7 +579,7 @@ async function downloadReviewInfo(ids) {
   let doc = parser.parseFromString(responseText, "text/html");
   let info = await getInfoWithSize(doc);
 
-  await chrome.storage.local.set({ ["reviewInfo." + info.id]: info });
+  await browser.storage.local.set({ ["reviewInfo." + info.id]: info });
 }
 */
 

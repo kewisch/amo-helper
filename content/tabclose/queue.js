@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-chrome.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender, sendReply) => {
   if (data.action == "getScrollPosition") {
     sendReply({ scrollY: window.scrollY, scrollX: window.scrollX });
   } else if (data.action == "setScrollPosition") {

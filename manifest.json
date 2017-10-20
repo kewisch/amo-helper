@@ -13,8 +13,8 @@
   "permissions": [
     "alarms",
     "clipboardWrite",
-    "contextMenus",
     "downloads",
+    "menus",
     "notifications",
     "tabs",
     "storage",

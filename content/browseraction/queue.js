@@ -21,4 +21,4 @@ function parseQueueNumbers(doc) {
   return numbers;
 }
 
-chrome.runtime.sendMessage({ action: "update-badge-numbers", numbers: parseQueueNumbers(document), totalonly: true });
+browser.runtime.sendMessage({ action: "update-badge-numbers", numbers: parseQueueNumbers(document), totalonly: true });

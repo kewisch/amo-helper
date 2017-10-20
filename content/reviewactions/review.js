@@ -35,7 +35,7 @@ createAction("Copy Slug", (event) => {
 
 createAction("Download", (event) => {
   let id = document.querySelector("#addon").getAttribute("data-id");
-  chrome.runtime.sendMessage({ action: "download", addonid: id, version: "latest" });
+  browser.runtime.sendMessage({ action: "download", addonid: id, version: "latest" });
 
   event.preventDefault();
   event.stopPropagation();

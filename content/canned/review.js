@@ -49,7 +49,7 @@ function setupLayout(cannedData, includeBody) {
   button.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    chrome.runtime.sendMessage({ action: "openPrefs" });
+    browser.runtime.sendMessage({ action: "openPrefs" });
   });
 
 
@@ -75,7 +75,7 @@ function setupLayout(cannedData, includeBody) {
 
 // -- main --
 
-chrome.storage.local.get({
+browser.storage.local.get({
   "canned-responses": [],
   "canned-use-stock": true,
   "canned-include-body": true

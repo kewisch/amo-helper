@@ -240,7 +240,7 @@ function getInfo(doc) {
 
 function updateSize(info) {
   return new Promise((resolve) => {
-    chrome.storage.local.get({ "queueinfo-use-diff": false }, resolve);
+    browser.storage.local.get({ "queueinfo-use-diff": false }, resolve);
   }).then((prefs) => {
     if (prefs["queueinfo-use-diff"] && info.lastapproved_idx !== null) {
       let prev = info.versions[info.lastapproved_idx];
@@ -284,7 +284,7 @@ function findParent(node, className) {
       let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
       let version = headerparts[1].trim();
       let id = document.querySelector("#addon").getAttribute("data-id");
-      chrome.runtime.sendMessage({ action: "download", addonid: id, version: version });
+      browser.runtime.sendMessage({ action: "download", addonid: id, version: version });
 
       event.preventDefault();
       event.stopPropagation();

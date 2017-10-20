@@ -45,7 +45,7 @@ function actionHandler(event) {
   event.stopPropagation();
 
   let action = event.target.className.replace("amoqueue-tinderbar-", "");
-  chrome.runtime.sendMessage({ action: "tinder", method: "next", result: action });
+  browser.runtime.sendMessage({ action: "tinder", method: "next", result: action });
 
   console.log(event.target.className + " - " + action);
 

@@ -10,7 +10,7 @@ browser.storage.local.get({ "filewindow-enabled": false }).then((prefs) => {
 
   $(".file-info a[href*='/browse/'], .file-info a[href*='/compare/']").on("click", (event) => {
     let url = new URL(event.target.href, window.location);
-    chrome.runtime.sendMessage({ action: "filewindow-open", url: url.href });
+    browser.runtime.sendMessage({ action: "filewindow-open", url: url.href });
     event.preventDefault();
     event.stopPropagation();
   });

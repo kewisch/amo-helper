@@ -12,7 +12,7 @@ browser.runtime.onMessage.addListener((data, sender, sendReply) => {
     return;
   }
 
-  chrome.storage.local.get({ "translation-secret-key": "" }, (prefs) => {
+  browser.storage.local.get({ "translation-secret-key": "" }, (prefs) => {
     if (!prefs["translation-secret-key"]) {
       sendReply({ error: "Secret key not set" });
       return;

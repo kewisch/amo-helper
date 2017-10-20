@@ -59,7 +59,7 @@ function startTimer(reset=true) {
     let minutes = (diff / 60) | 0;
 
     if (timerNotifyInterval != 0 && seconds == 0 && minutes != 0 && (minutes % timerNotifyInterval) == 0) {
-      chrome.runtime.sendMessage({ action: "reviewtimer-notify", slug: addonSlug, seconds: diff, name: addonName });
+      browser.runtime.sendMessage({ action: "reviewtimer-notify", slug: addonSlug, seconds: diff, name: addonName });
     }
 
     timerNode.textContent = minutes.toString().padStart(2, "0") + ":" + seconds.toString().padStart(2, "0");
