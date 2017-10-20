@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-let per_page_value = 100;
+let per_page_value = 200;
 let last_queue_page = {};
 
 /* exported getLastQueue, queueByAddon */
@@ -25,7 +25,7 @@ function queueByAddon(slug) {
 
 browser.webRequest.onBeforeRequest.addListener((details) => {
   let url = new URL(details.url);
-  if (!url.search.includes("per_page") && per_page_value != 100) {
+  if (!url.search.includes("per_page") && per_page_value != 200) {
     url.search = "?per_page=" + per_page_value;
     return { redirectUrl: url.href };
   }
@@ -46,7 +46,7 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-browser.storage.local.get({ "queueinfo-per-page": 100 }, (prefs) => {
+browser.storage.local.get({ "queueinfo-per-page": 200 }, (prefs) => {
   per_page_value = prefs["queueinfo-per-page"];
 });
 

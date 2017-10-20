@@ -23,7 +23,7 @@ const DEFAULT_PREFERENCES = {
   "tabclose-review-child": true,
   "queueinfo-use-diff": false,
   "queueinfo-show-weeklines": false,
-  "queueinfo-per-page": 100,
+  "queueinfo-per-page": 200,
   "queueinfo-partner-addons": "",
   "omnibox-enabled": true,
   "browseraction-queue-refresh-period": 60,
