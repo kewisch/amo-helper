@@ -70,15 +70,17 @@ browser.runtime.onMessage.addListener((data, sender, sendReply) => {
       reviewPages[sender.tab.id] = data.addonid;
     });
   } else if (data.action == "tabclose-backtoreview") {
-    let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug));
-    browser.tabs.query({ url: urls }, ([tab, ...rest]) => {
-      if (tab) {
-        browser.tabs.update(tab.id, { active: true }, () => {
-          browser.tabs.remove(sender.tab.id);
-        });
-      } else {
-        browser.tabs.update(sender.tab.id, { url: url });
-      }
+    browser.storage.local.get({ instance: "addons.mozilla.org" }, (prefs) => {
+      let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug).replace(/{instance}/, prefs["instance"]));
+      browser.tabs.query({ url: urls }, ([tab, ...rest]) => {
+        if (tab) {
+          browser.tabs.update(tab.id, { active: true }, () => {
+            browser.tabs.remove(sender.tab.id);
+          });
+        } else {
+          browser.tabs.update(sender.tab.id, { url: url });
+        }
+      });
     });
   }
 });

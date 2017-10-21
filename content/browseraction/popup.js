@@ -18,16 +18,21 @@ function setupMenuClick() {
       return;
     }
 
-    let href = event.target.getAttribute("href");
-    let promise = Promise.resolve();
+    (async () => {
+      let href = event.target.getAttribute("href");
+      if (href.startsWith("#!AMO")) {
+        let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
+        let url = `https://${prefs["instance"]}/en-US/${href.substr(6)}`;
+        await browser.tabs.create({ url: url });
+      } else if (href.startsWith("#")) {
+        await browser.runtime.sendMessage({ action: "popup-action-" + href.substr(1) });
+      } else {
+        await browser.tabs.create({ url: href });
+      }
 
-    if (href.startsWith("#")) {
-      promise = browser.runtime.sendMessage({ action: "popup-action-" + href.substr(1) });
-    } else {
-      promise = browser.tabs.create({ url: event.target.getAttribute("href") });
-    }
+      window.close();
+    })();
 
-    promise.then(() => window.close());
     event.preventDefault();
   });
 }

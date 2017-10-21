@@ -5,59 +5,61 @@
 
 const allSuggestions = {
   "": {
-    content: "%s",
-    description: "Editor Review for %s",
-    url: "https://addons.mozilla.org/editors/review/%s"
+    content: "{keyword}",
+    description: "Editor Review for {keyword}",
+    url: "https://{instance}/editors/review/{keyword}"
   },
   "addon": {
-    content: "addon %s",
-    description: "Add-on Listing for %s",
-    url: "https://addons.mozilla.org/addon/%s"
+    content: "addon {keyword}",
+    description: "Add-on Listing for {keyword}",
+    url: "https://{instance}/addon/{keyword}"
   },
   "devhub": {
-    content: "devhub %s",
-    description: "Developer Hub for %s",
-    url: "https://addons.mozilla.org/developers/addon/%s/edit"
+    content: "devhub {keyword}",
+    description: "Developer Hub for {keyword}",
+    url: "https://{instance}/developers/addon/{keyword}/edit"
   },
   "versions": {
-    content: "versions %s",
-    description: "Developer Versions for %s",
-    url: "https://addons.mozilla.org/developers/addon/%s/versions"
+    content: "versions {keyword}",
+    description: "Developer Versions for {keyword}",
+    url: "https://{instance}/developers/addon/{keyword}/versions"
   },
   "admin": {
-    content: "admin %s",
-    description: "Admin Page for %s",
-    url: "https://addons.mozilla.org/admin/addon/manage/%s"
+    content: "admin {keyword}",
+    description: "Admin Page for {keyword}",
+    url: "https://{instance}/admin/addon/manage/{keyword}"
   },
   "feed": {
-    content: "feed %s",
-    description: "Activity Log for %s",
-    url: "https://addons.mozilla.org/developers/feed/%s"
+    content: "feed {keyword}",
+    description: "Activity Log for {keyword}",
+    url: "https://{instance}/developers/feed/{keyword}"
   },
   "stats": {
-    content: "stats %s",
-    description: "Statistics Dashboard for %s",
-    url: "https://addons.mozilla.org/firefox/addon/%s/statistics/"
+    content: "stats {keyword}",
+    description: "Statistics Dashboard for {keyword}",
+    url: "https://{instance}/firefox/addon/{keyword}/statistics/"
   }
 };
 
-function resetDefaultSuggestion() {
-  browser.omnibox.setDefaultSuggestion({ description: "Visit addons.mozilla.org" });
+async function resetDefaultSuggestion() {
+  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
+  browser.omnibox.setDefaultSuggestion({ description: "Visit " + prefs["instance"] });
 }
 
 function inputChangedListener(text, suggest) {
-  browser.omnibox.setDefaultSuggestion({ description: allSuggestions[""].description.replace("%s", text) });
+  let descriptionText = allSuggestions[""].description.replace(/{keyword}/, text);
+  browser.omnibox.setDefaultSuggestion({ description: descriptionText });
 
   suggest(Object.values(allSuggestions).map(({ content, description }) => {
     return {
-      content: content.replace("%s", text),
-      description: description.replace("%s", text)
+      content: content.replace(/{keyword}/, text),
+      description: description.replace(/{keyword}/, text)
     };
   }));
 }
 
-function inputEnteredListener(text, disposition) {
-  resetDefaultSuggestion();
+async function inputEnteredListener(text, disposition) {
+  await resetDefaultSuggestion();
 
   let [action, slug, ...rest] = text.split(/\W+/);
   if (!slug) {
@@ -70,14 +72,14 @@ function inputEnteredListener(text, disposition) {
     return;
   }
 
-  let url = data.url.replace("%s", slug);
+  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
+  let url = data.url.replace(/{keyword}/, slug).replace(/{instance}/, prefs["instance"]);
 
   if (disposition == "currentTab") {
-    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      browser.tabs.update(tabs[0].id, { url: url });
-    });
+    let tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    await browser.tabs.update(tabs[0].id, { url: url });
   } else {
-    browser.tabs.create({ url: url, active: disposition == "newForegroundTab" });
+    await browser.tabs.create({ url: url, active: disposition == "newForegroundTab" });
   }
 }
 

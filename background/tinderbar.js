@@ -39,27 +39,27 @@ function createCompleteTab(createOptions) {
 }
 
 
-// function tinderstart(addons, preload=TABS_PRELOAD) {
-//   browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-//     let tabIndex = tabs[0].index;
-//     let active = true;
+// async function tinderstart(addons, preload=TABS_PRELOAD) {
+//   let tabs = await browser.tabs.query({ active: true, currentWindow: true });
+//   let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
+//   let tabIndex = tabs[0].index;
+//   let active = true;
 //
-//     // Create the first few tabs, making the first one active
-//     for (let i = 0; i < preload; i++) {
-//       let curaddon = addons.shift();
-//       if (!curaddon) {
-//         break;
-//       }
-//
-//       browser.tabs.create({
-//         index: ++tabIndex,
-//         active: active,
-//         url: REVIEW_URL.replace("{addon}", curaddon)
-//       });
-//
-//       active = false;
+//   // Create the first few tabs, making the first one active
+//   for (let i = 0; i < preload; i++) {
+//     let curaddon = addons.shift();
+//     if (!curaddon) {
+//       break;
 //     }
-//   });
+//
+//     browser.tabs.create({
+//       index: ++tabIndex,
+//       active: active,
+//       url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, prefs["instance"]);
+//     });
+//
+//     active = false;
+//   }
 // }
 
 function tinderStop() {
@@ -87,7 +87,7 @@ async function tinderNextTab(currentTab) {
 }
 
 async function tinderTabsLoadNext() {
-  let prefs = await browser.storage.local.get({ "tinderbar-preload-tabs": 3 });
+  let prefs = await browser.storage.local.get({ "tinderbar-preload-tabs": 3, "instance": "addons.mozilla.org" });
   if (!tinder_running || tinder_current_tabs.length >= prefs["tinderbar-preload-tabs"]) {
     return;
   }
@@ -103,7 +103,7 @@ async function tinderTabsLoadNext() {
   let [createdPromise, updatedPromise] = createCompleteTab({
     index: lastTab.index + 1,
     active: false,
-    url: REVIEW_URL.replace("{addon}", nextaddon)
+    url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, prefs["instance"])
   });
 
   let tab = await createdPromise;

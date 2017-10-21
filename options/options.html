@@ -9,6 +9,27 @@
   <link rel="stylesheet" type="text/css" href="options.css"/>
 </head>
 <body>
+  <section id="instance-section">
+    <h1>Instance</h1>
+    <fieldset id="instance" type="radio">
+      <legend>
+        The instance to use for links where it cannot be inferred from context
+      </legend>
+      <label class="oneline">
+        <input type="radio" id="instance-prod" name="instance" value="addons.mozilla.org">
+        Production
+      </label>
+      <label class="oneline">
+        <input type="radio" id="instance-stage" name="instance" value="addons.allizom.org">
+        Stage
+      </label>
+      <label class="oneline">
+        <input type="radio" id="instance-dev" name="instance" value="addons-dev.allizom.org">
+        Dev
+      </label>
+    </fieldset>
+  </section>
+
   <section id="tabclose-section">
     <h1>Closing Tabs</h1>
     <label>

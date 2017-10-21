@@ -18,6 +18,7 @@ const DEFAULT_DANGEROUS_MESSAGES = [
 ].join(", ");
 
 const DEFAULT_PREFERENCES = {
+  "instance": "addons.mozilla.org",
   "is-admin": false,
   "tabclose-other-queue": true,
   "tabclose-review-child": true,
@@ -82,6 +83,9 @@ function restore_options() {
 
       if (elem.type == "checkbox") {
         elem.checked = prefs[key];
+      } else if (elem.getAttribute("type") == "radio") {
+        let item = document.querySelector(`input[type='radio'][name='${elem.id}'][value='${prefs[key]}']`);
+        item.checked = true;
       } else {
         elem.value = prefs[key];
       }
@@ -93,7 +97,9 @@ function restore_options() {
 
 function change_options(event) {
   let node = event.target;
-  if (!node.id || node.localName != "input" || !Object.keys(DEFAULT_PREFERENCES).includes(node.id)) {
+  let defaultPrefs = Object.keys(DEFAULT_PREFERENCES);
+  let isPreference = defaultPrefs.includes(node.id) || defaultPrefs.includes(node.name);
+  if (!node.id || node.localName != "input" || !isPreference) {
     return;
   }
 
@@ -103,6 +109,8 @@ function change_options(event) {
     browser.storage.local.set({ [node.id]: parseInt(node.value, 10) });
   } else if (node.getAttribute("type") == "text") {
     browser.storage.local.set({ [node.id]: node.value });
+  } else if (node.getAttribute("type") == "radio") {
+    browser.storage.local.set({ [node.name]: node.value });
   }
 }
 

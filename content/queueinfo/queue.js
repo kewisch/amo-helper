@@ -569,8 +569,9 @@ function updateSort(rows=null) {
 /* Unfortunately this does not work due to cookies not being set on the XHR request
 async function downloadReviewInfo(ids) {
 
+  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
   let id = ids[0]; // temporary
-  let response = await fetch(REVIEW_URL.replace(/{addon}/, id));
+  let response = await fetch(REVIEW_URL.replace(/{addon}/, id).replace(/{instance}/, prefs["instance"]);
   let responseText = await response.text();
 
   let parser = new DOMParser();

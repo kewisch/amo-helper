@@ -21,14 +21,13 @@ function parseQueueNumbers(doc) {
   return numbers;
 }
 
-function updateQueueNumbers() {
-  return fetch("https://addons.mozilla.org/en-US/editors/queue/auto_approved", { mode: "cors", credentials: "include" }).then((response) => {
-    return response.text();
-  }).then((text) => {
-    let parser = new DOMParser();
-    let doc = parser.parseFromString(text, "text/html");
-    return parseQueueNumbers(doc);
-  });
+async function updateQueueNumbers() {
+  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
+  let url = `https://${prefs["instance"]}/en-US/editors/queue/auto_approved`;
+  let text = await fetch(url, { mode: "cors", credentials: "include" }).then(resp => resp.text());
+  let parser = new DOMParser();
+  let doc = parser.parseFromString(text, "text/html");
+  return parseQueueNumbers(doc);
 }
 
 function updateBadge(numbers) {
@@ -68,7 +67,7 @@ function switchToReviewPage() {
   browser.tabs.query({ active: true, currentWindow: true }, ([tab, ...rest]) => {
     let match = tab.url.match(ADDON_LINKS_RE);
     if (match) {
-      browser.tabs.update(tab.id, { url: REVIEW_URL.replace(/{addon}/, match[4]) });
+      browser.tabs.update(tab.id, { url: REVIEW_URL.replace(/{addon}/, match[4]).replace(/{instance}/, match[1]) });
     }
   });
 }
@@ -89,7 +88,8 @@ browser.storage.onChanged.addListener((changes, area) => {
   for (let key of Object.keys(changes)) {
     if (key == "browseraction-queue-refresh-period") {
       setupQueueRefresh();
-      return;
+    } else if (key == "instance") {
+      updateQueueNumbers().then(updateBadge);
     }
   }
 });
