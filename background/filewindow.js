@@ -37,7 +37,7 @@ async function saveWindowPosition(windowId) {
 }
 
 browser.runtime.onMessage.addListener((data, sender, sendReply) => {
-  if (data.action == "filewindow-open" && (new URL(data.url)).hostname == "addons.mozilla.org") {
+  if (data.action == "filewindow-open" && AMO_HOSTS.includes((new URL(data.url)).hostname)) {
     openFileBrowser(data.url);
   } else if (data.action == "filewindow-position") {
     saveWindowPosition(sender.tab.windowId);

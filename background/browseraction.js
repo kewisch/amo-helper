@@ -57,25 +57,18 @@ function setupQueueRefresh() {
 }
 
 async function closeAMOTabs() {
-  let results = await Promise.all([
-    // Editor pages
-    browser.tabs.query({ url: "https://addons.mozilla.org/en-US/editors/*" }),
-    browser.tabs.query({ url: "https://addons.mozilla.org/en-US/firefox/addon/*/privacy/" }),
-
-    // File browsers
-    browser.tabs.query({ url: "https://addons.mozilla.org/en-US/firefox/files/*" })
-  ]);
+  let urls = AMO_EDITORS_PATTERNS.concat(AMO_PRIVACY_PAGES).concat(FILEBROWSER_PATTERNS);
+  let results = await browser.tabs.query({ url: urls });
 
   let tabIds = [].concat(...results).map(tab => tab.id);
   await browser.tabs.remove(tabIds);
 }
 
 function switchToReviewPage() {
-  let RE_ADDON_LINKS = /https:\/\/addons.mozilla.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
   browser.tabs.query({ active: true, currentWindow: true }, ([tab, ...rest]) => {
-    let match = tab.url.match(RE_ADDON_LINKS);
+    let match = tab.url.match(ADDON_LINKS_RE);
     if (match) {
-      browser.tabs.update(tab.id, { url: "https://addons.mozilla.org/en-US/editors/review/" + match[4] });
+      browser.tabs.update(tab.id, { url: REVIEW_URL.replace(/{addon}/, match[4]) });
     }
   });
 }

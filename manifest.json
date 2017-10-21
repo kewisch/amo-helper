@@ -46,6 +46,8 @@
 
   "background": {
     "scripts": [
+      "common/constants.js",
+
       "background/info.js",
       "background/canned.js",
       "background/context.js",
@@ -110,6 +112,7 @@
       ],
       "js": [
         "libs/moment.min.js",
+        "common/constants.js",
         "content/queueinfo/queue.js"
       ],
       "css": ["content/queueinfo/queue.css"],

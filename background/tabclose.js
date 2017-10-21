@@ -5,12 +5,6 @@
 
 "use strict";
 
-const REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review(|-listed|-unlisted)\/(.*)/;
-const QUEUE_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/queue\/(.*)/;
-
-// const FILEBROWSER_MATCH = "https://addons.mozilla.org/en-US/firefox/files/browse/*";
-// const COMPARE_MATCH = "https://addons.mozilla.org/en-US/firefox/files/compare/*";
-
 let tabsToClose = {};
 let reviewPages = {};
 
@@ -76,8 +70,8 @@ browser.runtime.onMessage.addListener((data, sender, sendReply) => {
       reviewPages[sender.tab.id] = data.addonid;
     });
   } else if (data.action == "tabclose-backtoreview") {
-    let url = "https://addons.mozilla.org/en-US/editors/review/" + data.slug;
-    browser.tabs.query({ url: url }, ([tab, ...rest]) => {
+    let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug));
+    browser.tabs.query({ url: urls }, ([tab, ...rest]) => {
       if (tab) {
         browser.tabs.update(tab.id, { active: true }, () => {
           browser.tabs.remove(sender.tab.id);
@@ -98,7 +92,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     let isQueue = tab.url.match(QUEUE_RE);
 
     if (isReview) {
-      reviewPages[tabId] = isReview[3];
+      reviewPages[tabId] = isReview[4];
     } else if (isQueue) {
       if (tabId in reviewPages) {
         removeTabsFor(tabId, reviewPages[tabId], prefs["tabclose-review-child"]);

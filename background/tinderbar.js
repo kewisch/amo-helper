@@ -3,9 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-const ADDON_REVIEW_URL = "https://addons.mozilla.org/editors/review/$ADDON";
-const ADDON_REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review(|-listed|-unlisted)\/(.*)/;
-
 let tinder_current_tabs = [];
 let tinder_running = false;
 
@@ -13,7 +10,7 @@ async function getLastTab() {
   let len = tinder_current_tabs.length;
   if (len == 0) {
     let currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
-    let matchCurrentTab = currentTabs[0].url.match(ADDON_REVIEW_RE);
+    let matchCurrentTab = currentTabs[0].url.match(REVIEW_RE);
     return { slug: matchCurrentTab ? matchCurrentTab[3] : null, tab: currentTabs[0] };
   } else {
     return tinder_current_tabs[tinder_current_tabs.length - 1];
@@ -57,7 +54,7 @@ function createCompleteTab(createOptions) {
 //       browser.tabs.create({
 //         index: ++tabIndex,
 //         active: active,
-//         url: ADDON_REVIEW_URL.replace("$ADDON", curaddon)
+//         url: REVIEW_URL.replace("{addon}", curaddon)
 //       });
 //
 //       active = false;
@@ -106,7 +103,7 @@ async function tinderTabsLoadNext() {
   let [createdPromise, updatedPromise] = createCompleteTab({
     index: lastTab.index + 1,
     active: false,
-    url: ADDON_REVIEW_URL.replace("$ADDON", nextaddon)
+    url: REVIEW_URL.replace("{addon}", nextaddon)
   });
 
   let tab = await createdPromise;
@@ -131,7 +128,7 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
 });
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url && !ADDON_REVIEW_RE.test(changeInfo.url)) {
+  if (changeInfo.url && !REVIEW_RE.test(changeInfo.url)) {
     let tabIndex = tinder_current_tabs.findIndex(data => data.tab.id == tabId);
     if (tabIndex > -1) {
       tinder_current_tabs.splice(tabIndex, 1);

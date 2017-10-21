@@ -9,7 +9,6 @@ const OVERDUE_SOURCES = 7;
 const IS_ADMIN = !!document.getElementById("unlisted-queues");
 const QUEUE = document.location.pathname.split("/").pop();
 
-
 async function initPageLayout() {
   let header = document.querySelector("#addon-queue > thead > .listing-header");
 
@@ -561,7 +560,6 @@ function updateSort(rows=null) {
     }
   });
 
-
   let rowparent = rows[0].parentNode;
   for (let row of rows) {
     rowparent.appendChild(row);
@@ -572,7 +570,7 @@ function updateSort(rows=null) {
 async function downloadReviewInfo(ids) {
 
   let id = ids[0]; // temporary
-  let response = await fetch("https://addons.mozilla.org/en-US/editors/review/" + id);
+  let response = await fetch(REVIEW_URL.replace(/{addon}/, id));
   let responseText = await response.text();
 
   let parser = new DOMParser();

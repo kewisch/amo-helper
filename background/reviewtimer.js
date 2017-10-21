@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-const EDITOR_REVIEW_RE = /https:\/\/addons.mozilla.org\/([^/]+)\/editors\/review(|-listed|-unlisted)\/(.*)/;
-
 let mostActiveReview = null;
 let mostActiveTab = null;
 
@@ -26,9 +24,9 @@ browser.runtime.onMessage.addListener((data, sender, sendReply) => {
 
 browser.tabs.onActivated.addListener((activeInfo) => {
   browser.tabs.get(activeInfo.tabId, (tab) => {
-    let isReview = tab.url ? tab.url.match(EDITOR_REVIEW_RE) : null;
+    let isReview = tab.url ? tab.url.match(REVIEW_RE) : null;
     if (isReview) {
-      mostActiveReview = isReview[3];
+      mostActiveReview = isReview[4];
       mostActiveTab = tab;
     }
   });

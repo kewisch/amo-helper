@@ -31,7 +31,7 @@ browser.webRequest.onBeforeRequest.addListener((details) => {
   }
 
   return {};
-}, { urls: ["https://addons.mozilla.org/en-US/editors/queue/*"] }, ["blocking"]);
+}, { urls: AMO_QUEUE_PATTERNS }, ["blocking"]);
 
 
 browser.storage.onChanged.addListener((changes, area) => {
