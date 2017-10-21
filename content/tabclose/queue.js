@@ -5,10 +5,10 @@
 
 browser.runtime.onMessage.addListener((data, sender) => {
   if (data.action == "getScrollPosition") {
-    return Promise.resolve({ scrollY: window.scrollY, scrollX: window.scrollX });
+    return { scrollY: window.scrollY, scrollX: window.scrollX };
   } else if (data.action == "setScrollPosition") {
     window.scrollTo(data.scrollX, data.scrollY);
-    return Promise.resolve("ok");
+    return "ok";
   }
   return undefined;
 });

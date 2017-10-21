@@ -49,15 +49,14 @@ function createInfoStorage(prefix, storageName) {
   };
 }
 
-var infostorage = {
+let infostorage = {
   slug: createInfoStorage("slugInfo", "slug"),
   review: createInfoStorage("reviewInfo", "review")
 };
 
-browser.runtime.onMessage.addListener(async (data, sender) => {
-  if (data.action != "infostorage") {
-    return undefined;
+browser.runtime.onMessage.addListener((data, sender) => {
+  if (data.action == "infostorage") {
+    return infostorage[data.storage][data.op](data.keys);
   }
-
-  return infostorage[data.storage][data.op](data.keys);
+  return undefined;
 });

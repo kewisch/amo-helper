@@ -33,87 +33,81 @@ async function copyScrollPosition(from, to) {
   await browser.tabs.sendMessage(to.id, data);
 }
 
-function removeOtherTabs(tabUrl, keepTab) {
+async function removeOtherTabs(tabUrl, keepTab) {
   let findTabUrl = tabUrl.split(/\?|#/)[0] + "*";
-  browser.tabs.query({ url: findTabUrl }, (compareTabs) => {
-    let closingActiveTab = null;
-    let closeTabs = compareTabs.filter(tab => {
-      let shouldClose = tab.id != keepTab.id;
-      if (shouldClose && tab.active) {
-        closingActiveTab = tab;
-      }
-      return shouldClose;
-    });
+  let compareTabs = await browser.tabs.query({ url: findTabUrl });
 
-    let promise = Promise.resolve();
-    if (closingActiveTab) {
-      promise = copyScrollPosition(closingActiveTab, keepTab).then(() => {
-        browser.tabs.update(keepTab.id, { active: true });
-      });
+  let closingActiveTab = null;
+  let closeTabs = compareTabs.filter(tab => {
+    let shouldClose = tab.id != keepTab.id;
+    if (shouldClose && tab.active) {
+      closingActiveTab = tab;
     }
-    promise.then(() => {
-      if (closeTabs.length) {
-        browser.tabs.move(keepTab.id, { index: closeTabs[0].index });
-      }
-      browser.tabs.remove(closeTabs.map(tab => tab.id));
-    });
+    return shouldClose;
   });
+
+  if (closingActiveTab) {
+    await copyScrollPosition(closingActiveTab, keepTab);
+    await browser.tabs.update(keepTab.id, { active: true });
+  }
+
+  if (closeTabs.length) {
+    await browser.tabs.move(keepTab.id, { index: closeTabs[0].index });
+  }
+  await browser.tabs.remove(closeTabs.map(tab => tab.id));
 }
 
 browser.runtime.onMessage.addListener((data, sender) => {
-  if (data.action == "addonid") {
-    browser.storage.local.get({ "tabclose-review-child": true }, (prefs) => {
+  (async () => {
+    if (data.action == "addonid") {
+      let prefs = await browser.storage.local.get({ "tabclose-review-child": true });
       if (!(data.addonid in tabsToClose)) {
         tabsToClose[data.addonid] = {};
       }
       tabsToClose[data.addonid][sender.tab.id] = true;
       reviewPages[sender.tab.id] = data.addonid;
-    });
-  } else if (data.action == "tabclose-backtoreview") {
-    browser.storage.local.get({ instance: "addons.mozilla.org" }, (prefs) => {
+    } else if (data.action == "tabclose-backtoreview") {
+      let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
       let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug).replace(/{instance}/, prefs["instance"]));
-      browser.tabs.query({ url: urls }, ([tab, ...rest]) => {
-        if (tab) {
-          browser.tabs.update(tab.id, { active: true }, () => {
-            browser.tabs.remove(sender.tab.id);
-          });
-        } else {
-          browser.tabs.update(sender.tab.id, { url: url });
-        }
-      });
-    });
+      let [tab, ...rest] = await browser.tabs.query({ url: urls });
+      if (tab) {
+        await browser.tabs.update(tab.id, { active: true });
+        browser.tabs.remove(sender.tab.id);
+      } else {
+        browser.tabs.update(sender.tab.id, { url: url });
+      }
+    }
+  })();
+});
+
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  let prefs = await browser.storage.local.get({
+    "tabclose-other-queue": true,
+    "tabclose-review-child": true
+  });
+
+  let isReview = tab.url.match(REVIEW_RE);
+  let isQueue = tab.url.match(QUEUE_RE);
+
+  if (isReview) {
+    reviewPages[tabId] = isReview[4];
+  } else if (isQueue) {
+    if (tabId in reviewPages) {
+      removeTabsFor(tabId, reviewPages[tabId], prefs["tabclose-review-child"]);
+    }
+
+    if (changeInfo.status == "complete" && prefs["tabclose-other-queue"]) {
+      removeOtherTabs(tab.url, tab);
+    }
   }
 });
 
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  browser.storage.local.get({
-    "tabclose-other-queue": true,
-    "tabclose-review-child": true
-  }, (prefs) => {
-    let isReview = tab.url.match(REVIEW_RE);
-    let isQueue = tab.url.match(QUEUE_RE);
-
-    if (isReview) {
-      reviewPages[tabId] = isReview[4];
-    } else if (isQueue) {
-      if (tabId in reviewPages) {
-        removeTabsFor(tabId, reviewPages[tabId], prefs["tabclose-review-child"]);
-      }
-
-      if (changeInfo.status == "complete" && prefs["tabclose-other-queue"]) {
-        removeOtherTabs(tab.url, tab);
-      }
-    }
-  });
-});
-
-browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
+browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
   let slug = reviewPages[tabId];
   delete reviewPages[tabId];
 
-  browser.storage.local.get({ "tabclose-review-child": true }, (prefs) => {
-    if (slug) {
-      removeTabsFor(tabId, slug, prefs["tabclose-review-child"]);
-    }
-  });
+  if (slug) {
+    let prefs = browser.storage.local.get({ "tabclose-review-child": true });
+    removeTabsFor(tabId, slug, prefs["tabclose-review-child"]);
+  }
 });

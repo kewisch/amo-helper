@@ -63,32 +63,31 @@ function stateToType(state) {
   }[state] || "unknown";
 }
 
-function retrieveVersion(version, method="GET", responseType="arraybuffer") {
-  return fetch(version.installurl, { method, _xhr_responseType: responseType }).then((response) => {
-    if (response.status == 302) {
-      return fetch(response.headers.get("Location"), { method });
-    }
-    return response;
-  });
+async function retrieveVersion(version, method="GET") {
+  let response = await fetch(version.installurl, { method });
+  if (response.status == 302) {
+    return fetch(response.headers.get("Location"), { method });
+  }
+  return response;
 }
 
-function unzip(buffer) {
-  return JSZip.loadAsync(buffer).then((zip) => {
-    let filedata = {};
-    let promises = [];
+async function unzip(buffer) {
+  let zip = await JSZip.loadAsync(buffer);
+  let filedata = {};
+  let promises = [];
 
-    zip.forEach((relPath, file) => {
-      if (file.dir) { // || !file.name.endsWith(".js")) {
-        return;
-      }
+  zip.forEach((relPath, file) => {
+    if (file.dir) { // || !file.name.endsWith(".js")) {
+      return;
+    }
 
-      promises.push(file.async("string").then((content) => {
-        filedata[relPath] = content;
-      }));
-    });
-
-    return Promise.all(promises).then(() => filedata);
+    promises.push(file.async("string").then((content) => {
+      filedata[relPath] = content;
+    }));
   });
+
+  await Promise.all(promises);
+  return filedata;
 }
 
 function diffStat(dataA, dataB) {
@@ -130,10 +129,10 @@ function diffStat(dataA, dataB) {
 
 
 function determineChanges(versionA, versionB) {
-  function retrieveAndUnzip(version) {
-    return retrieveVersion(version).then(resp => {
-      return resp.arrayBuffer();
-    }).then(unzip);
+  async function retrieveAndUnzip(version) {
+    let resp = await retrieveVersion(version);
+    let buffer = await resp.arrayBuffer();
+    return unzip(buffer);
   }
 
   return Promise.all([
@@ -142,22 +141,23 @@ function determineChanges(versionA, versionB) {
   ]).then(([dataA, dataB]) => diffStat(dataA, dataB));
 }
 
-function determineSize(version) {
+async function determineSize(version) {
   if (!version) {
-    return Promise.resolve();
+    return;
   }
 
-  return retrieveVersion(version, "HEAD").then((response) => {
+  try {
+    let response = await retrieveVersion(version, "HEAD");
     version.size = parseInt(response.headers.get("Content-Length"), 10);
-  }, () => {
+  } catch (e) {
     version.size = 0;
-  });
+  }
 }
 
 function getInfo(doc) {
-  var lastapproved_idx = null;
+  let lastapproved_idx = null;
 
-  var versions = Array.from(doc.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
+  let versions = Array.from(doc.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
     let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
     let submissiondate = floatingtime(headerparts[2].trim(), true);
     let hasAutoApproval = false;
@@ -238,27 +238,20 @@ function getInfo(doc) {
   };
 }
 
-function updateSize(info) {
-  return new Promise((resolve) => {
-    browser.storage.local.get({ "queueinfo-use-diff": false }, resolve);
-  }).then((prefs) => {
-    if (prefs["queueinfo-use-diff"] && info.lastapproved_idx !== null) {
-      let prev = info.versions[info.lastapproved_idx];
-      let cur = info.versions[info.latest_idx];
-      return determineChanges(prev, cur).then((stats) => {
-        info.diffinfo = stats;
-      });
-    } else {
-      return Promise.all([
-        determineSize(info.versions[info.latest_idx]),
-        determineSize(info.versions[info.lastapproved_idx])
-      ]).then(() => {
-        delete info.diffinfo;
-      });
-    }
-  }).then(() => {
-    return info;
-  });
+async function updateSize(info) {
+  let prefs = await browser.storage.local.get({ "queueinfo-use-diff": false });
+  if (prefs["queueinfo-use-diff"] && info.lastapproved_idx !== null) {
+    let prev = info.versions[info.lastapproved_idx];
+    let cur = info.versions[info.latest_idx];
+    info.diffinfo = await determineChanges(prev, cur);
+  } else {
+    await Promise.all([
+      determineSize(info.versions[info.latest_idx]),
+      determineSize(info.versions[info.lastapproved_idx])
+    ]);
+    delete info.diffinfo;
+  }
+  return info;
 }
 
 function findParent(node, className) {
@@ -292,11 +285,10 @@ function findParent(node, className) {
   });
 
   // Open compare link if options enabled
-  browser.storage.local.get({ "queueinfo-open-compare": false }).then((prefs) => {
-    if (prefs["queueinfo-open-compare"]) {
-      document.querySelector(".listing-body:last-child .file-info a.compare").click();
-    }
-  });
+  let prefs = await browser.storage.local.get({ "queueinfo-open-compare": false });
+  if (prefs["queueinfo-open-compare"]) {
+    document.querySelector(".listing-body:last-child .file-info a.compare").click();
+  }
 
   // Collect review info and set in storage
   let info = getInfo(document);

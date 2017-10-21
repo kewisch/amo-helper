@@ -83,18 +83,17 @@ async function inputEnteredListener(text, disposition) {
   }
 }
 
-function setupListeners() {
-  browser.storage.local.get({ "omnibox-enabled": true }, (prefs) => {
-    browser.omnibox.onInputChanged.removeListener(inputChangedListener);
-    browser.omnibox.onInputEntered.removeListener(inputEnteredListener);
-    browser.omnibox.onInputCancelled.removeListener(resetDefaultSuggestion);
+async function setupListeners() {
+  let prefs = await browser.storage.local.get({ "omnibox-enabled": true });
+  browser.omnibox.onInputChanged.removeListener(inputChangedListener);
+  browser.omnibox.onInputEntered.removeListener(inputEnteredListener);
+  browser.omnibox.onInputCancelled.removeListener(resetDefaultSuggestion);
 
-    if (prefs["omnibox-enabled"]) {
-      browser.omnibox.onInputChanged.addListener(inputChangedListener);
-      browser.omnibox.onInputEntered.addListener(inputEnteredListener);
-      browser.omnibox.onInputCancelled.addListener(resetDefaultSuggestion);
-    }
-  });
+  if (prefs["omnibox-enabled"]) {
+    browser.omnibox.onInputChanged.addListener(inputChangedListener);
+    browser.omnibox.onInputEntered.addListener(inputEnteredListener);
+    browser.omnibox.onInputCancelled.addListener(resetDefaultSuggestion);
+  }
 }
 
 browser.storage.onChanged.addListener((changes, area) => {

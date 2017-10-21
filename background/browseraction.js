@@ -30,28 +30,25 @@ async function updateQueueNumbers() {
   return parseQueueNumbers(doc);
 }
 
-function updateBadge(numbers) {
-  browser.storage.local.get({ "browseraction-count-moderator": false }, (prefs) => {
-    if (!prefs["browseraction-count-moderator"]) {
-      delete numbers.reviews;
-    }
+async function updateBadge(numbers) {
+  let prefs = await browser.storage.local.get({ "browseraction-count-moderator": false });
+  if (!prefs["browseraction-count-moderator"]) {
+    delete numbers.reviews;
+  }
 
-    let total = Object.values(numbers).reduce((result, queue) => {
-      return result + queue.total;
-    }, 0);
+  let total = Object.values(numbers).reduce((result, queue) => {
+    return result + queue.total;
+  }, 0);
 
-    browser.browserAction.setBadgeText({ text: total.toString() });
-  });
+  browser.browserAction.setBadgeText({ text: total.toString() });
 }
 
-function setupQueueRefresh() {
-  browser.storage.local.get({ "browseraction-queue-refresh-period": 60 }, (prefs) => {
-    browser.alarms.clear("queuelength", () => {
-      browser.alarms.create("queuelength", {
-        delayInMinutes: 0,
-        periodInMinutes: prefs["browseraction-queue-refresh-period"]
-      });
-    });
+async function setupQueueRefresh() {
+  let prefs = await browser.storage.local.get({ "browseraction-queue-refresh-period": 60 });
+  await browser.alarms.clear("queuelength");
+  await browser.alarms.create("queuelength", {
+    delayInMinutes: 0,
+    periodInMinutes: prefs["browseraction-queue-refresh-period"]
   });
 }
 
@@ -63,13 +60,12 @@ async function closeAMOTabs() {
   await browser.tabs.remove(tabIds);
 }
 
-function switchToReviewPage() {
-  browser.tabs.query({ active: true, currentWindow: true }, ([tab, ...rest]) => {
-    let match = tab.url.match(ADDON_LINKS_RE);
-    if (match) {
-      browser.tabs.update(tab.id, { url: REVIEW_URL.replace(/{addon}/, match[4]).replace(/{instance}/, match[1]) });
-    }
-  });
+async function switchToReviewPage() {
+  let [tab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
+  let match = tab.url.match(ADDON_LINKS_RE);
+  if (match) {
+    await browser.tabs.update(tab.id, { url: REVIEW_URL.replace(/{addon}/, match[4]).replace(/{instance}/, match[1]) });
+  }
 }
 
 // -- main --

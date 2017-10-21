@@ -3,6 +3,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
+async function translate(textNode, clickedNode) {
+  let data = await browser.runtime.sendMessage({
+    action: "translate",
+    text: textNode.text(),
+    from: "translate"
+  });
+
+  if (data.error) {
+    clickedNode.text("Error : Key not set. See addon's options page.");
+  } else {
+    clickedNode.remove();
+    textNode.text(data.text);
+  }
+}
+
 window.addEventListener("load", () => {
   // Moderated reviews
   $(".review-flagged p:not(.description)").each(function() {
@@ -26,21 +41,4 @@ window.addEventListener("load", () => {
       translate($(".article p"), $(this));
     })
   );
-
-  function translate(textNode, clickedNode) {
-    var sending = browser.runtime.sendMessage({
-      action: "translate",
-      text: textNode.text(),
-      from: "translate"
-    });
-
-    sending.then((data) => {
-      if (data.error) {
-        clickedNode.text("Error : Key not set. See addon's options page.");
-      } else {
-        clickedNode.remove();
-        textNode.text(data.text);
-      }
-    });
-  }
 });

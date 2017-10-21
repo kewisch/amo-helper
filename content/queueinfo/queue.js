@@ -291,10 +291,9 @@ async function initPageLayout() {
   queueButtons.appendChild(clearButton);
 }
 
-function initPartnerAddons() {
-  return browser.storage.local.get({ "queueinfo-partner-addons": "" }, (prefs) => {
-    initPartnerAddons.addons = new Set(prefs["queueinfo-partner-addons"].split(/,\s*/));
-  });
+async function initPartnerAddons() {
+  let prefs = await browser.storage.local.get({ "queueinfo-partner-addons": "" });
+  initPartnerAddons.addons = new Set(prefs["queueinfo-partner-addons"].split(/,\s*/));
 }
 function isPartnerAddon(slug) {
   let addons = initPartnerAddons.addons || new Set();
@@ -323,67 +322,59 @@ function hideBecause(row, reason, state) {
   }
 }
 
-function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUpdater=() => {}) {
-  return new Promise((resolve, reject) => {
-    let searchbox = document.querySelector("div.queue-search");
+async function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUpdater=() => {}) {
+  let searchbox = document.querySelector("div.queue-search");
 
-    let fieldset = document.createElement("fieldset");
-    browser.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
-      let initial = prefs[prefName];
-      let legend = document.createElement("legend");
-      legend.textContent = labelText;
-      fieldset.appendChild(legend);
+  let fieldset = document.createElement("fieldset");
+  let prefs = await browser.storage.local.get({ [prefName]: defaultValue });
+  let initial = prefs[prefName];
+  let legend = document.createElement("legend");
+  legend.textContent = labelText;
+  fieldset.appendChild(legend);
 
-      for (let option of optionLabels) {
-        let label = document.createElement("label");
-        let radio = document.createElement("input");
-        let value = option.toLowerCase();
-        radio.setAttribute("type", "radio");
-        radio.setAttribute("name", prefName);
-        radio.setAttribute("value", value);
-        if (value == initial) {
-          radio.setAttribute("checked", "checked");
-        }
-        label.appendChild(radio);
-        label.appendChild(document.createTextNode(option));
-        fieldset.appendChild(label);
-      }
-      searchbox.appendChild(fieldset);
+  for (let option of optionLabels) {
+    let label = document.createElement("label");
+    let radio = document.createElement("input");
+    let value = option.toLowerCase();
+    radio.setAttribute("type", "radio");
+    radio.setAttribute("name", prefName);
+    radio.setAttribute("value", value);
+    if (value == initial) {
+      radio.setAttribute("checked", "checked");
+    }
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(option));
+    fieldset.appendChild(label);
+  }
+  searchbox.appendChild(fieldset);
 
-      fieldset.addEventListener("change", (event) => {
-        browser.storage.local.set({ [prefName]: event.target.value });
-        stateUpdater(event.target.value);
-      }, false);
-
-      stateUpdater(initial);
-      resolve();
-    });
+  fieldset.addEventListener("change", (event) => {
+    browser.storage.local.set({ [prefName]: event.target.value });
+    stateUpdater(event.target.value);
   });
+
+  stateUpdater(initial);
 }
 
-function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() => {}) {
-  return new Promise((resolve, reject) => {
-    let searchbox = document.querySelector("div.queue-search");
-    browser.storage.local.get({ [prefName]: defaultValue }, (prefs) => {
-      let initial = prefs[prefName];
-      let label = document.createElement("label");
-      let checkbox = document.createElement("input");
-      checkbox.setAttribute("type", "checkbox");
-      label.className = "amoqueue-search-checkbox-label";
-      label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(labelText));
-      checkbox.checked = initial;
-      searchbox.appendChild(label);
+async function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() => {}) {
+  let searchbox = document.querySelector("div.queue-search");
+  let prefs = await browser.storage.local.get({ [prefName]: defaultValue });
+  let initial = prefs[prefName];
+  let label = document.createElement("label");
+  let checkbox = document.createElement("input");
+  checkbox.setAttribute("type", "checkbox");
+  label.className = "amoqueue-search-checkbox-label";
+  label.appendChild(checkbox);
+  label.appendChild(document.createTextNode(labelText));
+  checkbox.checked = initial;
+  searchbox.appendChild(label);
 
-      checkbox.addEventListener("change", (event) => {
-        browser.storage.local.set({ [prefName]: event.target.checked });
-        stateUpdater(event.target.checked);
-      }, false);
-
-      stateUpdater(initial);
-      resolve();
-    });
+  checkbox.addEventListener("change", (event) => {
+    browser.storage.local.set({ [prefName]: event.target.checked });
+    stateUpdater(event.target.checked);
   });
+
+  stateUpdater(initial);
 }
 
 async function updateQueueInfo() {
@@ -393,7 +384,7 @@ async function updateQueueInfo() {
   }
 
   let data = await browser.runtime.sendMessage({ action: "infostorage", op: "get", storage: "review", keys: prefs });
-  for (let reviewInfo of Object.values(data)) {
+  for (let reviewInfo of Object.values(data || {})) {
     updateReviewInfoDisplay(reviewInfo.id, reviewInfo);
   }
 
@@ -568,7 +559,6 @@ function updateSort(rows=null) {
 
 /* Unfortunately this does not work due to cookies not being set on the XHR request
 async function downloadReviewInfo(ids) {
-
   let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
   let id = ids[0]; // temporary
   let response = await fetch(REVIEW_URL.replace(/{addon}/, id).replace(/{instance}/, prefs["instance"]);

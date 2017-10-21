@@ -37,11 +37,10 @@ function setupMenuClick() {
   });
 }
 
-function setupMenuState() {
+async function setupMenuState() {
   // set up switch action
-  browser.tabs.query({ active: true, currentWindow: true }).then(([tab, ...rest]) => {
-    hideElement(document.getElementById("page-action-gotoreview"), !tab.url.match(ADDON_LINKS_RE));
-  });
+  let [tab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
+  hideElement(document.getElementById("page-action-gotoreview"), !tab.url.match(ADDON_LINKS_RE));
 }
 
 window.addEventListener("DOMContentLoaded", () => {

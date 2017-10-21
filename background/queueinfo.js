@@ -55,11 +55,15 @@ browser.runtime.onMessage.addListener((data, sender) => {
     return undefined;
   }
 
+  let rv;
+
   if (data.method == "set") {
     last_queue_page[data.queue] = data.addons;
+    rv = null;
+  } else if (data.method == "get") {
+    rv = { queue: data.queue, addons: last_queue_page[data.queue] };
   }
-
-  return Promise.resolve({ queue: data.queue, addons: last_queue_page[data.queue] });
+  return rv;
 });
 
 // TODO cleanup reviewInfo

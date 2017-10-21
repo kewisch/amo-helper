@@ -72,27 +72,27 @@ function debounce(func, wait) {
   };
 }
 
-function restore_options() {
-  browser.storage.local.get(DEFAULT_PREFERENCES, (prefs) => {
-    document.documentElement.classList.toggle("is-admin", prefs["is-admin"]);
-    for (let key of Object.keys(prefs)) {
-      let elem = document.getElementById(key);
-      if (!elem) {
-        continue;
-      }
+async function restore_options() {
+  let prefs = await browser.storage.local.get(DEFAULT_PREFERENCES);
 
-      if (elem.type == "checkbox") {
-        elem.checked = prefs[key];
-      } else if (elem.getAttribute("type") == "radio") {
-        let item = document.querySelector(`input[type='radio'][name='${elem.id}'][value='${prefs[key]}']`);
-        item.checked = true;
-      } else {
-        elem.value = prefs[key];
-      }
+  document.documentElement.classList.toggle("is-admin", prefs["is-admin"]);
+  for (let key of Object.keys(prefs)) {
+    let elem = document.getElementById(key);
+    if (!elem) {
+      continue;
     }
-  });
 
-  restore_canned_options();
+    if (elem.type == "checkbox") {
+      elem.checked = prefs[key];
+    } else if (elem.getAttribute("type") == "radio") {
+      let item = document.querySelector(`input[type='radio'][name='${elem.id}'][value='${prefs[key]}']`);
+      item.checked = true;
+    } else {
+      elem.value = prefs[key];
+    }
+  }
+
+  await restore_canned_options();
 }
 
 function change_options(event) {
@@ -201,26 +201,25 @@ function update_canned_state() {
   }
 }
 
-function restore_canned_options() {
+async function restore_canned_options() {
   let select = document.getElementById("canned-select");
 
-  browser.storage.local.get({ "canned-responses": [] }, (prefs) => {
-    let previousOptions = document.querySelectorAll("#canned option:not(.canned-option-new)");
-    for (let option of previousOptions) {
-      option.remove();
-    }
+  let prefs = await browser.storage.local.get({ "canned-responses": [] });
+  let previousOptions = document.querySelectorAll("#canned option:not(.canned-option-new)");
+  for (let option of previousOptions) {
+    option.remove();
+  }
 
-    let newOption = document.querySelector("#canned .canned-option-new");
-    for (let optionData of prefs["canned-responses"]) {
-      let option = document.createElement("option");
-      option.textContent = optionData.label;
-      option.value = optionData.value;
-      select.insertBefore(option, newOption);
-    }
+  let newOption = document.querySelector("#canned .canned-option-new");
+  for (let optionData of prefs["canned-responses"]) {
+    let option = document.createElement("option");
+    option.textContent = optionData.label;
+    option.value = optionData.value;
+    select.insertBefore(option, newOption);
+  }
 
-    select.selectedIndex = 0;
-    update_canned_state();
-  });
+  select.selectedIndex = 0;
+  update_canned_state();
 }
 
 /* --- filewindow position --- */
@@ -312,7 +311,7 @@ function setup_import_export_listeners() {
       }
 
       await browser.storage.local.set(safePrefs);
-      restore_options();
+      await restore_options();
     });
     reader.readAsText(file);
   });

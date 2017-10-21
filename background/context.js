@@ -3,23 +3,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2016-2017 */
 
-function toAddonUrl(target, info) {
+async function toAddonUrl(target, info) {
   let matches = info.linkUrl.match(ADDON_LINKS_RE);
   if (!matches) {
     return;
   }
 
-  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    let activeTab = tabs[0];
-    let targetUrl = target.replace(/{addon}/, matches[4]).replace(/{instance}/, matches[1]);
+  let tabs = await browser.tabs.query({ active: true, currentWindow: true });
+  let activeTab = tabs[0];
+  let targetUrl = target.replace(/{addon}/, matches[4]).replace(/{instance}/, matches[1]);
 
-    if (info.modifiers && (info.modifiers.includes("Command") || info.modifiers.includes("Ctrl"))) {
-      // TODO add openerTabId: activeTab.id when supported
-      browser.tabs.create({ url: targetUrl, index: activeTab.index + 1 });
-    } else {
-      browser.tabs.update(activeTab.id, { url: targetUrl });
-    }
-  });
+  if (info.modifiers && (info.modifiers.includes("Command") || info.modifiers.includes("Ctrl"))) {
+    // TODO add openerTabId: activeTab.id when supported
+    await browser.tabs.create({ url: targetUrl, index: activeTab.index + 1 });
+  } else {
+    await browser.tabs.update(activeTab.id, { url: targetUrl });
+  }
 }
 
 function createLinksContextMenu(contextInfo) {
