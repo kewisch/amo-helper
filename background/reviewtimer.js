@@ -6,7 +6,7 @@
 let mostActiveReview = null;
 let mostActiveTab = null;
 
-browser.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender) => {
   if (data.action != "reviewtimer-notify" || data.slug != mostActiveReview) {
     return;
   }

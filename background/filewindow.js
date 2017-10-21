@@ -36,12 +36,16 @@ async function saveWindowPosition(windowId) {
   await browser.storage.local.set({ "filewindow-position": position });
 }
 
-browser.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender) => {
+  let rv;
+
   if (data.action == "filewindow-open" && AMO_HOSTS.includes((new URL(data.url)).hostname)) {
     openFileBrowser(data.url);
   } else if (data.action == "filewindow-position") {
     saveWindowPosition(sender.tab.windowId);
   } else if (data.action == "filewindow-isfilewindow") {
-    sendReply(openFileBrowser.lastWindowId == sender.tab.windowId);
+    rv = Promise.resolve(openFileBrowser.lastWindowId == sender.tab.windowId);
   }
+
+  return rv;
 });

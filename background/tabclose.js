@@ -60,7 +60,7 @@ function removeOtherTabs(tabUrl, keepTab) {
   });
 }
 
-browser.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender) => {
   if (data.action == "addonid") {
     browser.storage.local.get({ "tabclose-review-child": true }, (prefs) => {
       if (!(data.addonid in tabsToClose)) {

@@ -94,7 +94,7 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-browser.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender) => {
   if (data.action == "popup-action-refreshcount") {
     updateQueueNumbers().then(updateBadge);
   } else if (data.action == "popup-action-closetabs") {

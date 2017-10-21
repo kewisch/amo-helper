@@ -137,7 +137,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-browser.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender) => {
   if (data.action == "tinder" && data.method == "start") {
     tinderStart(sender.tab);
   } else if (data.action == "tinder" && data.method == "next") {

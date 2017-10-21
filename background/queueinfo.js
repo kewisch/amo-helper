@@ -50,16 +50,16 @@ browser.storage.local.get({ "queueinfo-per-page": 200 }, (prefs) => {
   per_page_value = prefs["queueinfo-per-page"];
 });
 
-browser.runtime.onMessage.addListener((data, sender, sendReply) => {
+browser.runtime.onMessage.addListener((data, sender) => {
   if (data.action != "queueinfo") {
-    return;
+    return undefined;
   }
 
   if (data.method == "set") {
     last_queue_page[data.queue] = data.addons;
-  } else if (data.method == "get") {
-    sendReply({ queue: data.queue, addons: last_queue_page[data.queue] });
   }
+
+  return Promise.resolve({ queue: data.queue, addons: last_queue_page[data.queue] });
 });
 
 // TODO cleanup reviewInfo

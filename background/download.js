@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-browser.runtime.onMessage.addListener(async (data, sender, sendReply) => {
+browser.runtime.onMessage.addListener(async (data, sender) => {
   if (data.action != "download") {
     return;
   }
