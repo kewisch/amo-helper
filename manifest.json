@@ -23,14 +23,23 @@
     "webRequestBlocking",
 
     "https://addons.mozilla.org/*",
+    "https://addons.allizom.org/*",
+    "https://addons-dev.allizom.org/*",
+
+    "https://reviewers.addons.mozilla.org/*",
+    "https://reviewers.addons.allizom.org/*",
+    "https://reviewers.addons-dev.allizom.org/*",
+
     "https://addons.cdn.mozilla.net/*",
+
     "https://api.cognitive.microsoft.com/*",
     "https://api.microsofttranslator.com/*"
   ],
 
   "options_ui": {
     "page": "options/options.html",
-    "chrome_style": true
+    "chrome_style": true,
+    "browser_style": true
   },
 
   "omnibox": {
@@ -66,171 +75,114 @@
   "content_scripts": [
     {
       "matches": [
-        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
-        "https://addons.mozilla.org/en-US/firefox/files/compare/*"
+        "https://reviewers.addons.mozilla.org/*/firefox/files/browse/*",
+        "https://reviewers.addons.mozilla.org/*/firefox/files/compare/*",
+
+        "https://reviewers.addons.allizom.org/*/firefox/files/browse/*",
+        "https://reviewers.addons.allizom.org/*/firefox/files/compare/*",
+
+        "https://reviewers.addons-dev.allizom.org/*/firefox/files/browse/*",
+        "https://reviewers.addons-dev.allizom.org/*/firefox/files/compare/*"
       ],
-      "js": ["libs/jquery-3.1.1.min.js", "content/copylink/filebrowser.js"],
-      "css": ["content/copylink/filebrowser.css"],
+      "js": [
+        "libs/jquery-3.1.1.min.js",
+        "content/copylink/filebrowser.js",
+
+        "content/reskin/filebrowser.js",
+        "content/tabclose/filebrowser.js",
+        "content/tabclose/find_addonid.js",
+
+        "libs/acorn.min.js",
+        "libs/source-map.min.js",
+        "libs/pretty-fast.js",
+        "content/filediff/filebrowser.js"
+      ],
+      "css": [
+        "content/copylink/filebrowser.css",
+        "content/reskin/filebrowser.css",
+        "content/filediff/filebrowser.css"
+      ],
       "run_at": "document_end"
     },{
       "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
+        "https://reviewers.addons.mozilla.org/*/editors/review/*",
+        "https://reviewers.addons.mozilla.org/*/editors/review-listed/*",
+        "https://reviewers.addons.mozilla.org/*/editors/review-unlisted/*",
+
+        "https://reviewers.addons.allizom.org/*/editors/review/*",
+        "https://reviewers.addons.allizom.org/*/editors/review-listed/*",
+        "https://reviewers.addons.allizom.org/*/editors/review-unlisted/*",
+
+        "https://reviewers.addons-dev.allizom.org/*/editors/review/*",
+        "https://reviewers.addons-dev.allizom.org/*/editors/review-listed/*",
+        "https://reviewers.addons-dev.allizom.org/*/editors/review-unlisted/*"
       ],
-      "js": ["content/copylink/review.js"],
+      "js": [
+        "libs/diff.min.js",
+        "libs/jszip.min.js",
+        "libs/jquery-3.1.1.min.js",
+        "libs/jquery-ui.min.js",
+
+        "content/copylink/review.js",
+        "content/queueinfo/review.js",
+        "content/canned/review.js",
+        "content/reviewactions/review.js",
+        "content/reviewinfo/review.js",
+        "content/reviewtimer/review.js",
+        "content/tinderbar/review.js",
+        "content/filewindow/review.js",
+
+        "content/translate/moderatedreviews.js"
+      ],
+      "css": [
+        "libs/jquery-ui.min.css",
+
+        "content/reskin/review.css",
+        "content/canned/review.css",
+        "content/reviewactions/review.css",
+        "content/reviewinfo/review.css",
+        "content/reviewtimer/review.css",
+        "content/tinderbar/review.css"
+      ],
       "run_at": "document_end"
     },{
       "matches": [
-        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
-        "https://addons.mozilla.org/en-US/firefox/files/compare/*",
-        "https://addons.mozilla.org/en-US/developers/addon/*"
+        "https://reviewers.addons.mozilla.org/*/developers/addon/*/file/*/validation/annotate",
+        "https://reviewers.addons.allizom.org/*/developers/addon/*/file/*/validation/annotate",
+        "https://reviewers.addons-dev.allizom.org/*/developers/addon/*/file/*/validation/annotate"
       ],
       "js": ["content/tabclose/find_addonid.js"],
       "run_at": "document_end"
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/queue/reviews*" ],
+      "matches": [
+        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews*",
+        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews*",
+
+        "https://reviewers.addons.allizom.org/*/editors/queue/reviews*",
+        "https://reviewers.addons.allizom.org/*/editors/queue/reviews*",
+
+        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews*",
+        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews*"
+      ],
       "js": [
         "libs/jquery-3.1.1.min.js",
         "content/translate/moderatedreviews.js"
       ],
       "run_at": "document_start"
     },{
-      "matches": [ "https://addons.mozilla.org/en-US/editors/queue/*" ],
-      "js": ["content/tabclose/queue.js"],
-      "run_at": "document_start"
-    },{
       "matches": [
-        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
-        "https://addons.mozilla.org/en-US/firefox/files/compare/*"
-      ],
-      "js": ["content/tabclose/filebrowser.js"],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/queue/*"
+        "https://reviewers.addons.mozilla.org/*/editors/queue/*",
+        "https://reviewers.addons.allizom.org/*/editors/queue/*",
+        "https://reviewers.addons-dev.allizom.org/*/editors/queue/*"
       ],
       "js": [
         "libs/moment.min.js",
         "common/constants.js",
-        "content/queueinfo/queue.js"
-      ],
-      "css": ["content/queueinfo/queue.css"],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": [
-        "libs/diff.min.js",
-        "libs/jszip.min.js",
-        "content/queueinfo/review.js"
-      ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/queue/*"
-      ],
-      "js": [
+        "content/queueinfo/queue.js",
+        "content/tabclose/queue.js",
         "content/browseraction/queue.js"
       ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "css": [ "content/reskin/review.css" ]
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
-        "https://addons.mozilla.org/en-US/firefox/files/compare/*"
-      ],
-      "js": [ "content/reskin/filebrowser.js" ],
-      "css": [ "content/reskin/filebrowser.css" ]
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": [
-        "libs/jquery-3.1.1.min.js",
-        "libs/jquery-ui.min.js",
-        "content/canned/review.js"
-      ],
-      "css": ["libs/jquery-ui.min.css", "content/canned/review.css"],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/firefox/files/browse/*",
-        "https://addons.mozilla.org/en-US/firefox/files/compare/*"
-      ],
-      "js": [
-        "libs/acorn.min.js",
-        "libs/source-map.min.js",
-        "libs/pretty-fast.js",
-        "content/filediff/filebrowser.js"
-      ],
-      "css": [ "content/filediff/filebrowser.css" ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": [ "content/reviewactions/review.js" ],
-      "css": [ "content/reviewactions/review.css" ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": [ "content/reviewinfo/review.js" ],
-      "css": [ "content/reviewinfo/review.css" ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": [ "content/reviewtimer/review.js" ],
-      "css": [ "content/reviewtimer/review.css" ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": [ "content/tinderbar/review.js" ],
-      "css": [ "content/tinderbar/review.css" ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": [ 
-        "libs/jquery-3.1.1.min.js",
-        "content/translate/moderatedreviews.js" 
-      ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://addons.mozilla.org/en-US/editors/review/*",
-        "https://addons.mozilla.org/en-US/editors/review-listed/*",
-        "https://addons.mozilla.org/en-US/editors/review-unlisted/*"
-      ],
-      "js": ["libs/jquery-3.1.1.min.js", "content/filewindow/review.js"],
+      "css": ["content/queueinfo/queue.css"],
       "run_at": "document_end"
     }
   ]
