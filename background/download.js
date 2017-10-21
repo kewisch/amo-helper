@@ -10,7 +10,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
 
   return (async () => {
     let reviewInfo = await infostorage.review.get({ ["reviewInfo." + data.addonid]: null });
-    let prefs = await browser.storage.local.get({ "downloads.basedir": "amo" });
+    let baseDir = await getStoragePreference("downloads.basedir");
 
     let info = reviewInfo["reviewInfo." + data.addonid];
     let version;
@@ -25,7 +25,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
       return;
     }
 
-    let filename = `${prefs["downloads.basedir"]}/${info.slug}/${version.version}/addon.xpi`;
+    let filename = `${baseDir}/${info.slug}/${version.version}/addon.xpi`;
 
     browser.downloads.download({
       url: version.installurl,
@@ -36,7 +36,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
 
     if (version.sourceurl) {
       // TODO use correct extension after bug 1245652 is fixed
-      let sourcename = `${prefs["downloads.basedir"]}/${info.slug}/${version.version}/sources.zip`;
+      let sourcename = `${baseDir}/${info.slug}/${version.version}/sources.zip`;
       browser.downloads.download({
         url: version.sourceurl,
         filename: sourcename,

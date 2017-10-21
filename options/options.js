@@ -3,59 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-const DEFAULT_DANGEROUS_PERMISSIONS = [
-  "cookies",
-  "history",
-  "logins",
-  "nativeMessaging"
-].join(", ");
-
-const DEFAULT_DANGEROUS_MESSAGES = [
-  "outerHTML",
-  "insertAdjacentHTML",
-  "innerHTML",
-  "eval"
-].join(", ");
-
-const DEFAULT_PREFERENCES = {
-  "instance": "addons.mozilla.org",
-  "is-admin": false,
-  "tabclose-other-queue": true,
-  "tabclose-review-child": true,
-  "queueinfo-use-diff": false,
-  "queueinfo-show-weeklines": false,
-  "queueinfo-per-page": 200,
-  "queueinfo-partner-addons": "",
-  "omnibox-enabled": true,
-  "browseraction-queue-refresh-period": 60,
-  "browseraction-count-moderator": false,
-  "canned-use-stock": true,
-  "canned-include-body": true,
-  "persist-info-storage": false,
-  "reviewinfo-dangerous-permissions": DEFAULT_DANGEROUS_PERMISSIONS,
-  "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
-  "reviewinfo-show-permissions": false,
-  "reviewinfo-show-validator": false,
-  "reviewtimer-display": true,
-  "reviewtimer-notify-interval": 10,
-  "translation-secret-key": "",
-  "tinderbar-show": false,
-  "tinderbar-approve-text": "Thank you for your contribution. This version has been approved using a streamlined review process.",
-  "tinderbar-preload-tabs": 3,
-  "filewindow-enabled": false
-};
-
-const HIDDEN_PREFERENCES = {
-  "is-admin": false,
-  "filewindow-position": {},
-  "queueinfo-business-days": false,
-  "canned-responses": [],
-  "show-info": "both",
-  "show-webext": "both",
-  "show-admin": "both",
-  "queueinfo-open-compare": false
-};
-
 // https://davidwalsh.name/javascript-debounce-function
 function debounce(func, wait) {
   let timeout;
@@ -204,14 +151,14 @@ function update_canned_state() {
 async function restore_canned_options() {
   let select = document.getElementById("canned-select");
 
-  let prefs = await browser.storage.local.get({ "canned-responses": [] });
+  let responses = await getStoragePreference("canned-responses");
   let previousOptions = document.querySelectorAll("#canned option:not(.canned-option-new)");
   for (let option of previousOptions) {
     option.remove();
   }
 
   let newOption = document.querySelector("#canned .canned-option-new");
-  for (let optionData of prefs["canned-responses"]) {
+  for (let optionData of responses) {
     let option = document.createElement("option");
     option.textContent = optionData.label;
     option.value = optionData.value;

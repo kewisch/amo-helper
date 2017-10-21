@@ -3,21 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-// TODO the prefs won't update on upgrade. Figure out something smart
-const DEFAULT_DANGEROUS_PERMISSIONS = [
-  "cookies",
-  "history",
-  "logins",
-  "nativeMessaging"
-].join(", ");
-
-const DEFAULT_DANGEROUS_MESSAGES = [
-  "outerHTML",
-  "insertAdjacentHTML",
-  "innerHTML",
-  "eval"
-].join(", ");
-
 const SKIP_MESSAGES = new Set([
   "We allow and encourage an upgrade but you cannot reverse this process. Once your users have" +
   " the WebExtension installed, they will not be able to install a legacy add-on."
@@ -36,10 +21,7 @@ async function initLayout() {
 
 async function initTopPermissions() {
   // Lets assume people don't use different permissions per platform and just get one
-  let prefs = await browser.storage.local.get({
-    "reviewinfo-dangerous-permissions": DEFAULT_DANGEROUS_PERMISSIONS,
-    "reviewinfo-show-permissions": false
-  });
+  let prefs = await getStoragePreference(["reviewinfo-dangerous-permissions", "reviewinfo-show-permissions"]);
   let permissionsNode = document.querySelector("#review-files .listing-body:last-child .file-info div strong");
   if (!permissionsNode || !prefs["reviewinfo-show-permissions"]) {
     return;
@@ -72,10 +54,7 @@ async function initTopPermissions() {
 
 
 async function retrieveValidation() {
-  let prefs = await browser.storage.local.get({
-    "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
-    "reviewinfo-show-validator": false
-  });
+  let prefs = await getStoragePreference(["reviewinfo-dangerous-messages", "reviewinfo-show-validator"]);
 
   if (!prefs["reviewinfo-show-validator"]) {
     return;

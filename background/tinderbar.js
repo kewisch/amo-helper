@@ -41,7 +41,7 @@ function createCompleteTab(createOptions) {
 
 // async function tinderstart(addons, preload=TABS_PRELOAD) {
 //   let tabs = await browser.tabs.query({ active: true, currentWindow: true });
-//   let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
+//   let instance = await getStoragePreference("instance");
 //   let tabIndex = tabs[0].index;
 //   let active = true;
 //
@@ -55,7 +55,7 @@ function createCompleteTab(createOptions) {
 //     browser.tabs.create({
 //       index: ++tabIndex,
 //       active: active,
-//       url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, prefs["instance"]);
+//       url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, instance);
 //     });
 //
 //     active = false;
@@ -87,7 +87,7 @@ async function tinderNextTab(currentTab) {
 }
 
 async function tinderTabsLoadNext() {
-  let prefs = await browser.storage.local.get({ "tinderbar-preload-tabs": 3, "instance": "addons.mozilla.org" });
+  let prefs = await getStoragePreference(["tinderbar-preload-tabs", "instance"]);
   if (!tinder_running || tinder_current_tabs.length >= prefs["tinderbar-preload-tabs"]) {
     return;
   }
@@ -113,8 +113,8 @@ async function tinderTabsLoadNext() {
 }
 
 async function tinderTabsPreload() {
-  let prefs = await browser.storage.local.get({ "tinderbar-preload-tabs": 3 });
-  while (tinder_running && tinder_current_tabs.length < prefs["tinderbar-preload-tabs"]) {
+  let preload = await getStoragePreference("tinderbar-preload-tabs");
+  while (tinder_running && tinder_current_tabs.length < preload) {
     await tinderTabsLoadNext();
   }
 }

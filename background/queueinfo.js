@@ -25,7 +25,7 @@ function queueByAddon(slug) {
 
 browser.webRequest.onBeforeRequest.addListener((details) => {
   let url = new URL(details.url);
-  if (!url.search.includes("per_page") && per_page_value != 200) {
+  if (!url.search.includes("per_page") && per_page_value != DEFAULT_PREFERENCES["queueinfo-per-page"]) {
     url.search = "?per_page=" + per_page_value;
     return { redirectUrl: url.href };
   }
@@ -46,8 +46,8 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-browser.storage.local.get({ "queueinfo-per-page": 200 }, (prefs) => {
-  per_page_value = prefs["queueinfo-per-page"];
+getStoragePreference("queueinfo-per-page").then((perPage) => {
+  per_page_value = perPage;
 });
 
 browser.runtime.onMessage.addListener((data, sender) => {

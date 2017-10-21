@@ -167,10 +167,10 @@ createCommand("amoqueue-download", "Download", null, async () => {
 
 // TODO move this to filewindow when there is a simple import mechanism
 Promise.all([
-  browser.storage.local.get({ "filewindow-enabled": false }),
+  getStoragePreference("filewindow-enabled"),
   browser.runtime.sendMessage({ action: "filewindow-isfilewindow" })
-]).then(([prefs, isfilewindow]) => {
-  if (!prefs["filewindow-enabled"] || !isfilewindow) {
+]).then(([enabled, isfilewindow]) => {
+  if (!enabled || !isfilewindow) {
     return;
   }
 

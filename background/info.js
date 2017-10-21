@@ -8,8 +8,7 @@ function createInfoStorage(prefix, storageName) {
     _storage: {},
 
     async get(keys) {
-      let prefs = await browser.storage.local.get({ "persist-info-storage": false });
-      if (prefs["persist-info-storage"]) {
+      if (await getStoragePreference("persist-info-storage")) {
         return browser.storage.local.get(keys);
       } else {
         let res = {};
@@ -25,8 +24,7 @@ function createInfoStorage(prefix, storageName) {
     },
 
     async set(keys) {
-      let prefs = await browser.storage.local.get({ "persist-info-storage": false });
-      if (prefs["persist-info-storage"]) {
+      if (await getStoragePreference("persist-info-storage")) {
         await browser.storage.local.set(keys);
       } else {
         for (let key of Object.keys(keys)) {
@@ -37,8 +35,7 @@ function createInfoStorage(prefix, storageName) {
     },
 
     async clear() {
-      let prefs = await browser.storage.local.get({ "persist-info-storage": false });
-      if (prefs["persist-info-storage"]) {
+      if (await getStoragePreference("persist-info-storage")) {
         let data = await browser.storage.local.get(null);
         let keys = Object.keys(data).filter(key => key.startsWith(prefix + "."));
         await browser.storage.local.remove(keys);

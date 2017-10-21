@@ -21,8 +21,8 @@ function setupMenuClick() {
     (async () => {
       let href = event.target.getAttribute("href");
       if (href.startsWith("#!AMO")) {
-        let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
-        let url = `https://${prefs["instance"]}/en-US/${href.substr(6)}`;
+        let instance = await getStoragePreference("instance");
+        let url = `https://${instance}/en-US/${href.substr(6)}`;
         await browser.tabs.create({ url: url });
       } else if (href.startsWith("#")) {
         await browser.runtime.sendMessage({ action: "popup-action-" + href.substr(1) });

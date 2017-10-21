@@ -75,11 +75,11 @@ function setupLayout(cannedData, includeBody) {
 
 // -- main --
 
-browser.storage.local.get({
-  "canned-responses": [],
-  "canned-use-stock": true,
-  "canned-include-body": true
-}, (prefs) => {
+getStoragePreference([
+  "canned-responses",
+  "canned-use-stock",
+  "canned-include-body"
+]).then((prefs) => {
   let cannedData = [];
   if (prefs["canned-use-stock"]) {
     let skip = new Set(["Choose a canned response...", "Approved for Public", "Rejected"]);

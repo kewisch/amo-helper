@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-browser.storage.local.get({ "filewindow-enabled": false }).then((prefs) => {
-  if (!prefs["filewindow-enabled"]) {
+getStoragePreference("filewindow-enabled").then((enabled) => {
+  if (!enabled) {
     return;
   }
 

@@ -12,7 +12,7 @@ const QUEUE = document.location.pathname.split("/").pop();
 async function initPageLayout() {
   let header = document.querySelector("#addon-queue > thead > .listing-header");
 
-  let prefs = await browser.storage.local.get({ "queueinfo-show-weeklines": false });
+  let weeklines = await getStoragePreference("queueinfo-show-weeklines");
   browser.storage.local.set({ "is-admin": IS_ADMIN });
 
   // Last update column
@@ -98,7 +98,7 @@ async function initPageLayout() {
       daycell.dataset.fullMinutes = toMinutes(size, unit);
       daycell.dataset.businessMinutes = unit.startsWith("day") ? toMinutes(bizdayCache[days], unit) : daycell.dataset.fullMinutes;
 
-      if (prefs["queueinfo-show-weeklines"] && (lastRelWeek == -1 || relweekCache[days] != lastRelWeek)) {
+      if (weeklines && (lastRelWeek == -1 || relweekCache[days] != lastRelWeek)) {
         row.classList.add("amoqueue-new-week");
         lastRelWeek = relweekCache[days];
       }
@@ -166,7 +166,7 @@ async function initPageLayout() {
   }
 
 
-  await addSearchRadio("Show Information requests", "show-info", "both", ["Both", "Only", "None"], (state) => {
+  await addSearchRadio("Show Information requests", "show-info", ["Both", "Only", "None"], (state) => {
     document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
       let needinfo = row.classList.contains("amoqueue-helper-iconclass-info");
       if (state == "both") {
@@ -181,7 +181,7 @@ async function initPageLayout() {
   });
 
   if (QUEUE != "auto_approved") {
-    await addSearchRadio("Show Add-ons", "show-webext", "both", ["Both", "WebExtensions", "Legacy"], (state) => {
+    await addSearchRadio("Show Add-ons", "show-webext", ["Both", "WebExtensions", "Legacy"], (state) => {
       document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
         let iswebext = row.classList.contains("amoqueue-helper-iconclass-webextension");
         if (state == "both") {
@@ -197,7 +197,7 @@ async function initPageLayout() {
   }
 
   if (IS_ADMIN) {
-    await addSearchRadio("Show Reviews", "show-admin", "both", ["Both", "Admin", "Regular"], (state) => {
+    await addSearchRadio("Show Reviews", "show-admin", ["Both", "Admin", "Regular"], (state) => {
       document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
         let isadmin = row.classList.contains("amoqueue-helper-iconclass-admin-review");
         if (state == "both") {
@@ -212,10 +212,10 @@ async function initPageLayout() {
     });
   }
 
-  await addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare", false);
+  await addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare");
 
   if (QUEUE != "auto_approved") {
-    await addSearchCheckbox("Show waiting time in business days", "queueinfo-business-days", false, (checked) => {
+    await addSearchCheckbox("Show waiting time in business days", "queueinfo-business-days", (checked) => {
       let addonRows = [...document.querySelectorAll(".addon-row")];
       for (let row of addonRows) {
         let cell = row.querySelector(".amoqueue-helper-waitcell");
@@ -268,9 +268,9 @@ async function initPageLayout() {
     loadLabel.className = "label";
 
     loadButton.addEventListener("click", async () => {
-      let prefs = await browser.storage.local.get("addons-per-load");
+      let perLoad = await getStoragePreference("addons-per-load");
       let noinfo = Array.from(document.querySelectorAll("#addon-queue .addon-row:not(.amoqueue-has-info)"))
-                        .slice(0, prefs["addons-per-load"])
+                        .slice(0, perLoad)
                         .map((row) => row.getAttribute("data-addon"));
       loadButton.setAttribute("disabled", "true");
       window.localStorage["dont_poll"] = true;
@@ -292,8 +292,8 @@ async function initPageLayout() {
 }
 
 async function initPartnerAddons() {
-  let prefs = await browser.storage.local.get({ "queueinfo-partner-addons": "" });
-  initPartnerAddons.addons = new Set(prefs["queueinfo-partner-addons"].split(/,\s*/));
+  let partnerAddons = await getStoragePreference("queueinfo-partner-addons");
+  initPartnerAddons.addons = new Set(partnerAddons.split(/,\s*/));
 }
 function isPartnerAddon(slug) {
   let addons = initPartnerAddons.addons || new Set();
@@ -322,12 +322,11 @@ function hideBecause(row, reason, state) {
   }
 }
 
-async function addSearchRadio(labelText, prefName, defaultValue, optionLabels, stateUpdater=() => {}) {
+async function addSearchRadio(labelText, prefName, optionLabels, stateUpdater=() => {}) {
   let searchbox = document.querySelector("div.queue-search");
 
   let fieldset = document.createElement("fieldset");
-  let prefs = await browser.storage.local.get({ [prefName]: defaultValue });
-  let initial = prefs[prefName];
+  let initial = await getStoragePreference(prefName);
   let legend = document.createElement("legend");
   legend.textContent = labelText;
   fieldset.appendChild(legend);
@@ -356,10 +355,9 @@ async function addSearchRadio(labelText, prefName, defaultValue, optionLabels, s
   stateUpdater(initial);
 }
 
-async function addSearchCheckbox(labelText, prefName, defaultValue, stateUpdater=() => {}) {
+async function addSearchCheckbox(labelText, prefName, stateUpdater=() => {}) {
   let searchbox = document.querySelector("div.queue-search");
-  let prefs = await browser.storage.local.get({ [prefName]: defaultValue });
-  let initial = prefs[prefName];
+  let initial = await getStoragePreference(prefName);
   let label = document.createElement("label");
   let checkbox = document.createElement("input");
   checkbox.setAttribute("type", "checkbox");
@@ -559,9 +557,9 @@ function updateSort(rows=null) {
 
 /* Unfortunately this does not work due to cookies not being set on the XHR request
 async function downloadReviewInfo(ids) {
-  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
+  let instance = await getStoragePreference("instance");
   let id = ids[0]; // temporary
-  let response = await fetch(REVIEW_URL.replace(/{addon}/, id).replace(/{instance}/, prefs["instance"]);
+  let response = await fetch(REVIEW_URL.replace(/{addon}/, id).replace(/{instance}/, instance);
   let responseText = await response.text();
 
   let parser = new DOMParser();

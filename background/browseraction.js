@@ -22,8 +22,8 @@ function parseQueueNumbers(doc) {
 }
 
 async function updateQueueNumbers() {
-  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
-  let url = `https://${prefs["instance"]}/en-US/editors/queue/auto_approved`;
+  let instance = await getStoragePreference("instance");
+  let url = `https://${instance}/en-US/editors/queue/auto_approved`;
   let text = await fetch(url, { mode: "cors", credentials: "include" }).then(resp => resp.text());
   let parser = new DOMParser();
   let doc = parser.parseFromString(text, "text/html");
@@ -31,8 +31,7 @@ async function updateQueueNumbers() {
 }
 
 async function updateBadge(numbers) {
-  let prefs = await browser.storage.local.get({ "browseraction-count-moderator": false });
-  if (!prefs["browseraction-count-moderator"]) {
+  if (!await getStoragePreference("browseraction-count-moderator")) {
     delete numbers.reviews;
   }
 
@@ -44,11 +43,10 @@ async function updateBadge(numbers) {
 }
 
 async function setupQueueRefresh() {
-  let prefs = await browser.storage.local.get({ "browseraction-queue-refresh-period": 60 });
   await browser.alarms.clear("queuelength");
   await browser.alarms.create("queuelength", {
     delayInMinutes: 0,
-    periodInMinutes: prefs["browseraction-queue-refresh-period"]
+    periodInMinutes: await getStoragePreference("browseraction-queue-refresh-period")
   });
 }
 

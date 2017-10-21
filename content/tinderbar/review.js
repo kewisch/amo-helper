@@ -3,12 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-const DEFAULT_ACCEPT_MESSAGE = "Thank you for your contribution. This version has been approved using a streamlined review process.";
 const IS_ADMIN = !!document.getElementById("unlisted-queues");
 
 async function initLayout() {
-  let prefs = await browser.storage.local.get({ "tinderbar-show": false });
-  if (!IS_ADMIN || !prefs["tinderbar-show"]) {
+  if (!IS_ADMIN || !await getStoragePreference("tinderbar-show")) {
     // This quick review feature only makes sense for admins, sorry
     return;
   }
@@ -52,8 +50,8 @@ function actionHandler(event) {
   switch (action) {
     case "accept":
       document.getElementById("id_action_0").click();
-      browser.storage.local.get({ "tinderbar-approve-text": DEFAULT_ACCEPT_MESSAGE }).then((prefs) => {
-        document.getElementById("id_comments").value = prefs["tinderbar-approve-text"];
+      getStoragePreference("tinderbar-approve-text").then((text) => {
+        document.getElementById("id_comments").value = text;
         document.querySelector("form[action='#review-actions']").submit();
       });
       break;

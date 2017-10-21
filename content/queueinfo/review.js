@@ -239,8 +239,7 @@ function getInfo(doc) {
 }
 
 async function updateSize(info) {
-  let prefs = await browser.storage.local.get({ "queueinfo-use-diff": false });
-  if (prefs["queueinfo-use-diff"] && info.lastapproved_idx !== null) {
+  if (await getStoragePreference("queueinfo-use-diff") && info.lastapproved_idx !== null) {
     let prev = info.versions[info.lastapproved_idx];
     let cur = info.versions[info.latest_idx];
     info.diffinfo = await determineChanges(prev, cur);
@@ -285,8 +284,7 @@ function findParent(node, className) {
   });
 
   // Open compare link if options enabled
-  let prefs = await browser.storage.local.get({ "queueinfo-open-compare": false });
-  if (prefs["queueinfo-open-compare"]) {
+  if (await getStoragePreference("queueinfo-open-compare")) {
     document.querySelector(".listing-body:last-child .file-info a.compare").click();
   }
 

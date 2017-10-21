@@ -17,8 +17,7 @@ async function openFileBrowser(url) {
       windowId: win.id
     });
   } else {
-    let prefs = await browser.storage.local.get({ "filewindow-position": {} });
-    let params = prefs["filewindow-position"];
+    let params = await getStoragePreference("filewindow-position");
     params.url = url;
 
     // Blocked by bug 1380169 and bug 1331906

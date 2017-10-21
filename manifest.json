@@ -56,6 +56,7 @@
   "background": {
     "scripts": [
       "common/constants.js",
+      "common/preferences.js",
 
       "background/info.js",
       "background/canned.js",
@@ -86,8 +87,11 @@
       ],
       "js": [
         "libs/jquery-3.1.1.min.js",
-        "content/copylink/filebrowser.js",
 
+        "common/constants.js",
+        "common/preferences.js",
+
+        "content/copylink/filebrowser.js",
         "content/reskin/filebrowser.js",
         "content/tabclose/filebrowser.js",
         "content/tabclose/find_addonid.js",
@@ -122,6 +126,9 @@
         "libs/jszip.min.js",
         "libs/jquery-3.1.1.min.js",
         "libs/jquery-ui.min.js",
+
+        "common/constants.js",
+        "common/preferences.js",
 
         "content/copylink/review.js",
         "content/queueinfo/review.js",
@@ -177,7 +184,10 @@
       ],
       "js": [
         "libs/moment.min.js",
+
         "common/constants.js",
+        "common/preferences.js",
+
         "content/queueinfo/queue.js",
         "content/tabclose/queue.js",
         "content/browseraction/queue.js"

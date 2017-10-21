@@ -42,8 +42,8 @@ const allSuggestions = {
 };
 
 async function resetDefaultSuggestion() {
-  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
-  browser.omnibox.setDefaultSuggestion({ description: "Visit " + prefs["instance"] });
+  let instance = await getStoragePreference("instance");
+  browser.omnibox.setDefaultSuggestion({ description: "Visit " + instance });
 }
 
 function inputChangedListener(text, suggest) {
@@ -72,8 +72,8 @@ async function inputEnteredListener(text, disposition) {
     return;
   }
 
-  let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
-  let url = data.url.replace(/{keyword}/, slug).replace(/{instance}/, prefs["instance"]);
+  let instance = await getStoragePreference("instance");
+  let url = data.url.replace(/{keyword}/, slug).replace(/{instance}/, instance);
 
   if (disposition == "currentTab") {
     let tabs = await browser.tabs.query({ active: true, currentWindow: true });
@@ -84,12 +84,11 @@ async function inputEnteredListener(text, disposition) {
 }
 
 async function setupListeners() {
-  let prefs = await browser.storage.local.get({ "omnibox-enabled": true });
   browser.omnibox.onInputChanged.removeListener(inputChangedListener);
   browser.omnibox.onInputEntered.removeListener(inputEnteredListener);
   browser.omnibox.onInputCancelled.removeListener(resetDefaultSuggestion);
 
-  if (prefs["omnibox-enabled"]) {
+  if (await getStoragePreference("omnibox-enabled")) {
     browser.omnibox.onInputChanged.addListener(inputChangedListener);
     browser.omnibox.onInputEntered.addListener(inputEnteredListener);
     browser.omnibox.onInputCancelled.addListener(resetDefaultSuggestion);

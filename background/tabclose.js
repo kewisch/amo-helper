@@ -60,15 +60,14 @@ async function removeOtherTabs(tabUrl, keepTab) {
 browser.runtime.onMessage.addListener((data, sender) => {
   (async () => {
     if (data.action == "addonid") {
-      let prefs = await browser.storage.local.get({ "tabclose-review-child": true });
       if (!(data.addonid in tabsToClose)) {
         tabsToClose[data.addonid] = {};
       }
       tabsToClose[data.addonid][sender.tab.id] = true;
       reviewPages[sender.tab.id] = data.addonid;
     } else if (data.action == "tabclose-backtoreview") {
-      let prefs = await browser.storage.local.get({ instance: "addons.mozilla.org" });
-      let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug).replace(/{instance}/, prefs["instance"]));
+      let instance = await getStoragePreference("instance");
+      let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug).replace(/{instance}/, instance));
       let [tab, ...rest] = await browser.tabs.query({ url: urls });
       if (tab) {
         await browser.tabs.update(tab.id, { active: true });
@@ -81,10 +80,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
 });
 
 browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  let prefs = await browser.storage.local.get({
-    "tabclose-other-queue": true,
-    "tabclose-review-child": true
-  });
+  let prefs = await getStoragePreference(["tabclose-other-queue", "tabclose-review-child"]);
 
   let isReview = tab.url.match(REVIEW_RE);
   let isQueue = tab.url.match(QUEUE_RE);
@@ -107,7 +103,6 @@ browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
   delete reviewPages[tabId];
 
   if (slug) {
-    let prefs = browser.storage.local.get({ "tabclose-review-child": true });
-    removeTabsFor(tabId, slug, prefs["tabclose-review-child"]);
+    removeTabsFor(tabId, slug, await getStoragePreference("tabclose-review-child"));
   }
 });

@@ -13,14 +13,13 @@ let addonName = document.title.split(" :: ")[0];
 let addonSlug = document.location.pathname.match(/\/([^/]+)$/)[1];
 
 async function initLayout() {
-  let prefs = await browser.storage.local.get({ "reviewtimer-display": true, "reviewtimer-notify-interval": 10 });
+  let prefs = await getStoragePreference(["reviewtimer-display", "reviewtimer-notify-interval"]);
   if (prefs["reviewtimer-display"]) {
     timerNode = document.body.appendChild(document.createElement("button"));
     timerNode.id = "amoqueue-timer";
     timerNotifyInterval = prefs["reviewtimer-notify-interval"];
 
     timerNode.addEventListener("click", togglePause);
-
 
     if (document.hidden) {
       let continueSetup = () => {

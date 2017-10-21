@@ -14,13 +14,13 @@ browser.runtime.onMessage.addListener((data, sender) => {
   }
 
   return (async () => {
-    let prefs = await browser.storage.local.get({ "translation-secret-key": "" });
-    if (!prefs["translation-secret-key"]) {
+    let key = await getStoragePreference("translation-secret-key");
+    if (!key) {
       return { error: "Secret key not set" };
     }
 
     if (tokenTimeout < Date.now()) {
-      let reqHeaders = new Headers({ "Ocp-Apim-Subscription-Key": prefs["translation-secret-key"] });
+      let reqHeaders = new Headers({ "Ocp-Apim-Subscription-Key": key });
       let url = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken";
       gAuthToken = await fetch(url, { method: "POST", headers: reqHeaders }).then(resp => resp.text());
       tokenTimeout = Date.now() + tokenttl;
