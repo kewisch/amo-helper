@@ -16,7 +16,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
   return (async () => {
     let key = await getStoragePreference("translation-secret-key");
     if (!key) {
-      return { error: "Secret key not set" };
+      return { error: "API key not set" };
     }
 
     if (tokenTimeout < Date.now()) {
@@ -32,6 +32,11 @@ browser.runtime.onMessage.addListener((data, sender) => {
 async function translate(text) {
   let reqHeaders = new Headers({ Authorization: "Bearer " + gAuthToken });
   let url = `https://api.microsofttranslator.com/V2/Http.svc/Translate?text=${encodeURIComponent(text)}&to=en`;
-  let translated = await fetch(url, { method: "GET", headers: reqHeaders }).then(resp => resp.text());
-  return translated.replace(/<[^>]*>/g, "");
+  let resp = await fetch(url, { method: "GET", headers: reqHeaders });
+  if (resp.ok) {
+    let translated = await resp.text();
+    return { text: translated.replace(/<[^>]*>/g, "") };
+  } else {
+    return { error: `Request failure, check API key (${resp.status} ${resp.statusText})` };
+  }
 }

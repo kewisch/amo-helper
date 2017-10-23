@@ -160,25 +160,29 @@
         "content/reviewactions/review.css",
         "content/reviewinfo/review.css",
         "content/reviewtimer/review.css",
-        "content/tinderbar/review.css"
+        "content/tinderbar/review.css",
+        "content/translate/common.css",
+        "content/translate/review.css"
       ],
       "run_at": "document_end"
     },{
       "matches": [
-        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews*",
-        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews*",
+        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews",
+        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews",
 
-        "https://reviewers.addons.allizom.org/*/editors/queue/reviews*",
-        "https://reviewers.addons.allizom.org/*/editors/queue/reviews*",
+        "https://reviewers.addons.allizom.org/*/editors/queue/reviews",
+        "https://reviewers.addons.allizom.org/*/editors/queue/reviews",
 
-        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews*",
-        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews*"
+        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews",
+        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews"
       ],
       "js": [
-        "libs/jquery-3.1.1.min.js",
+        "common/constants.js",
+        "common/preferences.js",
         "content/translate/moderatedreviews.js"
       ],
-      "run_at": "document_start"
+      "css": ["content/translate/common.css"],
+      "run_at": "document_end"
     },{
       "matches": [
         "https://reviewers.addons.mozilla.org/*/editors/queue/*",

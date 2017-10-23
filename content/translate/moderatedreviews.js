@@ -3,42 +3,96 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-async function translate(textNode, clickedNode) {
+async function translate(textNode, event) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  let anchor = event.currentTarget;
+
+  if (anchor.getAttribute("loading") == "true") {
+    return;
+  }
+
+  if (anchor.getAttribute("error") == "true") {
+    browser.runtime.sendMessage({ action: "openPrefs" });
+    return;
+  }
+
+  anchor.setAttribute("loading", "true");
+
   let data = await browser.runtime.sendMessage({
     action: "translate",
-    text: textNode.text(),
-    from: "translate"
+    text: textNode.textContent,
   });
 
+  anchor.removeAttribute("loading");
+
   if (data.error) {
-    clickedNode.text("Error : Key not set. See addon's options page.");
+    anchor.textContent = data.error;
+    anchor.setAttribute("error", "true");
   } else {
-    clickedNode.remove();
-    textNode.text(data.text);
+    anchor.remove();
+    textNode.textContent = data.text;
   }
 }
 
-window.addEventListener("load", () => {
-  // Moderated reviews
-  $(".review-flagged p:not(.description)").each(function() {
-    var reviewNode = $(this);
-    reviewNode.append(
-      $("<a />").text(" translate").click(function() {
-        translate(reviewNode.next(), $(this));
-      })
-    );
-  });
+function createTranslateLink(textNode) {
+  let anchor = document.createElement("a");
+  anchor.href = "#";
+  anchor.className = "amoqueue-translate-link";
+  anchor.addEventListener("click", translate.bind(null, textNode));
 
-  // Listed/Unlisted reviews
-  $("#addon-summary").prepend(
-    $("<a />").text("(Translate summary)").click(function() {
-      translate($("#addon-summary p:not(.addon-rating)"), $(this));
-    })
-  );
+  let loading = document.createElement("span");
+  loading.className = "amoqueue-translate-link-loading";
 
-  $(".article").prepend(
-    $("<a />").text("(Translate description)").click(function() {
-      translate($(".article p"), $(this));
-    })
-  );
-});
+  let text = document.createElement("span");
+  text.textContent = "translate";
+  text.className = "amoqueue-translate-link-text";
+
+  anchor.appendChild(loading);
+  anchor.appendChild(text);
+
+  return anchor;
+}
+
+function initLayout() {
+  // Moderated reviews pages
+  for (let node of document.querySelectorAll(".review-flagged p:not(.description)")) {
+    let anchor = createTranslateLink(node.nextElementSibling);
+    node.appendChild(anchor);
+  }
+
+  // Summary on review pages
+  let summary = document.querySelector("#addon-summary");
+  if (summary) {
+    let div = document.createElement("div");
+    div.className = "amoqueue-summary-caption";
+
+    let span = document.createElement("span");
+    span.className = "amoqueue-summary-caption-label";
+    span.textContent = "Summary";
+
+    let textNode = document.querySelector("#addon-summary p:not(.addon-rating)");
+    let anchor = createTranslateLink(textNode);
+
+    div.appendChild(span);
+    div.appendChild(anchor);
+
+    summary.insertBefore(div, summary.firstElementChild);
+  }
+
+  // Description on review pages
+  let description = document.querySelector("#addon .article");
+  if (description) {
+    let textNode = document.querySelector("#addon .article > p");
+    let anchor = createTranslateLink(textNode);
+    description.parentNode.insertBefore(anchor, description);
+  }
+}
+
+(async () => {
+  let hasKey = await getStoragePreference("translation-secret-key");
+  if (hasKey) {
+    initLayout();
+  }
+})();

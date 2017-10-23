@@ -1,0 +1,30 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Portions Copyright (C) Philipp Kewisch, 2017 */
+
+#more-about {
+  display: inline-block;
+}
+
+#addon-summary > p {
+  margin-left: 0.5em;
+}
+
+.amoqueue-summary-caption {
+  border-bottom: 1px dotted #a5c9d5;
+  padding: .308em .537em .214em .231em;
+}
+.amoqueue-summary-caption-label {
+  font-weight: bold;
+}
+
+.amoqueue-summary-caption .amoqueue-translate-link {
+  font-size: 0.9em;
+  padding-left: 0.5em;
+}
+
+#addon-summary > table tr:first-child td, #addon-summary > table tr:first-child th {
+  border-top: 1px dotted #a5c9d5;
+}
+
