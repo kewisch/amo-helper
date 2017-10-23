@@ -253,34 +253,11 @@ async function updateSize(info) {
   return info;
 }
 
-function findParent(node, className) {
-  let current = node;
-  while (current && !current.classList.contains(className)) {
-    current = current.parentNode;
-  }
-  return current;
-}
-
 // -- main --
 (async function() {
   // Make file info links open in a new tab
   document.querySelectorAll(".file-info a").forEach((link) => {
     link.setAttribute("target", "_blank");
-  });
-
-  // Make editors install link trigger a download
-  // TODO move this to content/downloads
-  document.getElementById("review-files").addEventListener("click", (event) => {
-    if (event.target.classList.contains("editors-install")) {
-      let listbody = findParent(event.target, "listing-body");
-      let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
-      let version = headerparts[1].trim();
-      let id = document.querySelector("#addon").getAttribute("data-id");
-      browser.runtime.sendMessage({ action: "download", addonid: id, version: version });
-
-      event.preventDefault();
-      event.stopPropagation();
-    }
   });
 
   // Open compare link if options enabled

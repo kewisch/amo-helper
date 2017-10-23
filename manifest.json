@@ -97,15 +97,18 @@
 
         "common/constants.js",
         "common/preferences.js",
+        "common/ui.js",
 
         "content/copylink/filebrowser.js",
+        "content/downloads/filebrowser.js",
+        "content/filediff/filebrowser.js",
         "content/reskin/filebrowser.js",
         "content/tabclose/filebrowser.js",
 
         "libs/acorn.min.js",
         "libs/source-map.min.js",
         "libs/pretty-fast.js",
-        "content/filediff/filebrowser.js"
+        "content/beautify/filebrowser.js"
       ],
       "css": [
         "content/copylink/filebrowser.css",
@@ -135,10 +138,12 @@
 
         "common/constants.js",
         "common/preferences.js",
+        "common/ui.js",
 
         "content/copylink/review.js",
         "content/queueinfo/review.js",
         "content/canned/review.js",
+        "content/downloads/review.js",
         "content/reviewactions/review.js",
         "content/reviewinfo/review.js",
         "content/reviewtimer/review.js",
