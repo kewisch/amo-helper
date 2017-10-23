@@ -9,13 +9,11 @@ async function toAddonUrl(target, info) {
     return;
   }
 
-  let tabs = await browser.tabs.query({ active: true, currentWindow: true });
-  let activeTab = tabs[0];
+  let [activeTab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
   let targetUrl = target.replace(/{addon}/, matches[4]).replace(/{instance}/, matches[1]);
 
   if (info.modifiers && (info.modifiers.includes("Command") || info.modifiers.includes("Ctrl"))) {
-    // TODO add openerTabId: activeTab.id when supported
-    await browser.tabs.create({ url: targetUrl, index: activeTab.index + 1 });
+    await browser.tabs.create({ url: targetUrl, index: activeTab.index + 1, openerTabId: activeTab.id });
   } else {
     await browser.tabs.update(activeTab.id, { url: targetUrl });
   }

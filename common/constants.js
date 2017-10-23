@@ -4,9 +4,10 @@
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
 /* exported REVIEW_URL, ADMIN_URL, LISTING_URL, MANAGE_URL, FEED_URL,
- * REVIEW_RE, QUEUE_RE, ADDON_LINKS_RE, FILEBROWSER_RE, REVIEW_PATTERNS,
- * FILEBROWSER_PATTERNS, COMPARE_MATCH, AMO_HOSTS, AMO_EDITORS_PATTERNS
- * AMO_PRIVACY_PAGES, AMO_QUEUE_PATTERNS, AMO_REVIEW_PATTERNS,
+ * REVIEW_RE, QUEUE_RE, ADDON_LINKS_RE, FILEBROWSER_RE, USER_RE,
+ * REVIEW_PATTERNS, FILEBROWSER_PATTERNS, LISTING_PATTERNS,
+ * DEVELOPER_PAGE_PATTERNS, USER_PAGE_PATTERNS, AMO_HOSTS, AMO_EDITORS_PATTERNS
+ * AMO_PRIVACY_PAGES, AMO_EULA_PAGES, AMO_QUEUE_PATTERNS, AMO_REVIEW_PATTERNS,
  * ADDON_LINK_PATTERNS */
 
 const REVIEW_URL = "https://reviewers.{instance}/editors/review/{addon}";
@@ -19,6 +20,7 @@ const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-
 const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/editors\/queue\/(.*)/;
 const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
 const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
+const USER_RE = /https:\/\/(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/user\/([^#/]*)/;
 
 const REVIEW_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/editors/review/{addon}",
@@ -34,7 +36,25 @@ const FILEBROWSER_PATTERNS = [
   "https://reviewers.addons-dev.allizom.org/*/firefox/files/browse/*",
   "https://reviewers.addons-dev.allizom.org/*/firefox/files/compare/*"
 ];
-const COMPARE_MATCH = "https://addons.mozilla.org/en-US/firefox/files/compare/*";
+
+// Also happens to cover privacy and eula pages
+const LISTING_PATTERNS = [
+  "https://addons.mozilla.org/*/firefox/addon/*",
+  "https://addons.allizom.org/*/firefox/addon/*",
+  "https://addons-dev.allizom.org/*/firefox/addon/*"
+];
+
+const DEVELOPER_PAGE_PATTERNS = [
+  "https://addons.mozilla.org/*/developers/addon/*",
+  "https://addons.allizom.org/*/developers/addon/*",
+  "https://addons-dev.allizom.org/*/developers/addon/*"
+];
+
+const USER_PAGE_PATTERNS = [
+  "https://addons.mozilla.org/*/firefox/user/*",
+  "https://addons.allizom.org/*/firefox/user/*",
+  "https://addons-dev.allizom.org/*/firefox/user/*"
+];
 
 const AMO_HOSTS = [
   "addons.mozilla.org",
@@ -56,6 +76,12 @@ const AMO_PRIVACY_PAGES = [
   "https://addons.mozilla.org/*/firefox/addon/*/privacy",
   "https://addons.allizom.org/*/firefox/addon/*/privacy",
   "https://addons-dev.allizom.org/*/firefox/addon/*/privacy"
+];
+
+const AMO_EULA_PAGES = [
+  "https://addons.mozilla.org/*/firefox/addon/*/eula",
+  "https://addons.allizom.org/*/firefox/addon/*/eula",
+  "https://addons-dev.allizom.org/*/firefox/addon/*/eula"
 ];
 
 const AMO_QUEUE_PATTERNS = [

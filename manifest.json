@@ -3,6 +3,13 @@
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
   "version": "6.5.2",
+
+  "applications": {
+    "gecko": {
+      "strict_min_version": "57.0"
+    }
+  },
+
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
@@ -94,7 +101,6 @@
         "content/copylink/filebrowser.js",
         "content/reskin/filebrowser.js",
         "content/tabclose/filebrowser.js",
-        "content/tabclose/find_addonid.js",
 
         "libs/acorn.min.js",
         "libs/source-map.min.js",
@@ -151,14 +157,6 @@
         "content/reviewtimer/review.css",
         "content/tinderbar/review.css"
       ],
-      "run_at": "document_end"
-    },{
-      "matches": [
-        "https://reviewers.addons.mozilla.org/*/developers/addon/*/file/*/validation/annotate",
-        "https://reviewers.addons.allizom.org/*/developers/addon/*/file/*/validation/annotate",
-        "https://reviewers.addons-dev.allizom.org/*/developers/addon/*/file/*/validation/annotate"
-      ],
-      "js": ["content/tabclose/find_addonid.js"],
       "run_at": "document_end"
     },{
       "matches": [

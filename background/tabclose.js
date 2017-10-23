@@ -5,32 +5,60 @@
 
 "use strict";
 
-let tabsToClose = {};
-let reviewPages = {};
-
-function removeTabsFor(tabId, addonid, closeTabs) {
-  if (tabsToClose[addonid]) {
-    if (closeTabs) {
-      browser.tabs.remove(Object.keys(tabsToClose[addonid]).map(Number));
+class TabsToCloseMap extends Map {
+  addTab(addon, tabId) {
+    let tabs = this.get(addon);
+    if (!tabs) {
+      tabs = new Set();
+      this.set(addon, tabs);
     }
-    delete tabsToClose[addonid];
+
+    tabs.add(tabId);
   }
 
-  delete reviewPages[tabId];
+  close(addon, closeTabs) {
+    let tabs = this.get(addon);
+    if (tabs && closeTabs) {
+      browser.tabs.remove([...tabs.values()]);
+    }
+    this.delete(addon);
+  }
+}
 
-  /* It would be so simple if openerTabId was supported
-  // The closing tab is a review, find all opening tabs
-  browser.tabs.query({ url: [FILEBROWSER_MATCH, COMPARE_MATCH] }, (compareTabs) => {
-    let tabsToClose = compareTabs.filter(tab => tab.openerTabId == tabId);
-    browser.tabs.remove(tabsToClose.map(tab => tab.id));
-  });
-  */
+class ReviewPageMap extends Map {
+  constructor(...args) {
+    super(...args);
+    this.tabsToClose = new TabsToCloseMap();
+  }
+
+  addChildTab(reviewTabId, childTabId) {
+    let addon = this.get(reviewTabId);
+    this.tabsToClose.addTab(addon, childTabId);
+  }
+
+  close(tabId, closeTabs) {
+    let addon = this.get(tabId);
+    this.tabsToClose.close(addon, closeTabs);
+    this.delete(tabId);
+  }
+}
+
+let reviewPages = new ReviewPageMap();
+
+function relevantReviewChild(url) {
+  return url.match(ADDON_LINKS_RE) || url.match(FILEBROWSER_RE) || url.match(USER_RE);
 }
 
 async function copyScrollPosition(from, to) {
-  let data = await browser.tabs.sendMessage(from.id, { action: "getScrollPosition" });
-  data.action = "setScrollPosition";
-  await browser.tabs.sendMessage(to.id, data);
+  let code = "{ scrollY: window.scrollY, scrollX: window.scrollX }";
+  let position = await browser.tabs.executeScript(from.id, { code: code });
+
+  // Did you know that an attacker can assign a string to window.scrollY?
+  position.scrollX = parseInt(position.scrollX, 10);
+  position.scrollY = parseInt(position.scrollY, 10);
+
+  code = `window.scrollTo(${position.scrollX}, ${positon.scrollY})`;
+  await browser.tabs.executeScript(to.id, { code: code });
 }
 
 async function removeOtherTabs(tabUrl, keepTab) {
@@ -59,13 +87,7 @@ async function removeOtherTabs(tabUrl, keepTab) {
 
 browser.runtime.onMessage.addListener((data, sender) => {
   (async () => {
-    if (data.action == "addonid") {
-      if (!(data.addonid in tabsToClose)) {
-        tabsToClose[data.addonid] = {};
-      }
-      tabsToClose[data.addonid][sender.tab.id] = true;
-      reviewPages[sender.tab.id] = data.addonid;
-    } else if (data.action == "tabclose-backtoreview") {
+    if (data.action == "tabclose-backtoreview") {
       let instance = await getStoragePreference("instance");
       let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug).replace(/{instance}/, instance));
       let [tab, ...rest] = await browser.tabs.query({ url: urls });
@@ -79,30 +101,31 @@ browser.runtime.onMessage.addListener((data, sender) => {
   })();
 });
 
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  let prefs = await getStoragePreference(["tabclose-other-queue", "tabclose-review-child"]);
-
+browser.tabs.onUpdated.addListener(async (tabId, { status, url }, tab) => {
+  if (!status && !url) {
+    // Only care about status and URL changes
+    return;
+  }
   let isReview = tab.url.match(REVIEW_RE);
-  let isQueue = tab.url.match(QUEUE_RE);
 
   if (isReview) {
-    reviewPages[tabId] = isReview[4];
-  } else if (isQueue) {
-    if (tabId in reviewPages) {
-      removeTabsFor(tabId, reviewPages[tabId], prefs["tabclose-review-child"]);
-    }
-
-    if (changeInfo.status == "complete" && prefs["tabclose-other-queue"]) {
-      removeOtherTabs(tab.url, tab);
-    }
+    // This is a review page, keep track of it
+    reviewPages.set(tabId, isReview[4]);
+  } else if (tab.url.match(QUEUE_RE) && status == "complete" &&
+             await getStoragePreference("tabclose-other-queue")) {
+    // We've loaded a queue page, close other queues if requested
+    removeOtherTabs(tab.url, tab);
+  } else if (reviewPages.has(tab.openerTabId) && relevantReviewChild(tab.url)) {
+    // This is tab opened from a review page, it should be closed with the review page
+    reviewPages.addChildTab(tab.openerTabId, tabId);
+  } else if (!isReview && reviewPages.has(tabId)) {
+    // The tab navigated to another page, we can remove now
+    reviewPages.close(tabId, await getStoragePreference("tabclose-review-child"));
   }
 });
 
 browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
-  let slug = reviewPages[tabId];
-  delete reviewPages[tabId];
-
-  if (slug) {
-    removeTabsFor(tabId, slug, await getStoragePreference("tabclose-review-child"));
+  if (reviewPages.has(tabId)) {
+    reviewPages.close(tabId, await getStoragePreference("tabclose-review-child"));
   }
 });
