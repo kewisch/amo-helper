@@ -7,7 +7,7 @@ const allSuggestions = {
   "": {
     content: "{keyword}",
     description: "Editor Review for {keyword}",
-    url: "https://{instance}/editors/review/{keyword}"
+    url: "https://{instance}/reviewers/review/{keyword}"
   },
   "addon": {
     content: "addon {keyword}",

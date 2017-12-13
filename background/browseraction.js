@@ -23,7 +23,7 @@ function parseQueueNumbers(doc) {
 
 async function updateQueueNumbers() {
   let instance = await getStoragePreference("instance");
-  let url = `https://${instance}/en-US/editors/queue/auto_approved`;
+  let url = `https://${instance}/en-US/reviewers/queue/auto_approved`;
   let text = await fetch(url, { mode: "cors", credentials: "include" }).then(resp => resp.text());
   let parser = new DOMParser();
   let doc = parser.parseFromString(text, "text/html");

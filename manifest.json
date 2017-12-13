@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "7.0.0",
+  "version": "7.0.1",
 
   "applications": {
     "gecko": {
@@ -119,17 +119,17 @@
       "run_at": "document_end"
     },{
       "matches": [
-        "https://reviewers.addons.mozilla.org/*/editors/review/*",
-        "https://reviewers.addons.mozilla.org/*/editors/review-listed/*",
-        "https://reviewers.addons.mozilla.org/*/editors/review-unlisted/*",
+        "https://reviewers.addons.mozilla.org/*/reviewers/review/*",
+        "https://reviewers.addons.mozilla.org/*/reviewers/review-listed/*",
+        "https://reviewers.addons.mozilla.org/*/reviewers/review-unlisted/*",
 
-        "https://reviewers.addons.allizom.org/*/editors/review/*",
-        "https://reviewers.addons.allizom.org/*/editors/review-listed/*",
-        "https://reviewers.addons.allizom.org/*/editors/review-unlisted/*",
+        "https://reviewers.addons.allizom.org/*/reviewers/review/*",
+        "https://reviewers.addons.allizom.org/*/reviewers/review-listed/*",
+        "https://reviewers.addons.allizom.org/*/reviewers/review-unlisted/*",
 
-        "https://reviewers.addons-dev.allizom.org/*/editors/review/*",
-        "https://reviewers.addons-dev.allizom.org/*/editors/review-listed/*",
-        "https://reviewers.addons-dev.allizom.org/*/editors/review-unlisted/*"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review/*",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-listed/*",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/*"
       ],
       "js": [
         "libs/diff.min.js",
@@ -168,14 +168,14 @@
       "run_at": "document_end"
     },{
       "matches": [
-        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews",
-        "https://reviewers.addons.mozilla.org/*/editors/queue/reviews",
+        "https://reviewers.addons.mozilla.org/*/reviewers/queue/reviews",
+        "https://reviewers.addons.mozilla.org/*/reviewers/queue/reviews",
 
-        "https://reviewers.addons.allizom.org/*/editors/queue/reviews",
-        "https://reviewers.addons.allizom.org/*/editors/queue/reviews",
+        "https://reviewers.addons.allizom.org/*/reviewers/queue/reviews",
+        "https://reviewers.addons.allizom.org/*/reviewers/queue/reviews",
 
-        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews",
-        "https://reviewers.addons-dev.allizom.org/*/editors/queue/reviews"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews"
       ],
       "js": [
         "common/constants.js",
@@ -186,9 +186,9 @@
       "run_at": "document_end"
     },{
       "matches": [
-        "https://reviewers.addons.mozilla.org/*/editors/queue/*",
-        "https://reviewers.addons.allizom.org/*/editors/queue/*",
-        "https://reviewers.addons-dev.allizom.org/*/editors/queue/*"
+        "https://reviewers.addons.mozilla.org/*/reviewers/queue/*",
+        "https://reviewers.addons.allizom.org/*/reviewers/queue/*",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/*"
       ],
       "js": [
         "libs/moment.min.js",
