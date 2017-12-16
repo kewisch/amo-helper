@@ -31,13 +31,27 @@ async function updateQueueNumbers() {
 }
 
 async function updateBadge(numbers) {
-  if (!await getStoragePreference("browseraction-count-moderator")) {
-    delete numbers.reviews;
-  }
+  let prefs = await getStoragePreference([
+    "browseraction-count-legacy",
+    "browseraction-count-moderator",
+    "browseraction-count-autoapproval",
+    "browseraction-count-content"
+  ]);
 
-  let total = Object.values(numbers).reduce((result, queue) => {
-    return result + queue.total;
-  }, 0);
+  let total = 0;
+
+  if (prefs["browseraction-count-legacy"]) {
+    total += numbers["new"].total + numbers.updates.total;
+  }
+  if (prefs["browseraction-count-moderator"]) {
+    total += numbers.reviews.total;
+  }
+  if (prefs["browseraction-count-autoapproval"]) {
+    total += numbers.auto_approved.total;
+  }
+  if (prefs["browseraction-count-content"]) {
+    total += numbers.content_review.total;
+  }
 
   browser.browserAction.setBadgeText({ text: total.toString() });
 }
@@ -88,6 +102,8 @@ browser.storage.onChanged.addListener((changes, area) => {
     if (key == "browseraction-queue-refresh-period") {
       setupQueueRefresh();
     } else if (key == "instance") {
+      updateQueueNumbers().then(updateBadge);
+    } else if (key.startsWith("browseraction-count-")) {
       updateQueueNumbers().then(updateBadge);
     }
   }

@@ -36,6 +36,10 @@ fieldset {
   margin: 0;
 }
 
+fieldset > label:first-of-type {
+  margin-inline-start: 2em;
+}
+
 #canned {
   display: grid;
   grid: 21px auto / 40% 21px auto;

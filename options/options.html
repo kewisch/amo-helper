@@ -13,7 +13,7 @@
     <h1>Instance</h1>
     <fieldset id="instance" type="radio">
       <legend>
-        The instance to use for links where it cannot be inferred from context
+        The instance to use for links where it cannot be inferred from context:
       </legend>
       <label class="oneline">
         <input type="radio" id="instance-prod" name="instance" value="addons.mozilla.org">
@@ -50,10 +50,27 @@
       Number of minutes between refreshing the toolbar icon badge
     </label>
 
-    <label>
-      <input type="checkbox" id="browseraction-count-moderator">
-      Include moderated reviews in badge count
-    </label>
+    <fieldset id="instance" type="radio">
+      <legend>
+        Queues to include in badge count:
+      </legend>
+      <label class="oneline">
+        <input type="checkbox" id="browseraction-count-legacy" name="browseraction-count" value="addons.mozilla.org">
+        Legacy
+      </label>
+      <label class="oneline">
+        <input type="checkbox" id="browseraction-count-moderator" name="browseraction-count" value="addons.allizom.org">
+        Moderated Reviews
+      </label>
+      <label class="oneline">
+        <input type="checkbox" id="browseraction-count-autoapproval" name="browseraction-count" value="addons-dev.allizom.org">
+        Auto-approval
+      </label>
+      <label class="oneline">
+        <input type="checkbox" id="browseraction-count-content" name="browseraction-count" value="addons-dev.allizom.org">
+        Content
+      </label>
+    </fieldset>
 
     <label>
       <input type="checkbox" id="omnibox-enabled">
