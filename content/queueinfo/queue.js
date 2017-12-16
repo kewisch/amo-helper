@@ -6,14 +6,13 @@
 // import { getInfoWithSize } from "./review-common"
 
 const OVERDUE_SOURCES = 7;
-const IS_ADMIN = !!document.getElementById("unlisted-queues");
 const QUEUE = document.location.pathname.split("/").pop();
 
 async function initPageLayout() {
   let header = document.querySelector("#addon-queue > thead > .listing-header");
 
   let weeklines = await getStoragePreference("queueinfo-show-weeklines");
-  browser.storage.local.set({ "is-admin": IS_ADMIN });
+  let isAdmin = await getStoragePreference("is-admin");
 
   // Last update column
   let column = document.createElement("th");
@@ -28,7 +27,7 @@ async function initPageLayout() {
   header.appendChild(column);
 
   // Size column
-  if (IS_ADMIN) {
+  if (isAdmin) {
     column = document.createElement("th");
     column.className ="amoqueue-helper-size-column";
     column.textContent = "Size";
@@ -59,7 +58,7 @@ async function initPageLayout() {
     row.appendChild(cell);
 
     // Size column
-    if (IS_ADMIN) {
+    if (isAdmin) {
       cell = document.createElement("td");
       cell.className = "amoqueue-helper-cell amoqueue-helper-size-cell";
       row.appendChild(cell);
@@ -196,7 +195,7 @@ async function initPageLayout() {
     });
   }
 
-  if (IS_ADMIN) {
+  if (isAdmin) {
     await addSearchRadio("Show Reviews", "show-admin", ["Both", "Admin", "Regular"], (state) => {
       document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
         let isadmin = row.classList.contains("amoqueue-helper-iconclass-admin-review");
@@ -256,7 +255,7 @@ async function initPageLayout() {
   searchbox.appendChild(queueButtons);
 
   /* TODO disabled this feature since XHR doesn't do cookies correctly.
-  if (IS_ADMIN) {
+  if (isAdmin) {
     // Load button
     let loadButton = document.createElement("button");
     loadButton.id = "amoqueue-load-button";

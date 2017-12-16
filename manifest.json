@@ -204,6 +204,16 @@
       ],
       "css": ["content/queueinfo/queue.css"],
       "run_at": "document_end"
+    },{
+      "matches": [
+        "https://reviewers.addons.mozilla.org/*/reviewers/",
+        "https://reviewers.addons.allizom.org/*/reviewers/",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/"
+      ],
+      "js": [
+        "content/admin/dashboard.js"
+      ],
+      "run_at": "document_end"
     }
   ]
 }
