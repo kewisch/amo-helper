@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "7.0.1",
+  "version": "7.0.2",
 
   "applications": {
     "gecko": {
@@ -122,14 +122,17 @@
         "https://reviewers.addons.mozilla.org/*/reviewers/review/*",
         "https://reviewers.addons.mozilla.org/*/reviewers/review-listed/*",
         "https://reviewers.addons.mozilla.org/*/reviewers/review-unlisted/*",
+        "https://reviewers.addons.mozilla.org/*/reviewers/review-content/*",
 
         "https://reviewers.addons.allizom.org/*/reviewers/review/*",
         "https://reviewers.addons.allizom.org/*/reviewers/review-listed/*",
         "https://reviewers.addons.allizom.org/*/reviewers/review-unlisted/*",
+        "https://reviewers.addons.allizom.org/*/reviewers/review-content/*",
 
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-listed/*",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/*"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/*",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*"
       ],
       "js": [
         "libs/diff.min.js",
@@ -197,7 +200,6 @@
         "common/preferences.js",
 
         "content/queueinfo/queue.js",
-        "content/tabclose/queue.js",
         "content/browseraction/queue.js"
       ],
       "css": ["content/queueinfo/queue.css"],

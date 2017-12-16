@@ -36,7 +36,7 @@ createCommand("amoqueue-hide-delete", "Toggle comment lines", "*", () => {
 });
 
 createCommand("amoqueue-copy-slug", "Copy Slug", null, () => {
-  let slug = document.querySelector("a.command[href*='editors/review']").getAttribute("href").split("/")[4];
+  let slug = document.querySelector("a.command[href*='reviewers/review']").getAttribute("href").split("/")[4];
 
   let textarea = document.createElement("textarea");
   textarea.value = decodeURIComponent(slug);

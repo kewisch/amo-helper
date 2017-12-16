@@ -16,9 +16,9 @@ const LISTING_URL = "https://{instance}/addon/{addon}";
 const MANAGE_URL = "https://{instance}/developers/addon/{addon}/edit";
 const FEED_URL = "https://{instance}/developers/feed/{addon}";
 
-const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/editors\/review(|-listed|-unlisted)\/(.*)/;
-const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/editors\/queue\/(.*)/;
-const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]*)\/(editors\/review(|-listed|-unlisted)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
+const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/reviewers\/review(|-listed|-unlisted|-content)\/(.*)/;
+const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/reviewers\/queue\/(.*)/;
+const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]*)\/(reviewers\/review(|-listed|-unlisted|-content)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
 const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
 const USER_RE = /https:\/\/(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/user\/([^#/]*)/;
 
@@ -100,6 +100,7 @@ const ADDON_LINK_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/reviewers/review/*",
   "https://reviewers.addons.mozilla.org/*/reviewers/review-listed/*",
   "https://reviewers.addons.mozilla.org/*/reviewers/review-unlisted/*",
+  "https://reviewers.addons.mozilla.org/*/reviewers/review-content/*",
   "https://addons.mozilla.org/*/admin/manage/*",
   "https://addons.mozilla.org/*/*/addon/*", /* catches listing and manage url */
   "https://addons.mozilla.org/*/developers/feed/*",
@@ -107,6 +108,7 @@ const ADDON_LINK_PATTERNS = [
   "https://reviewers.addons.allizom.org/*/reviewers/review/*",
   "https://reviewers.addons.allizom.org/*/reviewers/review-listed/*",
   "https://reviewers.addons.allizom.org/*/reviewers/review-unlisted/*",
+  "https://reviewers.addons.allizom.org/*/reviewers/review-content/*",
   "https://addons.allizom.org/*/admin/manage/*",
   "https://addons.allizom.org/*/*/addon/*", /* catches listing and manage url */
   "https://addons.allizom.org/*/developers/feed/*",
@@ -114,6 +116,7 @@ const ADDON_LINK_PATTERNS = [
   "https://reviewers.addons-dev.allizom.org/*/reviewers/review/*",
   "https://reviewers.addons-dev.allizom.org/*/reviewers/review-listed/*",
   "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/*",
+  "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*",
   "https://addons-dev.allizom.org/*/admin/manage/*",
   "https://addons-dev.allizom.org/*/*/addon/*", /* catches listing and manage url */
   "https://addons-dev.allizom.org/*/developers/feed/*",

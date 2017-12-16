@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-document.querySelector("a.command[href*='editors/review']").addEventListener("click", (event) => {
+document.querySelector("a.command[href*='reviewers/review']").addEventListener("click", (event) => {
   let slug = event.target.getAttribute("href").split("/")[4];
 
   browser.runtime.sendMessage({ action: "tabclose-backtoreview", slug: slug });
