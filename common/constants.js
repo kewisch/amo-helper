@@ -8,7 +8,7 @@
  * REVIEW_PATTERNS, FILEBROWSER_PATTERNS, LISTING_PATTERNS,
  * DEVELOPER_PAGE_PATTERNS, USER_PAGE_PATTERNS, AMO_HOSTS, AMO_EDITORS_PATTERNS
  * AMO_PRIVACY_PAGES, AMO_EULA_PAGES, AMO_QUEUE_PATTERNS, AMO_REVIEW_PATTERNS,
- * ADDON_LINK_PATTERNS */
+ * ADDON_LINK_PATTERNS, replacePattern */
 
 const REVIEW_URL = "https://reviewers.{instance}/reviewers/review{type}/{addon}";
 const ADMIN_URL = "https://{instance}/admin/addon/manage/{addon}";
@@ -121,3 +121,7 @@ const ADDON_LINK_PATTERNS = [
   "https://addons-dev.allizom.org/*/*/addon/*", /* catches listing and manage url */
   "https://addons-dev.allizom.org/*/developers/feed/*",
 ];
+
+function replacePattern(str, replacements) {
+  return str.replace(/{([a-z]+)}/g, (match, key) => replacements[key] || "");
+}

@@ -59,7 +59,10 @@ function createCompleteTab(createOptions) {
 //     browser.tabs.create({
 //       index: ++tabIndex,
 //       active: active,
-//       url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, instance).replace(/{type}/, '');
+//       url: replacePattern(REVIEW_URL, {
+//         addon: nextaddon,
+//         instance: instance,
+//       });
 //     });
 //
 //     active = false;
@@ -105,12 +108,15 @@ async function tinderTabsLoadNext() {
   }
 
   let lastTab = await browser.tabs.get(lastTabId);
-  let url = REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, prefs["instance"]).replace(/{type}/, isContent ? "-content" : "");
 
   let [createdPromise, updatedPromise] = createCompleteTab({
     index: lastTab.index + 1,
     active: false,
-    url: url
+    url: replacePattern(REVIEW_URL, {
+      addon: nextaddon,
+      instance: prefs["instance"],
+      type: isContent ? "-content" : ""
+    })
   });
 
   let tab = await createdPromise;

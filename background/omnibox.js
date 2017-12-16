@@ -47,13 +47,13 @@ async function resetDefaultSuggestion() {
 }
 
 function inputChangedListener(text, suggest) {
-  let descriptionText = allSuggestions[""].description.replace(/{keyword}/, text);
+  let descriptionText = replacePattern(allSuggestions[""].description, { keyword: text });
   browser.omnibox.setDefaultSuggestion({ description: descriptionText });
 
   suggest(Object.values(allSuggestions).map(({ content, description }) => {
     return {
-      content: content.replace(/{keyword}/, text),
-      description: description.replace(/{keyword}/, text)
+      content: replacePattern(content, { keyword: text }),
+      description: replacePattern(description, { keyword: text }),
     };
   }));
 }
@@ -73,7 +73,7 @@ async function inputEnteredListener(text, disposition) {
   }
 
   let instance = await getStoragePreference("instance");
-  let url = data.url.replace(/{keyword}/, slug).replace(/{instance}/, instance);
+  let url = replacePattern(data.url, { keyword: slug, instance: instance });
 
   if (disposition == "currentTab") {
     let tabs = await browser.tabs.query({ active: true, currentWindow: true });

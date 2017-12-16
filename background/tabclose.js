@@ -89,7 +89,9 @@ browser.runtime.onMessage.addListener((data, sender) => {
   (async () => {
     if (data.action == "tabclose-backtoreview") {
       let instance = await getStoragePreference("instance");
-      let urls = REVIEW_PATTERNS.map(url => url.replace(/{addon}/, data.slug).replace(/{instance}/, instance));
+      let urls = REVIEW_PATTERNS.map(url => {
+        return replacePattern(url, { addon: data.slug, instance: instance });
+      });
       let [tab, ...rest] = await browser.tabs.query({ url: urls });
       if (tab) {
         await browser.tabs.update(tab.id, { active: true });

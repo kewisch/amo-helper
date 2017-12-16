@@ -10,7 +10,10 @@ async function toAddonUrl(target, info) {
   }
 
   let [activeTab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
-  let targetUrl = target.replace(/{addon}/, matches[4]).replace(/{instance}/, matches[1]);
+  let targetUrl = replacePattern(target, {
+    addon: matches[4],
+    instance: matches[1]
+  });
 
   if (info.modifiers && (info.modifiers.includes("Command") || info.modifiers.includes("Ctrl"))) {
     await browser.tabs.create({ url: targetUrl, index: activeTab.index + 1, openerTabId: activeTab.id });
@@ -40,7 +43,7 @@ createLinksContextMenu([{
   url: MANAGE_URL,
 }, {
   title: "Review Add-on",
-  url: REVIEW_URL.replace(/{type}/, ""),
+  url: REVIEW_URL,
 }, {
   title: "Admin Add-on",
   url: ADMIN_URL,

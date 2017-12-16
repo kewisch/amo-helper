@@ -62,7 +62,12 @@ async function switchToReviewPage() {
   let [tab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
   let match = tab.url.match(ADDON_LINKS_RE);
   if (match) {
-    await browser.tabs.update(tab.id, { url: REVIEW_URL.replace(/{addon}/, match[4]).replace(/{instance}/, match[1]).replace(/{type}/, "") });
+    await browser.tabs.update(tab.id, {
+      url: replacePattern(REVIEW_URL, {
+        addon: match[4],
+        instance: match[1]
+      })
+    });
   }
 }
 
