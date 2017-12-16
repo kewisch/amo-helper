@@ -43,6 +43,7 @@ const DEFAULT_PREFERENCES = {
   "reviewinfo-dangerous-messages": DEFAULT_DANGEROUS_MESSAGES,
   "reviewinfo-show-permissions": false,
   "reviewinfo-show-validator": false,
+  "reviewinfo-dontshow-content": true,
   "reviewtimer-display": true,
   "reviewtimer-notify-interval": 10,
   "translation-secret-key": "",

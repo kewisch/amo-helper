@@ -21,9 +21,14 @@ async function initLayout() {
 
 async function initTopPermissions() {
   // Lets assume people don't use different permissions per platform and just get one
-  let prefs = await getStoragePreference(["reviewinfo-dangerous-permissions", "reviewinfo-show-permissions"]);
+  let prefs = await getStoragePreference([
+    "reviewinfo-dangerous-permissions",
+    "reviewinfo-show-permissions",
+    "reviewinfo-dontshow-content"
+  ]);
   let permissionsNode = document.querySelector("#review-files .listing-body:last-child .file-info div strong");
-  if (!permissionsNode || !prefs["reviewinfo-show-permissions"]) {
+  let skipContent = document.location.href.match(CONTENT_REVIEW_RE) && prefs["reviewinfo-dontshow-content"];
+  if (!permissionsNode || !prefs["reviewinfo-show-permissions"] || skipContent) {
     return;
   }
 
@@ -54,9 +59,14 @@ async function initTopPermissions() {
 
 
 async function retrieveValidation() {
-  let prefs = await getStoragePreference(["reviewinfo-dangerous-messages", "reviewinfo-show-validator"]);
+  let prefs = await getStoragePreference([
+    "reviewinfo-dangerous-messages",
+    "reviewinfo-show-validator",
+    "reviewinfo-dontshow-content"
+  ]);
+  let skipContent = document.location.href.match(CONTENT_REVIEW_RE) && prefs["reviewinfo-dontshow-content"];
 
-  if (!prefs["reviewinfo-show-validator"]) {
+  if (!prefs["reviewinfo-show-validator"] || skipContent) {
     return;
   }
 

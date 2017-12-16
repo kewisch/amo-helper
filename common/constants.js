@@ -5,7 +5,7 @@
 
 /* exported REVIEW_URL, ADMIN_URL, LISTING_URL, MANAGE_URL, FEED_URL,
  * REVIEW_RE, QUEUE_RE, ADDON_LINKS_RE, FILEBROWSER_RE, USER_RE,
- * REVIEW_PATTERNS, FILEBROWSER_PATTERNS, LISTING_PATTERNS,
+ * CONTENT_REVIEW_RE, REVIEW_PATTERNS, FILEBROWSER_PATTERNS, LISTING_PATTERNS,
  * DEVELOPER_PAGE_PATTERNS, USER_PAGE_PATTERNS, AMO_HOSTS, AMO_EDITORS_PATTERNS
  * AMO_PRIVACY_PAGES, AMO_EULA_PAGES, AMO_QUEUE_PATTERNS, AMO_REVIEW_PATTERNS,
  * ADDON_LINK_PATTERNS, replacePattern */
@@ -21,6 +21,7 @@ const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-d
 const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]*)\/(reviewers\/review(|-listed|-unlisted|-content)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
 const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
 const USER_RE = /https:\/\/(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/user\/([^#/]*)/;
+const CONTENT_REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/reviewers\/review-content\/(.*)/;
 
 const REVIEW_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/reviewers/review/{addon}",
