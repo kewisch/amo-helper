@@ -50,14 +50,14 @@ function relevantReviewChild(url) {
 }
 
 async function copyScrollPosition(from, to) {
-  let code = "{ scrollY: window.scrollY, scrollX: window.scrollX }";
+  let code = "({ scrollY: window.scrollY, scrollX: window.scrollX })";
   let position = await browser.tabs.executeScript(from.id, { code: code });
 
   // Did you know that an attacker can assign a string to window.scrollY?
   position.scrollX = parseInt(position.scrollX, 10);
   position.scrollY = parseInt(position.scrollY, 10);
 
-  code = `window.scrollTo(${position.scrollX}, ${positon.scrollY})`;
+  code = `window.scrollTo(${position.scrollX}, ${position.scrollY})`;
   await browser.tabs.executeScript(to.id, { code: code });
 }
 
@@ -67,7 +67,7 @@ async function removeOtherTabs(tabUrl, keepTab) {
 
   let closingActiveTab = null;
   let closeTabs = compareTabs.filter(tab => {
-    let shouldClose = tab.id != keepTab.id;
+    let shouldClose = tab.windowId != keepTab.windowId || tab.id != keepTab.id;
     if (shouldClose && tab.active) {
       closingActiveTab = tab;
     }
@@ -120,7 +120,7 @@ browser.tabs.onUpdated.addListener(async (tabId, { status, url }, tab) => {
   } else if (reviewPages.has(tab.openerTabId) && relevantReviewChild(tab.url)) {
     // This is tab opened from a review page, it should be closed with the review page
     reviewPages.addChildTab(tab.openerTabId, tabId);
-  } else if (!isReview && reviewPages.has(tabId)) {
+  } else if (!isReview && status == "complete" && reviewPages.has(tabId)) {
     // The tab navigated to another page, we can remove now
     reviewPages.close(tabId, await getStoragePreference("tabclose-review-child"));
   }
