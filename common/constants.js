@@ -10,7 +10,7 @@
  * AMO_PRIVACY_PAGES, AMO_EULA_PAGES, AMO_QUEUE_PATTERNS, AMO_REVIEW_PATTERNS,
  * ADDON_LINK_PATTERNS */
 
-const REVIEW_URL = "https://reviewers.{instance}/reviewers/review/{addon}";
+const REVIEW_URL = "https://reviewers.{instance}/reviewers/review{type}/{addon}";
 const ADMIN_URL = "https://{instance}/admin/addon/manage/{addon}";
 const LISTING_URL = "https://{instance}/addon/{addon}";
 const MANAGE_URL = "https://{instance}/developers/addon/{addon}/edit";

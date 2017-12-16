@@ -3,11 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-const IS_ADMIN = !!document.getElementById("unlisted-queues");
-
 async function initLayout() {
-  if (!IS_ADMIN || !await getStoragePreference("tinderbar-show")) {
-    // This quick review feature only makes sense for admins, sorry
+  if (!await getStoragePreference("tinderbar-show")) {
     return;
   }
 
@@ -15,17 +12,12 @@ async function initLayout() {
   bar.id = "tinderbar";
 
   let stop = bar.appendChild(document.createElement("a"));
-  // let reject = bar.appendChild(document.createElement("a"));
   let skip = bar.appendChild(document.createElement("a"));
   let accept = bar.appendChild(document.createElement("a"));
 
   stop.className = "amoqueue-tinderbar-stop";
   stop.textContent = "×";
   stop.href = "#";
-
-  // reject.className = "amoqueue-tinderbar-reject";
-  // reject.textContent = "Reject";
-  // reject.href = "#";
 
   skip.className = "amoqueue-tinderbar-skip";
   skip.textContent = "Skip";
@@ -38,30 +30,21 @@ async function initLayout() {
   bar.addEventListener("click", actionHandler);
 }
 
-function actionHandler(event) {
+async function actionHandler(event) {
   event.preventDefault();
   event.stopPropagation();
 
   let action = event.target.className.replace("amoqueue-tinderbar-", "");
-  browser.runtime.sendMessage({ action: "tinder", method: "next", result: action });
+  let text = await getStoragePreference("tinderbar-approve-text");
 
-  console.log(event.target.className + " - " + action);
+  await browser.runtime.sendMessage({ action: "tinder", method: "next", result: action });
 
-  switch (action) {
-    case "accept":
-      document.getElementById("id_action_0").click();
-      getStoragePreference("tinderbar-approve-text").then((text) => {
-        document.getElementById("id_comments").value = text;
-        document.querySelector("form[action='#review-actions']").submit();
-      });
-      break;
-    case "reject":
-      // Not sure if this should be implemented, need a comment anyway
-      document.getElementById("id_action_1").click();
-      break;
-    case "stop":
-      window.close();
-      break;
+  if (action == "accept") {
+    document.getElementById("id_action_0").click();
+    if (document.getElementById("id_action_0").value != "confirm_auto_approved") {
+      document.getElementById("id_comments").value = text;
+    }
+    document.querySelector("form[action='#review-actions']").submit();
   }
 }
 

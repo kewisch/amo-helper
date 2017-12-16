@@ -40,7 +40,7 @@ createLinksContextMenu([{
   url: MANAGE_URL,
 }, {
   title: "Review Add-on",
-  url: REVIEW_URL,
+  url: REVIEW_URL.replace(/{type}/, ""),
 }, {
   title: "Admin Add-on",
   url: ADMIN_URL,

@@ -11,9 +11,17 @@ let last_queue_page = {};
 function getLastQueue(queue) {
   return last_queue_page[queue] || [];
 }
-function queueByAddon(slug) {
-  // Not great performance, this can be optimized later
-  for (let [queue, addons] of Object.entries(last_queue_page)) {
+function queueByAddon(slug, queue) {
+  if (queue) {
+    // Not great performance, this can be optimized later
+    for (let [curqueue, addons] of Object.entries(last_queue_page)) {
+      let index = addons.findIndex(addon => addon == slug);
+      if (index > -1) {
+        return { index: index, queue: curqueue, addons: addons };
+      }
+    }
+  } else {
+    let addons = last_queue_page[queueName];
     let index = addons.findIndex(addon => addon == slug);
     if (index > -1) {
       return { index: index, queue: queue, addons: addons };

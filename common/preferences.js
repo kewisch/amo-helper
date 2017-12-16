@@ -44,7 +44,7 @@ const DEFAULT_PREFERENCES = {
   "reviewtimer-notify-interval": 10,
   "translation-secret-key": "",
   "tinderbar-show": false,
-  "tinderbar-approve-text": "Thank you for your contribution. This version has been approved using a streamlined review process.",
+  "tinderbar-approve-text": "",
   "tinderbar-preload-tabs": 3,
   "filewindow-enabled": false
 };

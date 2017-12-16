@@ -11,7 +11,11 @@ async function getLastTab() {
   if (len == 0) {
     let currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
     let matchCurrentTab = currentTabs[0].url.match(REVIEW_RE);
-    return { slug: matchCurrentTab ? matchCurrentTab[3] : null, tab: currentTabs[0] };
+    return {
+      slug: matchCurrentTab ? matchCurrentTab[4] : null,
+      tabId: currentTabs[0].id,
+      isContent: matchCurrentTab ? matchCurrentTab[3] == "-content" : false
+    };
   } else {
     return tinder_current_tabs[tinder_current_tabs.length - 1];
   }
@@ -55,7 +59,7 @@ function createCompleteTab(createOptions) {
 //     browser.tabs.create({
 //       index: ++tabIndex,
 //       active: active,
-//       url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, instance);
+//       url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, instance).replace(/{type}/, '');
 //     });
 //
 //     active = false;
@@ -64,7 +68,7 @@ function createCompleteTab(createOptions) {
 
 function tinderStop() {
   tinder_running = false;
-  browser.tabs.remove(tinder_current_tabs.map(data => data.tab.id));
+  browser.tabs.remove(tinder_current_tabs.map(data => data.tabId));
 }
 
 async function tinderNextTab(currentTab) {
@@ -77,10 +81,10 @@ async function tinderNextTab(currentTab) {
   tinderTabsPreload();
 
   // focus the next tab
-  let curTabIndex = tinder_current_tabs.findIndex(data => data.tab.id == currentTab.id);
+  let curTabIndex = tinder_current_tabs.findIndex(data => data.tabId == currentTab.id);
   let nextTab = tinder_current_tabs[curTabIndex + 1];
   if (nextTab) {
-    await browser.tabs.update(nextTab.tab.id, { active: true });
+    await browser.tabs.update(nextTab.tabId, { active: true });
   } else {
     tinder_running = false;
   }
@@ -92,22 +96,25 @@ async function tinderTabsLoadNext() {
     return;
   }
 
-  let { slug: lastSlug, tab: lastTab } = await getLastTab();
-  let { index=-1, addons=[] } = queueByAddon(lastSlug);
+  let { slug: lastSlug, tabId: lastTabId, isContent } = await getLastTab();
+  let { index=-1, addons=[] } = queueByAddon(lastSlug, isContent && "content_review");
   let nextaddon = addons[index + 1];
   if (!nextaddon) {
     tinder_running = false;
     return;
   }
 
+  let lastTab = await browser.tabs.get(lastTabId);
+  let url = REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, prefs["instance"]).replace(/{type}/, isContent ? "-content" : "");
+
   let [createdPromise, updatedPromise] = createCompleteTab({
     index: lastTab.index + 1,
     active: false,
-    url: REVIEW_URL.replace(/{addon}/, nextaddon).replace(/{instance}/, prefs["instance"])
+    url: url
   });
 
   let tab = await createdPromise;
-  tinder_current_tabs.push({ slug: nextaddon, tab: tab });
+  tinder_current_tabs.push({ slug: nextaddon, tabId: tab.id, isContent: isContent });
 
   await updatedPromise;
 }
@@ -120,7 +127,7 @@ async function tinderTabsPreload() {
 }
 
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  let tabIndex = tinder_current_tabs.findIndex(data => data.tab.id == tabId);
+  let tabIndex = tinder_current_tabs.findIndex(data => data.tabId == tabId);
   if (tabIndex > -1) {
     tinder_current_tabs.splice(tabIndex, 1);
     tinderTabsPreload();
@@ -129,7 +136,7 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url && !REVIEW_RE.test(changeInfo.url)) {
-    let tabIndex = tinder_current_tabs.findIndex(data => data.tab.id == tabId);
+    let tabIndex = tinder_current_tabs.findIndex(data => data.tabId == tabId);
     if (tabIndex > -1) {
       tinder_current_tabs.splice(tabIndex, 1);
       tinderTabsPreload();
@@ -138,16 +145,22 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 browser.runtime.onMessage.addListener((data, sender) => {
-  if (data.action == "tinder" && data.method == "start") {
-    tinderStart(sender.tab);
-  } else if (data.action == "tinder" && data.method == "next") {
-    if (data.result == "stop") {
-      tinderStop();
-    } else {
-      if (data.result == "skip") {
-        browser.tabs.remove(sender.tab.id);
-      }
-      tinderNextTab(sender.tab);
-    }
+  if (data.action != "tinder") {
+    return undefined;
   }
+
+  return (async function() {
+    if (data.method == "start") {
+      tinderStart(sender.tab);
+    } else if (data.method == "next") {
+      if (data.result == "stop") {
+        tinderStop();
+      } else {
+        await tinderNextTab(sender.tab);
+        if (data.result == "skip") {
+          await browser.tabs.remove(sender.tab.id);
+        }
+      }
+    }
+  })();
 });

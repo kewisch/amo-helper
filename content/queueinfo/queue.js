@@ -558,7 +558,7 @@ function updateSort(rows=null) {
 async function downloadReviewInfo(ids) {
   let instance = await getStoragePreference("instance");
   let id = ids[0]; // temporary
-  let response = await fetch(REVIEW_URL.replace(/{addon}/, id).replace(/{instance}/, instance);
+  let response = await fetch(REVIEW_URL.replace(/{addon}/, id).replace(/{instance}/, instance).replace(/{type}/, "");
   let responseText = await response.text();
 
   let parser = new DOMParser();
