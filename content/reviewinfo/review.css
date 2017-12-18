@@ -33,3 +33,26 @@
   background-color: white;
   box-shadow: 33px 33px 100px -33px rgba(0,0,0,0.75);
 }
+
+/* scroll to top/bottom buttons */
+.amoqueue-scroll-to-bottom {
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+}
+
+.amoqueue-scroll-to-bottom:active {
+  top: auto;
+  bottom: calc(1em + 2px);
+}
+
+.amoqueue-scroll-to-top-container {
+  overflow: auto;
+}
+.amoqueue-scroll-to-top {
+  float: right;
+}
+
+#addon .featured .secondary {
+  margin-bottom: 2em;
+}

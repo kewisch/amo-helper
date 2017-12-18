@@ -9,6 +9,8 @@ const SKIP_MESSAGES = new Set([
 ]);
 
 async function initLayout() {
+  addScrollToButtons();
+
   // Put latest permissions at top.
   await initTopPermissions();
 
@@ -17,6 +19,35 @@ async function initLayout() {
 
   // Scroll to the end of the header.
   window.scroll(0, document.querySelector(".addon").offsetTop - 10);
+}
+
+function addScrollToButtons() {
+  // Scroll to latest version
+  let scrollToBottom = document.createElement("button");
+  document.querySelector("#addon .secondary").appendChild(scrollToBottom);
+
+  scrollToBottom.className = "amoqueue-scroll-to-bottom";
+  scrollToBottom.textContent = "Scroll to last version";
+  scrollToBottom.type = "button";
+  scrollToBottom.addEventListener("click", (event) => {
+    document.querySelector(".listing-header:nth-last-child(2)").scrollIntoView();
+  });
+
+  // Scroll to metadata
+  let scrollToTop = document.createElement("button");
+  let scrollToTopContainer = document.createElement("div");
+  scrollToTopContainer.appendChild(scrollToTop);
+  document.querySelector("#addon").insertBefore(scrollToTopContainer, document.querySelector("#review-actions"));
+
+  scrollToTopContainer.className = "amoqueue-scroll-to-top-container";
+
+  scrollToTop.className = "amoqueue-scroll-to-top";
+  scrollToTop.textContent = "Scroll to metadata";
+  scrollToTop.type = "button";
+  scrollToTop.addEventListener("click", (event) => {
+    document.querySelector("#addon-summary").scrollIntoView();
+    event.preventDefault();
+  });
 }
 
 async function initTopPermissions() {
