@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "7.4.0",
+  "version": "7.5.0",
 
   "applications": {
     "gecko": {
@@ -213,6 +213,15 @@
       "js": [
         "content/admin/dashboard.js"
       ],
+      "run_at": "document_end"
+    },{
+      "matches": [
+        "https://reviewers.addons.mozilla.org/*/reviewers/review-content/*",
+        "https://reviewers.addons.allizom.org/*/reviewers/review-content/*",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*"
+      ],
+      "js": [ "content/contentreview/review.js"],
+      "css": ["content/contentreview/review.css"],
       "run_at": "document_end"
     }
   ]
