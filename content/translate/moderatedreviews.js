@@ -59,6 +59,7 @@ function initLayout() {
   // Moderated reviews pages
   for (let node of document.querySelectorAll(".review-flagged p:not(.description)")) {
     let anchor = createTranslateLink(node.nextElementSibling);
+    anchor.classList.add("amoqueue-translate-moderated-review");
     node.appendChild(anchor);
   }
 
@@ -74,6 +75,7 @@ function initLayout() {
 
     let textNode = document.querySelector("#addon-summary p:not(.addon-rating)");
     let anchor = createTranslateLink(textNode);
+    anchor.id = "amoqueue-translate-summary";
 
     div.appendChild(span);
     div.appendChild(anchor);
@@ -86,6 +88,7 @@ function initLayout() {
   if (description) {
     let textNode = document.querySelector("#addon .article > p");
     let anchor = createTranslateLink(textNode);
+    anchor.id = "amoqueue-translate-description";
     description.parentNode.insertBefore(anchor, description);
   }
 }
