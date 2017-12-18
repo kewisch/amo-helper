@@ -25,3 +25,11 @@
   max-height: 26.5em;
   overflow: auto;
 }
+
+/* zoomable screenshots */
+.screenshot:hover {
+  transform: scale(2);
+  transform-origin: center left;
+  background-color: white;
+  box-shadow: 33px 33px 100px -33px rgba(0,0,0,0.75);
+}
