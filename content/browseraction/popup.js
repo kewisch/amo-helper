@@ -41,6 +41,7 @@ async function setupMenuState() {
   // set up switch action
   let [tab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
   hideElement(document.getElementById("page-action-gotoreview"), !tab.url.match(ADDON_LINKS_RE));
+  hideElement(document.getElementById("page-action-showuseraddons"), !tab.url.match(USER_EDIT_RE));
 }
 
 window.addEventListener("DOMContentLoaded", () => {

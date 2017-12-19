@@ -85,6 +85,13 @@ async function switchToReviewPage() {
   }
 }
 
+async function showUserAddons() {
+  let [tab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
+  let userId = tab.url.split("/").pop();
+  let url = "https://sql.telemetry.mozilla.org/queries/49910?p_user=" + userId;
+  browser.tabs.update(tab.id, { url });
+}
+
 // -- main --
 
 browser.alarms.onAlarm.addListener((alarm) => {
@@ -116,6 +123,8 @@ browser.runtime.onMessage.addListener((data, sender) => {
     closeAMOTabs();
   } else if (data.action == "popup-action-gotoreview") {
     switchToReviewPage();
+  } else if (data.action == "popup-action-showuseraddons") {
+    showUserAddons();
   } else if (data.action == "update-badge-numbers") {
     updateBadge(data.numbers);
   }
