@@ -161,6 +161,11 @@ browser.runtime.onMessage.addListener((data, sender) => {
     } else if (data.method == "next") {
       if (data.result == "stop") {
         tinderStop();
+      } else if (data.result == "manual") {
+        // On a manual click, only load next tabs if we are in tinder mode
+        if (tinder_running) {
+          await tinderNextTab(sender.tab);
+        }
       } else {
         await tinderNextTab(sender.tab);
         if (data.result == "skip") {

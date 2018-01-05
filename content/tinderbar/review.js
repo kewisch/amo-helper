@@ -28,6 +28,8 @@ async function initLayout() {
   accept.href = "#";
 
   bar.addEventListener("click", actionHandler);
+
+  document.querySelector("#review-actions input[type='submit']").addEventListener("click", manualSubmit);
 }
 
 async function actionHandler(event) {
@@ -46,6 +48,10 @@ async function actionHandler(event) {
     }
     document.querySelector("form[action='#review-actions']").submit();
   }
+}
+
+function manualSubmit() {
+  browser.runtime.sendMessage({ action: "tinder", method: "next", result: "manual" });
 }
 
 initLayout();
