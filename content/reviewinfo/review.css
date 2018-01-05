@@ -49,9 +49,6 @@
 .amoqueue-scroll-to-top-container {
   overflow: auto;
 }
-.amoqueue-scroll-to-top {
-  float: right;
-}
 
 #addon .featured .secondary {
   margin-bottom: 2em;
