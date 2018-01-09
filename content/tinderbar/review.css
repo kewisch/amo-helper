@@ -41,6 +41,11 @@
   background-color: #ff4040;
   width: 10%;
 }
+#tinderbar a.amoqueue-tinderbar-noresponse {
+  color: black;
+  background-color: #ff4040;
+  width: 100%;
+}
 
 body:not(.amoqueue-tinderbar-running) #tinderbar,
 body.amoqueue-tinderbar-running .amoqueue-enable-tinderbar {

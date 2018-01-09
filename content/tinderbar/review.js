@@ -14,6 +14,7 @@ async function initLayout() {
   let stop = bar.appendChild(document.createElement("a"));
   let skip = bar.appendChild(document.createElement("a"));
   let accept = bar.appendChild(document.createElement("a"));
+  let noresponse = bar.appendChild(document.createElement("a"));
 
   stop.className = "amoqueue-tinderbar-stop";
   stop.textContent = "×";
@@ -26,6 +27,10 @@ async function initLayout() {
   accept.className = "amoqueue-tinderbar-accept";
   accept.textContent = "Accept";
   accept.href = "#";
+
+  noresponse.className = "amoqueue-tinderbar-noresponse";
+  noresponse.textContent = "Reject for no response";
+  noresponse.href = "#";
 
   bar.addEventListener("click", actionHandler);
 
@@ -49,6 +54,14 @@ async function actionHandler(event) {
     document.getElementById("id_action_0").click();
     if (document.getElementById("id_action_0").value != "confirm_auto_approved") {
       document.getElementById("id_comments").value = text;
+    }
+    document.querySelector("form[action='#review-actions']").submit();
+  } else if (action == "noresponse") {
+    document.getElementById("id_action_1").click();
+    document.getElementById("id_comments").value = "Rejecting due to lack of response. Please get back to us with the requested information before uploading a new version.";
+
+    for (let option of document.getElementById("id_versions").options) {
+      option.selected = true;
     }
     document.querySelector("form[action='#review-actions']").submit();
   }
