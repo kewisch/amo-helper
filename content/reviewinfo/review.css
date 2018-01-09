@@ -50,6 +50,10 @@
   overflow: auto;
 }
 
+.amoqueue-extra-save {
+  float: right;
+}
+
 #addon .featured .secondary {
   margin-bottom: 2em;
 }

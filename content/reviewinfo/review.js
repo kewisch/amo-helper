@@ -48,6 +48,12 @@ function addScrollToButtons() {
     document.querySelector("#addon-summary").scrollIntoView();
     event.preventDefault();
   });
+
+  let extraSaveButton = document.createElement("input");
+  extraSaveButton.className = "amoqueue-extra-save";
+  extraSaveButton.type = "submit";
+  extraSaveButton.value = "Save";
+  scrollToTopContainer.appendChild(extraSaveButton);
 }
 
 async function initTopPermissions() {
