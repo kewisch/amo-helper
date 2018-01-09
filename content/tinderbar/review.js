@@ -29,7 +29,11 @@ async function initLayout() {
 
   bar.addEventListener("click", actionHandler);
 
-  document.querySelector("#review-actions input[type='submit']").addEventListener("click", manualSubmit);
+  if (await getStoragePreference("tinderbar-running")) {
+    document.body.classList.add("amoqueue-tinderbar-running");
+  }
+
+  document.querySelector(".review-form").addEventListener("submit", manualSubmit);
 }
 
 async function actionHandler(event) {
@@ -53,5 +57,22 @@ async function actionHandler(event) {
 function manualSubmit() {
   browser.runtime.sendMessage({ action: "tinder", method: "next", result: "manual" });
 }
+
+createAction("Enable QuickReview", (event) => {
+  browser.runtime.sendMessage({ action: "tinder", method: "start" });
+
+  event.preventDefault();
+  event.stopPropagation();
+}, "amoqueue-enable-tinderbar");
+
+browser.storage.onChanged.addListener(async (changes, area) => {
+  if (area != "local" || !changes["tinderbar-running"]) {
+    return;
+  }
+
+  let running = changes["tinderbar-running"].newValue;
+  document.body.classList.toggle("amoqueue-tinderbar-running", running);
+});
+
 
 initLayout();

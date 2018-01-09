@@ -4,7 +4,7 @@
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
 let tinder_current_tabs = [];
-let tinder_running = false;
+browser.storage.local.set({ "tinderbar-running": false });
 
 async function getLastTab() {
   let len = tinder_current_tabs.length;
@@ -43,39 +43,24 @@ function createCompleteTab(createOptions) {
 }
 
 
-// async function tinderstart(addons, preload=TABS_PRELOAD) {
-//   let tabs = await browser.tabs.query({ active: true, currentWindow: true });
-//   let instance = await getStoragePreference("instance");
-//   let tabIndex = tabs[0].index;
-//   let active = true;
-//
-//   // Create the first few tabs, making the first one active
-//   for (let i = 0; i < preload; i++) {
-//     let curaddon = addons.shift();
-//     if (!curaddon) {
-//       break;
-//     }
-//
-//     browser.tabs.create({
-//       index: ++tabIndex,
-//       active: active,
-//       url: replacePattern(REVIEW_URL, {
-//         addon: nextaddon,
-//         instance: instance,
-//       });
-//     });
-//
-//     active = false;
-//   }
-// }
+async function tinderStop() {
+  await browser.storage.local.set({ "tinderbar-running": false });
+  await browser.tabs.remove(tinder_current_tabs.map(data => data.tabId));
+  tinder_current_tabs = [];
+}
 
-function tinderStop() {
-  tinder_running = false;
-  browser.tabs.remove(tinder_current_tabs.map(data => data.tabId));
+async function tinderStart(tab) {
+  let matchCurrentTab = tab.url.match(REVIEW_RE);
+  let isContent = matchCurrentTab ? matchCurrentTab[3] == "-content" : false;
+  let slug = matchCurrentTab ? matchCurrentTab[4] : null;
+  tinder_current_tabs.push({ slug: slug, tabId: tab.id, isContent: isContent });
+
+  await browser.storage.local.set({ "tinderbar-running": true });
+  tinderTabsPreload();
 }
 
 async function tinderNextTab(currentTab) {
-  tinder_running = true;
+  await browser.storage.local.set({ "tinderbar-running": true });
 
   // Make sure at least one tab is loaded
   await tinderTabsLoadNext();
@@ -89,13 +74,13 @@ async function tinderNextTab(currentTab) {
   if (nextTab) {
     await browser.tabs.update(nextTab.tabId, { active: true });
   } else {
-    tinder_running = false;
+    await browser.storage.local.set({ "tinderbar-running": false });
   }
 }
 
 async function tinderTabsLoadNext() {
-  let prefs = await getStoragePreference(["tinderbar-preload-tabs", "instance"]);
-  if (!tinder_running || tinder_current_tabs.length >= prefs["tinderbar-preload-tabs"]) {
+  let prefs = await getStoragePreference(["tinderbar-preload-tabs", "instance", "tinderbar-running"]);
+  if (!prefs["tinderbar-running"] || tinder_current_tabs.length >= prefs["tinderbar-preload-tabs"]) {
     return;
   }
 
@@ -103,7 +88,7 @@ async function tinderTabsLoadNext() {
   let { index=-1, addons=[] } = queueByAddon(lastSlug, isContent && "content_review");
   let nextaddon = addons[index + 1];
   if (!nextaddon) {
-    tinder_running = false;
+    await browser.storage.local.set({ "tinderbar-running": false });
     return;
   }
 
@@ -127,8 +112,10 @@ async function tinderTabsLoadNext() {
 
 async function tinderTabsPreload() {
   let preload = await getStoragePreference("tinderbar-preload-tabs");
-  while (tinder_running && tinder_current_tabs.length < preload) {
+  let running = await getStoragePreference("tinderbar-running");
+  while (running && tinder_current_tabs.length < preload) {
     await tinderTabsLoadNext();
+    running = await getStoragePreference("tinderbar-running");
   }
 }
 
@@ -157,13 +144,13 @@ browser.runtime.onMessage.addListener((data, sender) => {
 
   return (async function() {
     if (data.method == "start") {
-      tinderStart(sender.tab);
+      await tinderStart(sender.tab);
     } else if (data.method == "next") {
       if (data.result == "stop") {
         tinderStop();
       } else if (data.result == "manual") {
         // On a manual click, only load next tabs if we are in tinder mode
-        if (tinder_running) {
+        if (await getStoragePreference("tinderbar-running")) {
           await tinderNextTab(sender.tab);
         }
       } else {

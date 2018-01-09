@@ -61,6 +61,7 @@ const HIDDEN_PREFERENCES = {
   "show-info": "both",
   "show-webext": "both",
   "show-admin": "both",
+  "tinderbar-running": false,
   "queueinfo-open-compare": false,
   "downloads.basedir": "amo"
 };

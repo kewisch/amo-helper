@@ -42,6 +42,11 @@
   width: 10%;
 }
 
+body:not(.amoqueue-tinderbar-running) #tinderbar,
+body.amoqueue-tinderbar-running .amoqueue-enable-tinderbar {
+  display: none;
+}
+
 body {
   padding-bottom: 4em;
 }
