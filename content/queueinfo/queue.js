@@ -198,7 +198,7 @@ async function initPageLayout() {
   if (isAdmin) {
     await addSearchRadio("Show Reviews", "show-admin", ["Both", "Admin", "Regular"], (state) => {
       document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
-        let isadmin = row.classList.contains("amoqueue-helper-iconclass-admin-review");
+        let isadmin = row.classList.contains("amoqueue-helper-iconclass-needs-admin-code-review");
         if (state == "both") {
           hideBecause(row, "adminstate", false);
         } else if (state == "admin") {
