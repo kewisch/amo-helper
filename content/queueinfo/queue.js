@@ -27,7 +27,7 @@ async function initPageLayout() {
   header.appendChild(column);
 
   // Size column
-  if (isAdmin) {
+  if (isAdmin && QUEUE != "content_review") {
     column = document.createElement("th");
     column.className ="amoqueue-helper-size-column";
     column.textContent = "Size";
@@ -58,7 +58,7 @@ async function initPageLayout() {
     row.appendChild(cell);
 
     // Size column
-    if (isAdmin) {
+    if (isAdmin && QUEUE != "content_review") {
       cell = document.createElement("td");
       cell.className = "amoqueue-helper-cell amoqueue-helper-size-cell";
       row.appendChild(cell);
@@ -213,7 +213,7 @@ async function initPageLayout() {
 
   await addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare");
 
-  if (QUEUE != "auto_approved") {
+  if (QUEUE == "new" || QUEUE == "updates") {
     await addSearchCheckbox("Show waiting time in business days", "queueinfo-business-days", (checked) => {
       let addonRows = [...document.querySelectorAll(".addon-row")];
       for (let row of addonRows) {

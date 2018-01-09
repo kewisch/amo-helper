@@ -5,7 +5,7 @@
 
 function floatingtime(str, dtonly) {
   try {
-    return new Date(str + " UTC").toISOString().substr(0, dtonly ? 10 : 19);
+    return new Date(str.replace(/\./g, "") + " UTC").toISOString().substr(0, dtonly ? 10 : 19);
   } catch (e) {
     return str;
   }
