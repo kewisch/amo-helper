@@ -10,6 +10,14 @@
   width: auto;
 }
 
+/* fix sidebar at full width */
+.primary {
+  width: 90%;
+}
+.secondary.scroll_sidebar_parent {
+  width: 10%;
+}
+
 /* less padding in the files column */
 #review-files .files {
   padding: 15px 0 15px 10px;
