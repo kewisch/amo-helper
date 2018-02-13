@@ -63,6 +63,7 @@ const HIDDEN_PREFERENCES = {
   "show-admin": "both",
   "tinderbar-running": false,
   "queueinfo-open-compare": false,
+  "queueinfo-last-search": "",
   "downloads.basedir": "amo"
 };
 

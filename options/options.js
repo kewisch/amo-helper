@@ -3,22 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-// https://davidwalsh.name/javascript-debounce-function
-function debounce(func, wait) {
-  let timeout;
-  return function(...args) {
-    let later = () => {
-      timeout = null;
-      func.apply(this, args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (!timeout) {
-      func.apply(this, args);
-    }
-  };
-}
-
 async function restore_options() {
   let prefs = await browser.storage.local.get(DEFAULT_PREFERENCES);
 

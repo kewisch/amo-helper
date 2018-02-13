@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "7.8.1",
+  "version": "7.9.0",
 
   "applications": {
     "gecko": {
@@ -64,6 +64,7 @@
   "background": {
     "scripts": [
       "common/constants.js",
+      "common/helper.js",
       "common/preferences.js",
 
       "background/info.js",
@@ -197,6 +198,7 @@
         "libs/moment.min.js",
 
         "common/constants.js",
+        "common/helper.js",
         "common/preferences.js",
 
         "content/queueinfo/queue.js",

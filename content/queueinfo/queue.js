@@ -164,6 +164,55 @@ async function initPageLayout() {
     document.querySelector(".queue-inner").insertBefore(searchbox, queue);
   }
 
+  // Autocomplete "no results" row
+  let queueBody = document.querySelector("#addon-queue > tbody");
+
+  let noResultsRow = document.createElement("tr");
+  noResultsRow.id = "amoqueue-helper-autocomplete-noresults";
+  noResultsRow.style.display = "none";
+
+  let noResultsCell = document.createElement("td");
+  noResultsCell.setAttribute("colspan", header.children.length);
+  noResultsCell.style.textAlign = "center";
+  noResultsCell.textContent = "no results";
+
+  noResultsRow.appendChild(noResultsCell);
+  queueBody.appendChild(noResultsRow);
+
+  // Quick search
+  let textquery = document.getElementById("id_text_query");
+  if (!textquery) {
+    // Content review and appoval don't have the search box
+    let form = document.createElement("form");
+    form.setAttribute("onsubmit", "return false;");
+
+    let label = form.appendChild(document.createElement("label"));
+    label.setAttribute("for", "id_text_query");
+    label.textContent = "Search by add-on name";
+
+    form.appendChild(document.createTextNode(" "));
+
+    textquery = form.appendChild(document.createElement("input"));
+    textquery.id = "id_text_query";
+    textquery.name = "text_query";
+    textquery.type = "text";
+
+    form.appendChild(document.createTextNode(" "));
+
+    let button = form.appendChild(document.createElement("button"));
+    button.type = "submit";
+    button.textContent = "Search";
+
+    searchbox.appendChild(form);
+  }
+
+  let lastSearch = await getStoragePreference("queueinfo-last-search");
+  textquery.value = lastSearch;
+
+  textquery.addEventListener("keyup", updateAutocomplete, false);
+  window.addEventListener("pageshow", updateAutocomplete, false);
+  updateAutocomplete();
+
 
   await addSearchRadio("Show Information requests", "show-info", ["Both", "Only", "None"], (state) => {
     document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
@@ -233,21 +282,6 @@ async function initPageLayout() {
       updateSort(addonRows);
     });
   }
-
-  // Autocomplete "no results" row
-  let queueBody = document.querySelector("#addon-queue > tbody");
-
-  let noResultsRow = document.createElement("tr");
-  noResultsRow.id = "amoqueue-helper-autocomplete-noresults";
-  noResultsRow.style.display = "none";
-
-  let noResultsCell = document.createElement("td");
-  noResultsCell.setAttribute("colspan", header.children.length);
-  noResultsCell.style.textAlign = "center";
-  noResultsCell.textContent = "no results";
-
-  noResultsRow.appendChild(noResultsCell);
-  queueBody.appendChild(noResultsRow);
 
   // Queue buttons container
   let queueButtons = document.createElement("div");
@@ -484,7 +518,7 @@ function updateReviewInfoDisplay(id, info) {
   }
 }
 
-function updateAutocomplete() {
+var updateAutocomplete = debounce(() => {
   let textquery = document.getElementById("id_text_query");
   let value = textquery.value.toLowerCase();
   let foundsome = false;
@@ -495,12 +529,14 @@ function updateAutocomplete() {
     if (!hide) {
       foundsome = true;
     }
-    updateQueueRows();
   });
+  updateQueueRows();
+
+  browser.storage.local.set({ "queueinfo-last-search":  textquery.value });
 
   let noResults = document.getElementById("amoqueue-helper-autocomplete-noresults");
   noResults.style.display = foundsome ? "none" : "";
-}
+}, 200);
 
 function updateSort(rows=null) {
   function sortByWaitTime(a, b) {
@@ -683,12 +719,6 @@ browser.storage.onChanged.addListener(async (changes, area) => {
   await initPartnerAddons();
   await initPageLayout();
 
-  let textquery = document.getElementById("id_text_query");
-  if (textquery) {
-    textquery.addEventListener("keyup", updateAutocomplete, false);
-    window.addEventListener("pageshow", updateAutocomplete, false);
-    updateAutocomplete();
-  }
 
   window.addEventListener("pageshow", updateQueueInfo, false);
   updateQueueInfo();
