@@ -72,14 +72,15 @@ async function closeAMOTabs() {
   await browser.tabs.remove(tabIds);
 }
 
-async function switchToReviewPage() {
+async function switchToReviewPage(type="listed") {
   let [tab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
   let match = tab.url.match(ADDON_LINKS_RE);
   if (match) {
     await browser.tabs.update(tab.id, {
       url: replacePattern(REVIEW_URL, {
-        addon: match[4],
-        instance: match[1]
+        type: "-" + type,
+        addon: match[5],
+        instance: match[1] + ".org"
       })
     });
   }
@@ -121,8 +122,10 @@ browser.runtime.onMessage.addListener((data, sender) => {
     updateQueueNumbers().then(updateBadge);
   } else if (data.action == "popup-action-closetabs") {
     closeAMOTabs();
-  } else if (data.action == "popup-action-gotoreview") {
-    switchToReviewPage();
+  } else if (data.action == "popup-action-gototechnical") {
+    switchToReviewPage("listed");
+  } else if (data.action == "popup-action-gotocontent") {
+    switchToReviewPage("content");
   } else if (data.action == "popup-action-showuseraddons") {
     showUserAddons();
   } else if (data.action == "update-badge-numbers") {

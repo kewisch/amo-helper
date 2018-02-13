@@ -3,11 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-function hideElement(node, value=true) {
+function showIf(id, value) {
+  let node = document.getElementById(id);
   if (value) {
-    node.setAttribute("hidden", "true");
-  } else {
     node.removeAttribute("hidden");
+  } else {
+    node.setAttribute("hidden", "true");
   }
 }
 
@@ -40,8 +41,11 @@ function setupMenuClick() {
 async function setupMenuState() {
   // set up switch action
   let [tab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
-  hideElement(document.getElementById("page-action-gotoreview"), !tab.url.match(ADDON_LINKS_RE));
-  hideElement(document.getElementById("page-action-showuseraddons"), !tab.url.match(USER_EDIT_RE));
+  showIf("page-action-gotocontent", tab.url.match(REVIEW_RE) && !tab.url.match(CONTENT_REVIEW_RE));
+  showIf("page-action-gototechnical", tab.url.match(CONTENT_REVIEW_RE) || (
+    tab.url.match(ADDON_LINKS_RE) && !tab.url.match(REVIEW_RE)
+  ));
+  showIf("page-action-showuseraddons", tab.url.match(USER_EDIT_RE));
 }
 
 window.addEventListener("DOMContentLoaded", () => {
