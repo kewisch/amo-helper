@@ -100,9 +100,9 @@
       Number of queue items to show on one page
     </label>
 
-    <label class="expand admin-only">
-      List of partner add-on slugs (comma separated):
-      <input type="text" id="queueinfo-partner-addons">
+    <label class="expand vertical admin-only">
+      <div>List of partner add-on slugs (comma separated):</div>
+      <textarea id="queueinfo-partner-addons"></textarea>
     </label>
 
   <!--
@@ -177,7 +177,7 @@
 
   <section id="translation-section">
     <h1>Translation</h1>
-    <label>
+    <label class="expand half">
       Microsoft Azure translator text API secret key :
       <input type="text" id="translation-secret-key">
     </label>

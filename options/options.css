@@ -16,18 +16,35 @@ label, fieldset > legend {
   font-size: 1.25em;
   line-height: 22px;
   color: #333;
+  inline-size: -moz-fit-content;
 }
 
 label.oneline {
   display: inline;
 }
 
-label.expand {
+label.expand{
   display: flex;
+  inline-size: auto;
 }
 
-label.expand input {
+label.expand.vertical {
+  display: block;
+}
+
+label.expand.vertical textarea {
+  min-height: 10ex;
+  width: 100%;
+  resize: vertical;
+}
+
+label.expand input,
+label.expand textarea {
   flex: 1;
+}
+
+label.expand.half input {
+  flex: 0.5;
 }
 
 fieldset {
@@ -55,6 +72,7 @@ fieldset > label:first-of-type {
 #canned-value {
   grid-area: value;
   font: message-box;
+  resize: none;
 }
 
 #canned-select {
