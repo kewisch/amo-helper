@@ -716,6 +716,9 @@ browser.storage.onChanged.addListener(async (changes, area) => {
 });
 
 (async function() {
+  if (QUEUE == "reviews") {
+    return;
+  }
   await initPartnerAddons();
   await initPageLayout();
 

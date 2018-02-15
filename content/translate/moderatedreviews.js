@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
+
 async function translate(textNode, event) {
   event.preventDefault();
   event.stopPropagation();
@@ -94,8 +95,9 @@ function initLayout() {
 }
 
 (async () => {
+  let queue = document.location.pathname.split("/").pop();
   let hasKey = await getStoragePreference("translation-secret-key");
-  if (hasKey) {
+  if (hasKey && queue == "reviews") {
     initLayout();
   }
 })();

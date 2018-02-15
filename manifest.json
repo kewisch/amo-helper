@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "8.0.1",
+  "version": "8.0.2",
 
   "applications": {
     "gecko": {
@@ -172,24 +172,6 @@
       "run_at": "document_end"
     },{
       "matches": [
-        "https://reviewers.addons.mozilla.org/*/reviewers/queue/reviews",
-        "https://reviewers.addons.mozilla.org/*/reviewers/queue/reviews",
-
-        "https://reviewers.addons.allizom.org/*/reviewers/queue/reviews",
-        "https://reviewers.addons.allizom.org/*/reviewers/queue/reviews",
-
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews"
-      ],
-      "js": [
-        "common/constants.js",
-        "common/preferences.js",
-        "content/translate/moderatedreviews.js"
-      ],
-      "css": ["content/translate/common.css"],
-      "run_at": "document_end"
-    },{
-      "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/queue/*",
         "https://reviewers.addons.allizom.org/*/reviewers/queue/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/*"
@@ -202,9 +184,10 @@
         "common/preferences.js",
 
         "content/queueinfo/queue.js",
-        "content/browseraction/queue.js"
+        "content/browseraction/queue.js",
+        "content/translate/moderatedreviews.js"
       ],
-      "css": ["content/queueinfo/queue.css"],
+      "css": ["content/queueinfo/queue.css", "content/translate/common.css"],
       "run_at": "document_end"
     },{
       "matches": [
