@@ -1,0 +1,82 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Portions Copyright (C) Philipp Kewisch, 2017 */
+
+#reviews-flagged .review-flagged:not(.review-saved) {
+  display: none;
+  min-height: calc(100vh - 300px);
+}
+
+#reviews-flagged .review-flagged.review-saved {
+  border: 0;
+}
+#reviews-flagged .review-flagged.review-saved button {
+  display: none;
+}
+
+#reviews-flagged .review-flagged.amoqueue-review-current {
+  display: block !important;
+}
+
+.amoqueue-finished-info {
+  display: none;
+  font-weight: bold;
+  font-size: 2em;
+  text-align: center;
+  min-height: 50vh;
+  line-height: 50vh;
+}
+
+#reviews-flagged.amoqueue-finished .amoqueue-finished-info {
+  display: block;
+}
+
+.amoqueue-stat-value {
+  margin-inline-end: 2em;
+  margin-inline-start: 2px;
+}
+
+.amoqueue-stat-label {
+  font-weight: bold;
+  margin-inline-start: 2em;
+}
+
+#reviews-flagged .review-flagged .reviews-flagged-reasons {
+  margin-bottom: 10px;
+}
+#reviews-flagged .review-flagged .reviews-flagged-reasons .light {
+  float: right;
+}
+
+.data-grid-bottom {
+  display: flex;
+  justify-content: center;
+}
+
+.data-grid-bottom .pagination,
+.data-grid-bottom .num-results {
+  display: none;
+}
+
+.data-grid-bottom .amoqueue-command-key {
+  font-family: "andale mono", monospace !important;
+  display: inline-block;
+  font-weight: 700;
+  color: #fff;
+  background-color: #a9a9a9;
+  text-align: center;
+  min-width: 1.1em;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.data-grid-bottom .amoqueue-command-container:first-of-type {
+  margin: 0 20px 0 0;
+}
+.data-grid-bottom .amoqueue-command-container {
+  margin: 0 20px;
+  cursor: pointer;
+}
+.data-grid-bottom .amoqueue-command-label {
+  margin-inline-start: 5px;
+}
