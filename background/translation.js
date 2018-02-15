@@ -22,8 +22,19 @@ browser.runtime.onMessage.addListener((data, sender) => {
     if (tokenTimeout < Date.now()) {
       let reqHeaders = new Headers({ "Ocp-Apim-Subscription-Key": key });
       let url = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken";
-      gAuthToken = await fetch(url, { method: "POST", headers: reqHeaders }).then(resp => resp.text());
-      tokenTimeout = Date.now() + tokenttl;
+      let resp;
+      try {
+        resp = await fetch(url, { method: "POST", headers: reqHeaders });
+      } catch (e) {
+        return { error: `Request failure, service may be down (${e.message})` };
+      }
+
+      if (resp.ok) {
+        gAuthToken = await resp.text();
+        tokenTimeout = Date.now() + tokenttl;
+      } else {
+        return { error: `Request failure, check API key (${resp.status} ${resp.statusText})` };
+      }
     }
     return translate(data.text);
   })();
@@ -32,7 +43,13 @@ browser.runtime.onMessage.addListener((data, sender) => {
 async function translate(text) {
   let reqHeaders = new Headers({ Authorization: "Bearer " + gAuthToken });
   let url = `https://api.microsofttranslator.com/V2/Http.svc/Translate?text=${encodeURIComponent(text)}&to=en`;
-  let resp = await fetch(url, { method: "GET", headers: reqHeaders });
+  let resp;
+  try {
+    resp = await fetch(url, { method: "POST", headers: reqHeaders });
+  } catch (e) {
+    return { error: `Request failure, service may be down (${e.message})` };
+  }
+
   if (resp.ok) {
     let translated = await resp.text();
     return { text: translated.replace(/<[^>]*>/g, "") };
