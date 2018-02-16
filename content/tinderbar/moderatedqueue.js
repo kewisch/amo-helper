@@ -50,14 +50,14 @@ var reviews = {
     this.current.querySelector(`input[value="${value}"]`).click();
   },
 
-  keys: ["k", "s", "d", "p", "S", "n", "r", "R", "t"],
+  keys: ["k", "s", "d", "p", "S", "N", "n", "P", "r", "R", "t"],
   action: function(action) {
     switch (action) {
       case "k": this.decide(-1); break; // keep
       case "s": this.decide(0); break; // skip
       case "d": this.decide(1); break; // delete
-      case "p": case "S": this.prev(); break; // previous
-      case "n": this.next(); break; // next
+      case "p": case "S": case "N": this.prev(); break; // previous
+      case "n": case "P": this.next(); break; // next
       case "r": case "R": this.goreview(0); break; // restart
       case "t": this.translate(); break; // translate
     }
@@ -138,9 +138,12 @@ function initModeratedReviewLayout() {
   gridbottom.appendChild(createKeyDescription("n", "Next"));
   gridbottom.appendChild(createKeyDescription("p", "Previous", ["S"]));
   gridbottom.appendChild(createKeyDescription("r", "First", ["R"]));
-  if (document.querySelector(".amoqueue-translate-link")) {
-    gridbottom.appendChild(createKeyDescription("t", "Translate"));
-  }
+
+  getStoragePreference("translation-secret-key").then(found => {
+    if (found) {
+      gridbottom.appendChild(createKeyDescription("t", "Translate"));
+    }
+  });
 }
 
 function createKeyDescription(key, description, also) {
@@ -168,8 +171,6 @@ function createKeyDescription(key, description, also) {
   if (queue != "reviews") {
     return;
   }
-
-  console.log("LOADING" + queue);
 
   document.querySelector("#reviews-flagged").addEventListener("click", (event) => {
     if (event.target.localName != "input" && event.target.type != "radio") {
