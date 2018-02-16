@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
+const TOKEN_TTL = 1000 * 60 * 10;
 
 let gAuthToken;
-let tokenttl = 1000*60*10;
-let tokenTimeout = 0;
+let gTokenTimeout = 0;
 
 browser.runtime.onMessage.addListener((data, sender) => {
   if (data.action !== "translate") {
@@ -19,7 +19,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
       return { error: "API key not set" };
     }
 
-    if (tokenTimeout < Date.now()) {
+    if (gTokenTimeout < Date.now()) {
       let reqHeaders = new Headers({ "Ocp-Apim-Subscription-Key": key });
       let url = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken";
       let resp;
@@ -31,7 +31,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
 
       if (resp.ok) {
         gAuthToken = await resp.text();
-        tokenTimeout = Date.now() + tokenttl;
+        gTokenTimeout = Date.now() + TOKEN_TTL;
       } else {
         return { error: `Request failure, check API key (${resp.status} ${resp.statusText})` };
       }
@@ -57,3 +57,10 @@ async function translate(text) {
     return { error: `Request failure, check API key (${resp.status} ${resp.statusText})` };
   }
 }
+
+browser.storage.onChanged.addListener((changes, area) => {
+  if (area == "local" && changes["translation-secret-key"]) {
+    gTokenTimeout = 0;
+    gAuthToken = null;
+  }
+});
