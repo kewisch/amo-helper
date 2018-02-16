@@ -45,7 +45,7 @@ async function translate(text) {
   let url = `https://api.microsofttranslator.com/V2/Http.svc/Translate?text=${encodeURIComponent(text)}&to=en`;
   let resp;
   try {
-    resp = await fetch(url, { method: "POST", headers: reqHeaders });
+    resp = await fetch(url, { method: "GET", headers: reqHeaders });
   } catch (e) {
     return { error: `Request failure, service may be down (${e.message})` };
   }
