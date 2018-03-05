@@ -522,7 +522,8 @@ var updateAutocomplete = debounce(() => {
   let textquery = document.getElementById("id_text_query");
   let value = textquery.value.toLowerCase();
   let foundsome = false;
-  document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
+  let rows = document.querySelectorAll("#addon-queue .addon-row");
+  rows.forEach((row) => {
     let name = row.querySelector("td:nth-of-type(2) > a ").textContent.toLowerCase();
     let hide = textquery.value && !name.includes(value);
     hideBecause(row, "search", hide);
@@ -535,7 +536,7 @@ var updateAutocomplete = debounce(() => {
   browser.storage.local.set({ "queueinfo-last-search":  textquery.value });
 
   let noResults = document.getElementById("amoqueue-helper-autocomplete-noresults");
-  noResults.style.display = foundsome ? "none" : "";
+  noResults.style.display = !rows.length || foundsome ? "none" : "";
 }, 200);
 
 function updateSort(rows=null) {
@@ -584,9 +585,11 @@ function updateSort(rows=null) {
     }
   });
 
-  let rowparent = rows[0].parentNode;
-  for (let row of rows) {
-    rowparent.appendChild(row);
+  if (rows.length) {
+    let rowparent = rows[0].parentNode;
+    for (let row of rows) {
+      rowparent.appendChild(row);
+    }
   }
 }
 
