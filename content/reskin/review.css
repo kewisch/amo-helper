@@ -48,3 +48,9 @@ h4.author {
 #contribution {
   display: none;
 }
+
+/* overflow long history comments */
+.history-comment {
+  max-height: 60em;
+  overflow: auto;
+}
