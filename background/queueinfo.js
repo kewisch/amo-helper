@@ -5,30 +5,22 @@
 
 let per_page_value = 200;
 let last_queue_page = {};
+let last_queue_name = null;
 
-/* exported getLastQueue, queueByAddon */
+/* exported getLastQueue, queueByAddon, getLastVisitedQueue */
 
 function getLastQueue(queue) {
   return last_queue_page[queue] || [];
 }
-function queueByAddon(slug, queue) {
-  if (queue) {
-    // Not great performance, this can be optimized later
-    for (let [curqueue, addons] of Object.entries(last_queue_page)) {
-      let index = addons.findIndex(addon => addon == slug);
-      if (index > -1) {
-        return { index: index, queue: curqueue, addons: addons };
-      }
-    }
-  } else {
-    let addons = last_queue_page[queueName];
-    let index = addons.findIndex(addon => addon == slug);
-    if (index > -1) {
-      return { index: index, queue: queue, addons: addons };
-    }
-  }
 
-  return { index: -1, queue: null, addons: [] };
+function getLastVisitedQueue() {
+  return last_queue_name;
+}
+
+function queueByAddon(slug, queue=last_queue_name) {
+  let addons = last_queue_page[queue] || [];
+  let index = addons.findIndex(addon => addon == slug);
+  return { index, queue, addons };
 }
 
 browser.webRequest.onBeforeRequest.addListener((details) => {
@@ -40,6 +32,15 @@ browser.webRequest.onBeforeRequest.addListener((details) => {
 
   return {};
 }, { urls: AMO_QUEUE_PATTERNS }, ["blocking"]);
+
+browser.tabs.onUpdated.addListener((tabId, { url, status }, tab) => {
+  if (tab && tab.url) {
+    let match = tab.url.match(QUEUE_RE);
+    if (match) {
+      last_queue_name = match[3];
+    }
+  }
+});
 
 
 browser.storage.onChanged.addListener((changes, area) => {

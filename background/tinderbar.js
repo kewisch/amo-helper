@@ -9,12 +9,19 @@ browser.storage.local.set({ "tinderbar-running": false });
 async function getLastTab() {
   let len = tinder_current_tabs.length;
   if (len == 0) {
-    let currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
-    let matchCurrentTab = currentTabs[0].url.match(REVIEW_RE);
+    let [currentTab, ...rest] = await browser.tabs.query({ active: true, currentWindow: true });
+    let queue = null;
+    if (currentTab.openerTabId) {
+      let queueTab = await browser.tabs.get(currentTab.openerTabId);
+      let matchQueue = queueTab.url.match(QUEUE_RE);
+      queue = matchQueue ? matchQueue[3] : null;
+    }
+
+    let matchCurrentTab = currentTab.url.match(REVIEW_RE);
     return {
       slug: matchCurrentTab ? matchCurrentTab[4] : null,
-      tabId: currentTabs[0].id,
-      isContent: matchCurrentTab ? matchCurrentTab[3] == "-content" : false
+      tabId: currentTab.id,
+      queue: queue || getLastVisitedQueue()
     };
   } else {
     return tinder_current_tabs[tinder_current_tabs.length - 1];
@@ -51,9 +58,18 @@ async function tinderStop() {
 
 async function tinderStart(tab) {
   let matchCurrentTab = tab.url.match(REVIEW_RE);
-  let isContent = matchCurrentTab ? matchCurrentTab[3] == "-content" : false;
-  let slug = matchCurrentTab ? matchCurrentTab[4] : null;
-  tinder_current_tabs.push({ slug: slug, tabId: tab.id, isContent: isContent });
+  let queue;
+  if (tab.openerTabId) {
+    let queueTab = await browser.tabs.get(tab.openerTabId);
+    let queueMatch = queueTab.url.match(QUEUE_RE);
+    queue = queueMatch ? queueMatch[3] : null;
+  }
+
+  if (!matchCurrentTab) {
+    return;
+  }
+
+  tinder_current_tabs.push({ slug: matchCurrentTab[4], tabId: tab.id, queue: queue || getLastVisitedQueue() });
 
   await browser.storage.local.set({ "tinderbar-running": true });
   tinderTabsPreload();
@@ -84,8 +100,8 @@ async function tinderTabsLoadNext() {
     return;
   }
 
-  let { slug: lastSlug, tabId: lastTabId, isContent } = await getLastTab();
-  let { index=-1, addons=[] } = queueByAddon(lastSlug, isContent && "content_review");
+  let { slug: lastSlug, tabId: lastTabId, queue: lastQueue } = await getLastTab();
+  let { index=-1, addons=[] } = queueByAddon(lastSlug, lastQueue);
   let nextaddon = addons[index + 1];
   if (!nextaddon) {
     await browser.storage.local.set({ "tinderbar-running": false });
@@ -97,15 +113,16 @@ async function tinderTabsLoadNext() {
   let [createdPromise, updatedPromise] = createCompleteTab({
     index: lastTab.index + 1,
     active: false,
+    openerTabId: lastTab.openerTabId,
     url: replacePattern(REVIEW_URL, {
       addon: nextaddon,
       instance: prefs["instance"],
-      type: isContent ? "-content" : ""
+      type: lastQueue == "content_review" ? "-content" : ""
     })
   });
 
   let tab = await createdPromise;
-  tinder_current_tabs.push({ slug: nextaddon, tabId: tab.id, isContent: isContent });
+  tinder_current_tabs.push({ slug: nextaddon, tabId: tab.id, queue: lastQueue });
 
   await updatedPromise;
 }
