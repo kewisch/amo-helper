@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "8.2.1",
+  "version": "8.3.0",
 
   "applications": {
     "gecko": {
@@ -78,7 +78,8 @@
       "background/omnibox.js",
       "background/browseraction.js",
       "background/translation.js",
-      "background/filewindow.js"
+      "background/filewindow.js",
+      "background/filediff.js"
     ]
   },
 

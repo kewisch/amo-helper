@@ -24,3 +24,23 @@ body.amoqueue-hide-comments .amoqueue-comment-only {
 #commands tr:not(.amoqueue-no-key) + .amoqueue-no-key > td {
   padding-top: 2ex;
 }
+
+.amoqueue-content-image {
+  max-width: 100%;
+}
+
+.amoqueue-image-hover-container {
+  position: relative;
+}
+
+.amoqueue-image-hover {
+  display: none;
+}
+.td-line-code:hover .amoqueue-image-hover {
+  display: block;
+  position: absolute;
+  left: 200px;
+  top: -50px;
+  border: 2px solid black;
+  background-color: LightGray;
+}
