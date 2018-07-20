@@ -23,7 +23,8 @@ async function translate(textNode, event) {
 
   let data = await browser.runtime.sendMessage({
     action: "translate",
-    text: textNode.textContent,
+    format: "html",
+    text: textNode.innerHTML
   });
 
   anchor.removeAttribute("loading");
@@ -33,7 +34,8 @@ async function translate(textNode, event) {
     anchor.setAttribute("error", "true");
   } else {
     anchor.remove();
-    textNode.textContent = data.text;
+    textNode.classList.add("translated");
+    textNode.innerHTML = DOMPurify.sanitize(data.text);
   }
 }
 

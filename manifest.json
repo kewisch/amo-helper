@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "8.3.0",
+  "version": "8.3.1",
 
   "applications": {
     "gecko": {
@@ -141,6 +141,7 @@
         "libs/jszip.min.js",
         "libs/jquery-3.1.1.min.js",
         "libs/jquery-ui.min.js",
+        "libs/purify.js",
 
         "common/constants.js",
         "common/preferences.js",
@@ -192,6 +193,7 @@
       ],
       "js": [
         "libs/moment.min.js",
+        "libs/purify.js",
 
         "common/constants.js",
         "common/helper.js",
