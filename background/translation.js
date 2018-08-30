@@ -22,7 +22,7 @@ async function translate(text, format="plain") {
     "Content-Type": "application/json; charset=utf-8"
   });
   let url = `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=en&textType=${format}`;
-  let body = [{ "Text": text }];
+  let body = [{ Text: text }];
 
   let resp;
 
