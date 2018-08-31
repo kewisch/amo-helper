@@ -58,41 +58,49 @@ function createTranslateLink(textNode) {
   return anchor;
 }
 
-function initLayout() {
+function initRatingsLayout() {
   // Moderated reviews pages
   for (let node of document.querySelectorAll(".review-flagged p:not(.description)")) {
     let anchor = createTranslateLink(node.nextElementSibling);
     anchor.classList.add("amoqueue-translate-moderated-review");
     node.appendChild(anchor);
   }
+}
 
+function initReviewsLayout() {
   // Summary on review pages
-  let summary = document.querySelector("#addon-summary");
-  if (summary) {
-    let div = document.createElement("div");
-    div.className = "amoqueue-summary-caption";
+  let summary = document.querySelector("#addon .addon-info");
 
-    let span = document.createElement("span");
-    span.className = "amoqueue-summary-caption-label";
-    span.textContent = "Summary";
+  let div = document.createElement("div");
+  div.className = "amoqueue-summary-caption";
 
-    let textNode = document.querySelector("#addon-summary p:not(.addon-rating)");
-    let anchor = createTranslateLink(textNode);
-    anchor.id = "amoqueue-translate-summary";
+  let span = document.createElement("span");
+  span.className = "amoqueue-summary-caption-label";
+  span.textContent = "Summary";
 
-    div.appendChild(span);
-    div.appendChild(anchor);
+  let textNode = document.querySelector("#addon .addon-info > p");
+  let anchor = createTranslateLink(textNode);
+  anchor.id = "amoqueue-translate-summary";
 
-    summary.insertBefore(div, summary.firstElementChild);
-  }
+  div.appendChild(span);
+  div.appendChild(anchor);
+
+  summary.insertBefore(div, summary.firstElementChild);
 
   // Description on review pages
   let description = document.querySelector("#addon .article");
-  if (description) {
-    let textNode = document.querySelector("#addon .article > p");
-    let anchor = createTranslateLink(textNode);
-    anchor.id = "amoqueue-translate-description";
-    description.parentNode.insertBefore(anchor, description);
+  textNode = document.querySelector("#addon .article > p");
+  anchor = createTranslateLink(textNode);
+  anchor.id = "amoqueue-translate-description";
+  description.parentNode.insertBefore(anchor, description);
+
+  // Notes for reviewers
+  for (let node of document.querySelectorAll(".history-notes")) {
+    anchor = createTranslateLink(node);
+    anchor.classList.add("amoqueue-translate-history-notes");
+
+    let th = node.parentNode.previousElementSibling;
+    th.appendChild(anchor);
   }
 }
 
@@ -100,6 +108,8 @@ function initLayout() {
   let queue = document.location.pathname.split("/").pop();
   let hasKey = await getStoragePreference("translation-secret-key");
   if (hasKey && queue == "reviews") {
-    initLayout();
+    initRatingsLayout();
+  } else if (hasKey) {
+    initReviewsLayout();
   }
 })();
