@@ -8,13 +8,14 @@ function getWindow(id) {
   return id ? browser.windows.get(id).catch(() => null) : Promise.resolve(null);
 }
 
-async function openFileBrowser(url) {
+async function openFileBrowser(url, openerTabId) {
   let win = await getWindow(openFileBrowser.lastWindowId);
 
   if (win) {
     await browser.tabs.create({
       url: url,
-      windowId: win.id
+      windowId: win.id,
+      openerTabId: openerTabId
     });
   } else {
     let params = await getStoragePreference("filewindow-position");
@@ -39,7 +40,7 @@ browser.runtime.onMessage.addListener((data, sender) => {
   let rv;
 
   if (data.action == "filewindow-open" && AMO_HOSTS.includes((new URL(data.url)).hostname)) {
-    openFileBrowser(data.url);
+    openFileBrowser(data.url, sender.tab.id);
   } else if (data.action == "filewindow-position") {
     saveWindowPosition(sender.tab.windowId);
   } else if (data.action == "filewindow-isfilewindow") {
