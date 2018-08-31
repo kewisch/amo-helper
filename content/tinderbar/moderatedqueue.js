@@ -4,7 +4,7 @@
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
 var reviews = {
-  nodes: [...document.querySelectorAll("#reviews-flagged .review-flagged:not(.review-saved)")],
+  nodes: [...document.querySelectorAll("#reviews-flagged .review-flagged:not(.review-saved):not(.disabled)")],
   index: -1,
 
   get current() {
@@ -77,49 +77,48 @@ var reviews = {
 };
 
 function initModeratedReviewLayout() {
-  let container = document.querySelector("#reviews-flagged div.review-saved");
+  let [topContainer, bottomContainer] = document.querySelectorAll("#reviews-flagged div.review-saved");
   let button = document.querySelector("#reviews-flagged div.review-saved button");
 
   // Remaining
-  let remainlabel = container.insertBefore(document.createElement("span"), button);
+  let remainlabel = topContainer.insertBefore(document.createElement("span"), button);
   remainlabel.textContent = "Remaining:";
   remainlabel.className = "amoqueue-stat-label";
 
-  let remainvalue = container.insertBefore(document.createElement("span"), button);
+  let remainvalue = topContainer.insertBefore(document.createElement("span"), button);
   remainvalue.textContent = "0";
   remainvalue.className = "amoqueue-stat-value remain";
 
   // Keep
-  let keeplabel = container.insertBefore(document.createElement("span"), button);
+  let keeplabel = topContainer.insertBefore(document.createElement("span"), button);
   keeplabel.textContent = "Keep:";
   keeplabel.className = "amoqueue-stat-label";
 
-  let keepvalue = container.insertBefore(document.createElement("span"), button);
+  let keepvalue = topContainer.insertBefore(document.createElement("span"), button);
   keepvalue.textContent = "0";
   keepvalue.className = "amoqueue-stat-value keep";
 
   // Skip
-  let skiplabel = container.insertBefore(document.createElement("span"), button);
+  let skiplabel = topContainer.insertBefore(document.createElement("span"), button);
   skiplabel.textContent = "Skip:";
   skiplabel.className = "amoqueue-stat-label";
 
-  let skipvalue = container.insertBefore(document.createElement("span"), button);
+  let skipvalue = topContainer.insertBefore(document.createElement("span"), button);
   skipvalue.textContent = "0";
   skipvalue.className = "amoqueue-stat-value skip";
 
   // Delete
-  let deletelabel = container.insertBefore(document.createElement("span"), button);
+  let deletelabel = topContainer.insertBefore(document.createElement("span"), button);
   deletelabel.textContent = "Delete:";
   deletelabel.className = "amoqueue-stat-label";
 
-  let deletevalue = container.insertBefore(document.createElement("span"), button);
+  let deletevalue = topContainer.insertBefore(document.createElement("span"), button);
   deletevalue.textContent = "0";
   deletevalue.className = "amoqueue-stat-value delete";
 
   // Finished label
-  let bottomcontainer = document.querySelector("#reviews-flagged div.review-flagged.review-saved");
-  let bottombutton = document.querySelector("#reviews-flagged div.review-flagged.review-saved button");
-  let finishedlabel = bottomcontainer.insertBefore(document.createElement("span"), bottombutton);
+  let bottomButton = bottomContainer.querySelector("button");
+  let finishedlabel = bottomContainer.insertBefore(document.createElement("span"), bottomButton);
   finishedlabel.textContent = "All done, click Process Reviews to submit";
   finishedlabel.className = "amoqueue-finished-info";
 
@@ -131,7 +130,8 @@ function initModeratedReviewLayout() {
   }
 
   // Keyboard shortcut legend
-  let gridbottom = document.querySelector(".data-grid-bottom");
+  let gridbottom = bottomContainer.parentNode.appendChild(document.createElement("div"));
+  gridbottom.className = "amoqueue-keyboard-legend";
   gridbottom.appendChild(createKeyDescription("s", "Skip"));
   gridbottom.appendChild(createKeyDescription("d", "Delete"));
   gridbottom.appendChild(createKeyDescription("k", "Keep"));
