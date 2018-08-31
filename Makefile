@@ -17,6 +17,16 @@ endef
 
 version = $(shell head manifest.json  | sed -ne 's/[ ]*"version": "\([^"]*\)",/\1/p')
 
+
+help:
+	@echo "Usage:"
+	@echo
+	@echo "make build               - run web-ext build with the right ignore files"
+	@echo "make version             - display current version"
+	@echo "make tag                 - show changelog then tag current version"
+	@echo "make major/minor/patch   - bump the major/minor/patch version"
+	@echo
+
 build:
 	web-ext build -o -i 'junk' -i Makefile -i README.md
 
