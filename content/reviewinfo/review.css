@@ -35,6 +35,10 @@
 }
 
 /* scroll to top/bottom buttons */
+.addon-previews {
+  position: relative;
+}
+
 .amoqueue-scroll-to-bottom {
   position: absolute;
   bottom: 1em;

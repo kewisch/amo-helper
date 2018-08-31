@@ -80,7 +80,7 @@ async function switchToReviewPage(type="listed") {
       url: replacePattern(REVIEW_URL, {
         type: "-" + type,
         addon: match[5],
-        instance: match[1] + ".org"
+        instance: match[1]
       })
     });
   }

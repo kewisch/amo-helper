@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "8.3.3",
+  "version": "9.0.0",
 
   "applications": {
     "gecko": {
@@ -38,6 +38,9 @@
     "https://reviewers.addons.allizom.org/*",
     "https://reviewers.addons-dev.allizom.org/*",
 
+    "https://addons.thunderbird.net/*",
+    "https://reviewers.addons.thunderbird.net/*",
+
     "https://addons.cdn.mozilla.net/*",
 
     "https://api.cognitive.microsoft.com/*",
@@ -67,6 +70,7 @@
       "common/helper.js",
       "common/preferences.js",
 
+      "background/atnredirect.js",
       "background/info.js",
       "background/canned.js",
       "background/context.js",
@@ -93,7 +97,10 @@
         "https://reviewers.addons.allizom.org/*/firefox/files/compare/*",
 
         "https://reviewers.addons-dev.allizom.org/*/firefox/files/browse/*",
-        "https://reviewers.addons-dev.allizom.org/*/firefox/files/compare/*"
+        "https://reviewers.addons-dev.allizom.org/*/firefox/files/compare/*",
+
+        "https://reviewers.addons.thunderbird.net/*/thunderbird/files/browse/*",
+        "https://reviewers.addons.thunderbird.net/*/thunderbird/files/compare/*"
       ],
       "js": [
         "libs/jquery-3.1.1.min.js",
@@ -134,7 +141,12 @@
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-listed/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/*",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*",
+
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review/*",
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review-listed/*",
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review-unlisted/*",
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review-content/*"
       ],
       "js": [
         "libs/diff.min.js",
@@ -181,7 +193,10 @@
         "https://reviewers.addons.allizom.org/*/reviewers/queue/reviews*",
 
         "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews*",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews*"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews*",
+
+        "https://reviewers.addons.thunderbird.net/*/reviewers/queue/reviews*",
+        "https://reviewers.addons.thunderbird.net/*/reviewers/queue/reviews*"
       ],
       "css": ["content/tinderbar/moderatedqueue.css"],
       "run_at": "document_start"
@@ -189,7 +204,9 @@
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/queue/*",
         "https://reviewers.addons.allizom.org/*/reviewers/queue/*",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/*"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/*",
+
+        "https://reviewers.addons.thunderbird.net/*/reviewers/queue/*"
       ],
       "js": [
         "libs/moment.min.js",
@@ -210,7 +227,9 @@
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/",
         "https://reviewers.addons.allizom.org/*/reviewers/",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/",
+
+        "https://reviewers.addons.thunderbird.net/*/reviewers/"
       ],
       "js": [
         "content/admin/dashboard.js"
@@ -220,7 +239,9 @@
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/review-content/*",
         "https://reviewers.addons.allizom.org/*/reviewers/review-content/*",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*",
+
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review-content/*"
       ],
       "js": [ "content/contentreview/review.js"],
       "css": ["content/contentreview/review.css"],

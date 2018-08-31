@@ -16,18 +16,20 @@ const LISTING_URL = "https://{instance}/addon/{addon}";
 const MANAGE_URL = "https://{instance}/developers/addon/{addon}/edit";
 const FEED_URL = "https://{instance}/developers/feed/{addon}";
 
-const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/reviewers\/review(|-listed|-unlisted|-content)\/(.*)/;
-const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/reviewers\/queue\/(.*)/;
-const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]*)\/(reviewers\/review(|-listed|-unlisted|-content)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
-const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
-const USER_RE = /https:\/\/(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/user\/([^#/]*)/;
-const USER_EDIT_RE = /https:\/\/(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/firefox\/users\/edit\/([^#/]*)/;
-const CONTENT_REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla|addons\.allizom|addons-dev\.allizom)\.org\/([^/]+)\/reviewers\/review-content\/(.*)/;
+const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/review(|-listed|-unlisted|-content)\/(.*)/;
+const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/queue\/(.*)/;
+const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]*)\/(reviewers\/review(|-listed|-unlisted|-content)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
+const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
+const USER_RE = /https:\/\/(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/user\/([^#/]*)/;
+const USER_EDIT_RE = /https:\/\/(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/users\/edit\/([^#/]*)/;
+const CONTENT_REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/review-content\/(.*)/;
 
 const REVIEW_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/reviewers/review/{addon}",
   "https://reviewers.addons.allizom.org/*/reviewers/review/{addon}",
-  "https://reviewers.addons-dev.allizom.org/*/reviewers/review/{addon}"
+  "https://reviewers.addons-dev.allizom.org/*/reviewers/review/{addon}",
+
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review/{addon}"
 ];
 
 const FILEBROWSER_PATTERNS = [
@@ -36,26 +38,35 @@ const FILEBROWSER_PATTERNS = [
   "https://reviewers.addons.allizom.org/*/firefox/files/browse/*",
   "https://reviewers.addons.allizom.org/*/firefox/files/compare/*",
   "https://reviewers.addons-dev.allizom.org/*/firefox/files/browse/*",
-  "https://reviewers.addons-dev.allizom.org/*/firefox/files/compare/*"
+  "https://reviewers.addons-dev.allizom.org/*/firefox/files/compare/*",
+
+  "https://reviewers.addons.thunderbird.net/*/thunderbird/files/browse/*",
+  "https://reviewers.addons.thunderbird.net/*/thunderbird/files/compare/*"
 ];
 
 // Also happens to cover privacy and eula pages
 const LISTING_PATTERNS = [
   "https://addons.mozilla.org/*/firefox/addon/*",
   "https://addons.allizom.org/*/firefox/addon/*",
-  "https://addons-dev.allizom.org/*/firefox/addon/*"
+  "https://addons-dev.allizom.org/*/firefox/addon/*",
+
+  "https://addons.thunderbird.net/*/thunderbird/addon/*"
 ];
 
 const DEVELOPER_PAGE_PATTERNS = [
   "https://addons.mozilla.org/*/developers/addon/*",
   "https://addons.allizom.org/*/developers/addon/*",
-  "https://addons-dev.allizom.org/*/developers/addon/*"
+  "https://addons-dev.allizom.org/*/developers/addon/*",
+
+  "https://addons.thunderbird.net/*/developers/addon/*"
 ];
 
 const USER_PAGE_PATTERNS = [
   "https://addons.mozilla.org/*/firefox/user/*",
   "https://addons.allizom.org/*/firefox/user/*",
-  "https://addons-dev.allizom.org/*/firefox/user/*"
+  "https://addons-dev.allizom.org/*/firefox/user/*",
+
+  "https://addons.thunderbird.net/*/thunderbird/user/*"
 ];
 
 const AMO_HOSTS = [
@@ -65,37 +76,50 @@ const AMO_HOSTS = [
 
   "reviewers.addons.mozilla.org",
   "reviewers.addons.allizom.org",
-  "reviewers.addons-dev.allizom.org"
+  "reviewers.addons-dev.allizom.org",
+
+  "addons.thunderbird.net",
+  "reviewers.addons.thunderbird.net"
 ];
 
 const AMO_EDITORS_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/reviewers/*",
   "https://reviewers.addons.allizom.org/*/reviewers/*",
-  "https://reviewers.addons-dev.allizom.org/*/reviewers/*"
+  "https://reviewers.addons-dev.allizom.org/*/reviewers/*",
+
+  "https://reviewers.addons.thunderbird.net/*/reviewers/*"
 ];
 
 const AMO_PRIVACY_PAGES = [
   "https://addons.mozilla.org/*/firefox/addon/*/privacy",
   "https://addons.allizom.org/*/firefox/addon/*/privacy",
-  "https://addons-dev.allizom.org/*/firefox/addon/*/privacy"
+  "https://addons-dev.allizom.org/*/firefox/addon/*/privacy",
+
+  "https://addons.thunderbird.net/*/thunderbird/addon/*/privacy"
 ];
 
 const AMO_EULA_PAGES = [
   "https://addons.mozilla.org/*/firefox/addon/*/eula",
   "https://addons.allizom.org/*/firefox/addon/*/eula",
-  "https://addons-dev.allizom.org/*/firefox/addon/*/eula"
+  "https://addons-dev.allizom.org/*/firefox/addon/*/eula",
+
+  "https://addons.thunderbird.net/*/thunderbird/addon/*/eula"
 ];
 
 const AMO_QUEUE_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/reviewers/queue/*",
   "https://reviewers.addons.allizom.org/*/reviewers/queue/*",
-  "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/*"
+  "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/*",
+
+  "https://reviewers.addons.thunderbird.net/*/reviewers/queue/*"
 ];
 
 const AMO_REVIEW_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/reviewers/review/{slug}",
   "https://reviewers.addons.allizom.org/*/reviewers/review/{slug}",
-  "https://reviewers.addons-dev.allizom.org/*/reviewers/review/{slug}"
+  "https://reviewers.addons-dev.allizom.org/*/reviewers/review/{slug}",
+
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review/{slug}"
 ];
 
 const ADDON_LINK_PATTERNS = [
@@ -122,4 +146,12 @@ const ADDON_LINK_PATTERNS = [
   "https://addons-dev.allizom.org/*/admin/manage/*",
   "https://addons-dev.allizom.org/*/*/addon/*", /* catches listing and manage url */
   "https://addons-dev.allizom.org/*/developers/feed/*",
+
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review/*",
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review-listed/*",
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review-unlisted/*",
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review-content/*",
+  "https://addons.thunderbird.net/*/admin/manage/*",
+  "https://addons.thunderbird.net/*/*/addon/*", /* catches listing and manage url */
+  "https://addons.thunderbird.net/*/developers/feed/*",
 ];

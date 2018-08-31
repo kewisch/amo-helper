@@ -12,7 +12,7 @@ browser.webRequest.onHeadersReceived.addListener(({ responseHeaders }) => {
       continue;
     }
 
-    header.value = header.value.replace(/img-src/, "img-src https://addons.mozilla.org");
+    header.value = header.value.replace(/img-src/, "img-src https://addons.mozilla.org https://addons.thunderbird.net");
   }
 
   return { responseHeaders };
