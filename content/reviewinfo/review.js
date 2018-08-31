@@ -24,7 +24,7 @@ async function initLayout() {
 function addScrollToButtons() {
   // Scroll to latest version
   let scrollToBottom = document.createElement("button");
-  document.querySelector("#addon .secondary").appendChild(scrollToBottom);
+  document.querySelector("#addon .addon-previews").appendChild(scrollToBottom);
 
   scrollToBottom.className = "amoqueue-scroll-to-bottom";
   scrollToBottom.textContent = "Scroll to last version";
@@ -37,7 +37,9 @@ function addScrollToButtons() {
   let scrollToTop = document.createElement("button");
   let scrollToTopContainer = document.createElement("div");
   scrollToTopContainer.appendChild(scrollToTop);
-  document.querySelector("#addon").insertBefore(scrollToTopContainer, document.querySelector("#review-actions"));
+
+  let actions = document.querySelector("#review-actions");
+  actions.parentNode.insertBefore(scrollToTopContainer, actions);
 
   scrollToTopContainer.className = "amoqueue-scroll-to-top-container";
 
@@ -45,7 +47,7 @@ function addScrollToButtons() {
   scrollToTop.textContent = "Scroll to metadata";
   scrollToTop.type = "button";
   scrollToTop.addEventListener("click", (event) => {
-    document.querySelector("#addon-summary").scrollIntoView();
+    document.querySelector("#addon .addon-info-and-previews").scrollIntoView();
     event.preventDefault();
   });
 
@@ -171,7 +173,7 @@ function setHasSubstring(set, value) {
 }
 
 function createSummaryRow(className, label, values, isDangerous=null) {
-  let tbody = document.querySelector("#addon-summary table tbody");
+  let tbody = document.querySelector("#addon .addon-info table tbody");
   let row = tbody.appendChild(document.createElement("tr"));
   let head = row.appendChild(document.createElement("th"));
   let cell = row.appendChild(document.createElement("td"));
