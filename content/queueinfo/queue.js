@@ -40,7 +40,6 @@ async function initPageLayout() {
   let relweekCache = {};
   let lastRelWeek = -1;
 
-  let hasTypeColumn = document.querySelector(".listing-header > th > a[href$='addon_type_id']");
   let hasWaitingColumn = document.querySelector(".listing-header > th > a[href$='waiting_time_min']");
 
   for (let row of rows) {
@@ -108,15 +107,6 @@ async function initPageLayout() {
       row.classList.add("amoqueue-is-partner");
     }
 
-    if (hasTypeColumn) {
-      // Remove type column, don't see the need for it.
-      row.querySelector("td:nth-of-type(3)").remove();
-    }
-  }
-
-  // Remove header for type column
-  if (hasTypeColumn) {
-    hasTypeColumn.parentNode.remove();
   }
 
   // Counting filtered results requires the pagination node to always be around
