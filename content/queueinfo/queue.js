@@ -109,8 +109,16 @@ async function initPageLayout() {
     }
 
     if (hasTypeColumn) {
-      // Remove type column, don't see the need for it.
-      row.querySelector("td:nth-of-type(3)").remove();
+      // Remove type column and replace with icons in the flag column
+      let typeCol = row.querySelector("td:nth-of-type(3)");
+      let flagCol = row.querySelector("td:nth-of-type(5)");
+
+      let typeIcon = document.createElement("div");
+      typeIcon.className = "app-icon";
+      typeIcon.title = typeCol.textContent;
+      typeIcon.className = "app-icon amoqueue-type-" + typeCol.textContent.replace(/[^\w]+/g, "").toLowerCase();
+      flagCol.insertBefore(typeIcon, flagCol.firstElementChild);
+      typeCol.remove();
     }
   }
 
