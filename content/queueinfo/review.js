@@ -272,8 +272,9 @@ async function updateSize(info) {
 
   // Check the blocklist
   let lastVersion = info.versions[info.latest_idx];
-  if (await browser.runtime.sendMessage({ action: "queueinfo", method: "blocklisted", guid: info.guid, version: lastVersion ? lastVersion.version : "0" })) {
-    document.getElementById("main-wrapper").classList.add("amoqueue-blocklisted");
+  let blocked = await browser.runtime.sendMessage({ action: "blocklist", method: "check", guid: info.guid, version: lastVersion ? lastVersion.version : "0" });
+  if (blocked) {
+    document.getElementById("main-wrapper").classList.add("amoqueue-blocklisted-" + blocked.severity);
   }
 
   await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "slug", keys: { ["slugInfo." + info.slug]: info.id } });

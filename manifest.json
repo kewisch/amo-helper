@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "9.3.0",
+  "version": "9.3.1",
 
   "applications": {
     "gecko": {
@@ -44,7 +44,9 @@
     "https://addons.cdn.mozilla.net/*",
 
     "https://api.cognitive.microsoft.com/*",
-    "https://api.microsofttranslator.com/*"
+    "https://api.microsofttranslator.com/*",
+
+    "https://firefox.settings.services.mozilla.com/*/buckets/blocklists/collections/addons/records"
   ],
 
   "options_ui": {
@@ -64,18 +66,6 @@
     "browser_style": false
   },
 
-
-  "experiment_apis": {
-    "blocklist": {
-      "schema": "experiment/schema.json",
-      "parent": {
-        "scopes": ["addon_parent"],
-        "paths": [["blocklist"]],
-        "script": "experiment/blocklist.js"
-      }
-    }
-  },
-
   "background": {
     "scripts": [
       "common/constants.js",
@@ -84,6 +74,7 @@
 
       "background/atnredirect.js",
       "background/info.js",
+      "background/blocklist.js",
       "background/canned.js",
       "background/context.js",
       "background/download.js",

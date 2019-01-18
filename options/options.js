@@ -49,6 +49,7 @@ function setup_listeners() {
   setup_canned_listeners();
   setup_filewindow_listeners();
   setup_import_export_listeners();
+  setup_blocklist_listeners();
 }
 
 /* --- canned responses --- */
@@ -250,6 +251,32 @@ function setup_import_export_listeners() {
   importButton.addEventListener("click", (event) => {
     importFile.click();
     event.preventDefault();
+  });
+}
+
+function setup_blocklist_listeners() {
+  let blocklistButton = document.getElementById("reload-blocklist-button");
+  let blocklistState = document.getElementById("blocklist-state");
+  blocklistButton.addEventListener("click", async (event) => {
+    blocklistState.classList.remove("complete");
+    blocklistState.classList.remove("error");
+    blocklistButton.setAttribute("disabled", "true");
+
+    try {
+      blocklistState.classList.add("loading");
+      await browser.runtime.sendMessage({ action: "blocklist", method: "refresh" });
+      blocklistState.classList.add("complete");
+    } catch (e) {
+      blocklistState.classList.add("error");
+    }
+
+    blocklistState.classList.remove("loading");
+    blocklistButton.removeAttribute("disabled");
+
+    setTimeout(() => {
+      blocklistState.classList.remove("error");
+      blocklistState.classList.remove("complete");
+    }, 3000);
   });
 }
 

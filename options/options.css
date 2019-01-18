@@ -95,3 +95,27 @@ fieldset > label:first-of-type {
   width: 0;
   height: 0;
 }
+
+#blocklist-state {
+  margin-inline-start: 10px;
+}
+
+#blocklist-state.loading {
+  background: url(/images/throbber.png);
+  width: 27px;
+  height: 9px;
+}
+
+#blocklist-state.complete {
+  background: url(/images/check.svg);
+  width: 16px;
+  height: 16px;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  font-size: 1.25em;
+  height: 22px;
+  color: #333;
+}
