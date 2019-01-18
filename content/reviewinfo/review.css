@@ -61,3 +61,11 @@
 #addon .featured .secondary {
   margin-bottom: 2em;
 }
+
+#main-wrapper.amoqueue-blocklisted {
+  background: repeating-linear-gradient( 45deg, #fff, #fff 10px, #fbd4dc 10px, #fbd4dc 20px)
+}
+
+#main-wrapper.amoqueue-blocklisted #addon {
+  padding: 10px;
+}

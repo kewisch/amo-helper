@@ -229,6 +229,7 @@ function getInfo(doc) {
 
   return {
     id: doc.querySelector("#addon").getAttribute("data-id"),
+    guid: doc.querySelector(".addon-guid > td").textContent,
     slug: doc.location.pathname.match(/\/([^/]+)$/)[1],
     lastupdate: new Date().toISOString(),
 
@@ -260,6 +261,7 @@ async function updateSize(info) {
     link.setAttribute("target", "_blank");
   });
 
+
   // Open compare link if options enabled
   if (await getStoragePreference("queueinfo-open-compare")) {
     document.querySelector(".listing-body:last-child .file-info a.compare").click();
@@ -267,6 +269,12 @@ async function updateSize(info) {
 
   // Collect review info and set in storage
   let info = getInfo(document);
+
+  // Check the blocklist
+  let lastVersion = info.versions[info.latest_idx];
+  if (await browser.runtime.sendMessage({ action: "queueinfo", method: "blocklisted", guid: info.guid, version: lastVersion ? lastVersion.version : "0" })) {
+    document.getElementById("main-wrapper").classList.add("amoqueue-blocklisted");
+  }
 
   await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "slug", keys: { ["slugInfo." + info.slug]: info.id } });
   await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "review", keys: { ["reviewInfo." + info.id]: info } });

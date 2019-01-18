@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "9.2.0",
+  "version": "9.3.0",
 
   "applications": {
     "gecko": {
@@ -62,6 +62,18 @@
     "default_title": "addons.mozilla.org",
     "default_popup": "content/browseraction/popup.html",
     "browser_style": false
+  },
+
+
+  "experiment_apis": {
+    "blocklist": {
+      "schema": "experiment/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "paths": [["blocklist"]],
+        "script": "experiment/blocklist.js"
+      }
+    }
   },
 
   "background": {
