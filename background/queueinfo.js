@@ -71,12 +71,6 @@ browser.runtime.onMessage.addListener((data, sender) => {
     rv = null;
   } else if (data.method == "get") {
     rv = { queue: data.queue, addons: last_queue_page[data.queue] };
-  } else if (data.method == "blocklisted") {
-    if (browser.blocklist) {
-      rv = browser.blocklist.isBlocklisted(data.guid, data.version);
-    } else {
-      rv = false;
-    }
   }
 
   return rv;
