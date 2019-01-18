@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "9.3.1",
+  "version": "9.4.0",
 
   "applications": {
     "gecko": {
@@ -249,6 +249,15 @@
       "js": [ "content/contentreview/review.js"],
       "css": ["content/contentreview/review.css"],
       "run_at": "document_end"
+    },{
+      "matches": [
+        "https://reviewers.addons.mozilla.org/*/reviewers/privacy/*",
+        "https://reviewers.addons.allizom.org/*/reviewers/privacy/*",
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/privacy/*",
+
+        "https://reviewers.addons.thunderbird.net/*/reviewers/privacy/*"
+      ],
+      "css": ["content/reskin/privacy.css"]
     }
   ]
 }
