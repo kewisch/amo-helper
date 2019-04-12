@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "9.4.1",
+  "version": "9.5.0",
 
   "applications": {
     "gecko": {
@@ -21,6 +21,7 @@
   "permissions": [
     "alarms",
     "clipboardWrite",
+    "cookies",
     "downloads",
     "menus",
     "notifications",

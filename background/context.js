@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2016-2017 */
 
+
 async function toAddonUrl(target, info) {
   let matches = info.linkUrl.match(ADDON_LINKS_RE);
   if (!matches) {
@@ -70,5 +71,36 @@ browser.menus.create({
       document.body.removeChild(node);
     `;
     browser.tabs.executeScript(tab.id, { code: code });
+  }
+});
+
+browser.menus.create({
+  type: "normal",
+  title: "Open Review Page for guid/slug/id",
+  contexts: ["selection"],
+  onclick: async (info, tab) => {
+    async function apifetch(path) {
+      return fetch(replacePattern(API_BASE_URL, { instance, path }), {
+        credentials: "include",
+        headers: {
+          Authorization: "Bearer " + cookie.value
+        }
+      }).then(resp => resp.json(), () => null);
+    }
+
+    let instance = await getStoragePreference("instance");
+    let addonid = info.selectionText.trim();
+    let cookie = await browser.cookies.get({ url: `https://${instance}`, name: "frontend_auth_token" });
+
+    let addon = await apifetch(`addons/addon/${addonid}/`);
+
+    if (addon) {
+      let versions = await apifetch(`addons/addon/${addonid}/versions/?filter=all_with_unlisted`);
+      let listed = versions && versions.results.some(version => version.channel == "listed");
+      let type = listed ? "-listed" : "-unlisted";
+      browser.tabs.create({ url: replacePattern(REVIEW_URL, { instance, type, addon: addon.id }) });
+    } else {
+      console.error("Could not get details about: " + addonid);
+    }
   }
 });
