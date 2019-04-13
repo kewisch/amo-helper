@@ -72,3 +72,7 @@
 #main-wrapper.amoqueue-blocklisted #addon {
   padding: 10px;
 }
+
+#amoqueue_blocklist_addon {
+  background-color: #bc2b1a;
+}

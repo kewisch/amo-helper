@@ -167,6 +167,18 @@ async function downloadBlocklist() {
   }
 }
 
+async function fileBlocklistBug(guid, name) {
+  let tab = await browser.tabs.create({ url: "http://bugzilla.mozilla.org/form.blocklist" });
+
+  await browser.tabs.executeScript(tab.id, {
+    code: `
+      document.getElementById("blocklist_guids").value = ${JSON.stringify(guid)};
+      document.getElementById("blocklist_name").value = ${JSON.stringify(name)};
+      document.getElementById("blocklist_reason").focus();
+    `
+  });
+}
+
 browser.alarms.create("blocklist", { periodInMinutes: 720 });
 
 browser.alarms.onAlarm.addListener((alarm) => {
@@ -185,6 +197,8 @@ browser.runtime.onMessage.addListener((data, sender) => {
     return checkBlocklist(data.guid, data.version);
   } else if (data.method == "refresh") {
     return downloadBlocklist();
+  } else if (data.method == "file") {
+    return fileBlocklistBug(data.guid, data.name);
   }
 
   return null;

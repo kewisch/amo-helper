@@ -17,8 +17,31 @@ async function initLayout() {
   // Load validation report
   await retrieveValidation();
 
+  // Add Blocklist button
+  addBlocklistButton();
+
   // Scroll to the end of the header.
   window.scroll(0, document.querySelector(".addon").offsetTop - 10);
+}
+
+function addBlocklistButton() {
+  let area = document.querySelector("#extra-review-actions > .more-actions-inner > ul");
+
+  let button = document.createElement("button");
+  button.id = "amoqueue_blocklist_addon";
+  button.type = "button";
+  button.textContent = "File Blocklisting Bug";
+
+  button.addEventListener("click", () => {
+    browser.runtime.sendMessage({
+      action: "blocklist",
+      method: "file",
+      guid: document.querySelector(".addon-guid > td").textContent,
+      name: document.title.split(" :: ")[0],
+    });
+  });
+
+  area.appendChild(button);
 }
 
 function addScrollToButtons() {
