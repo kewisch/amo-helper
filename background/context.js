@@ -76,7 +76,7 @@ browser.menus.create({
 
 browser.menus.create({
   type: "normal",
-  title: "Open Review Page for guid/slug/id",
+  title: "Open Review Page for ID/GUID/Slug",
   contexts: ["selection"],
   onclick: async (info, tab) => {
     async function apifetch(path) {
@@ -89,18 +89,27 @@ browser.menus.create({
     }
 
     let instance = await getStoragePreference("instance");
-    let addonid = info.selectionText.trim();
     let cookie = await browser.cookies.get({ url: `https://${instance}`, name: "frontend_auth_token" });
 
-    let addon = await apifetch(`addons/addon/${addonid}/`);
+    let lookup = encodeURIComponent(info.selectionText.trim());
+    let type = "";
 
+    let addon = await apifetch(`addons/addon/${lookup}/`);
     if (addon) {
-      let versions = await apifetch(`addons/addon/${addonid}/versions/?filter=all_with_unlisted`);
-      let listed = versions && versions.results.some(version => version.channel == "listed");
-      let type = listed ? "-listed" : "-unlisted";
-      browser.tabs.create({ url: replacePattern(REVIEW_URL, { instance, type, addon: addon.id }) });
-    } else {
-      console.error("Could not get details about: " + addonid);
+      let isAdmin = await getStoragePreference("is-admin");
+
+      let filter = isAdmin ? "all_with_unlisted" : "all_without_unlisted";
+      let versions = await apifetch(`addons/addon/${lookup}/versions/?filter=${filter}`);
+
+      // Above request may fail for permissions, which is ok because we fall through to using the
+      // default URL without a type and looking up the raw selection text
+      if (versions && versions.results) {
+        let listed = versions.results.some(version => version.channel == "listed");
+        type = listed ? "-listed" : "-unlisted";
+        lookup = addon.id;
+      }
     }
+
+    await browser.tabs.create({ url: replacePattern(REVIEW_URL, { instance, type, addon: lookup }) });
   }
 });
