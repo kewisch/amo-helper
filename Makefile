@@ -24,6 +24,7 @@ help:
 	@echo "make build               - run web-ext build with the right ignore files"
 	@echo "make version             - display current version"
 	@echo "make tag                 - show changelog then tag current version"
+	@echo "make gitrelease          - create a git release for the latest version"
 	@echo "make major/minor/patch   - bump the major/minor/patch version"
 	@echo
 
@@ -36,6 +37,19 @@ version:
 tag:
 	git changelog
 	git tag v$(version)
+
+gitrelease: MESSAGE := $(shell mktemp -t amoqueue)
+gitrelease: TAG := $(shell git tags | tail -1)
+gitrelease: LASTTAG := $(shell git tags | tail -2 | head -1)
+gitrelease:
+	@git push --tags &>/dev/null
+	@echo $(TAG) > $(MESSAGE)
+	@echo >> $(MESSAGE)
+	@git log --reverse --no-merges --format='* %s' $(LASTTAG)..$(TAG) >> $(MESSAGE)
+	@echo Creating release $(TAG)
+	@git changelog $(LASTTAG)..$(TAG)
+	@echo -n "Getting release ready... "
+	@hub release create -F $(MESSAGE) $(TAG)
 
 major:
 	$(call bump,100,0,0)
