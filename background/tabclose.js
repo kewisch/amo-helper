@@ -88,16 +88,19 @@ async function removeOtherTabs(tabUrl, keepTab) {
 browser.runtime.onMessage.addListener((data, sender) => {
   (async () => {
     if (data.action == "tabclose-backtoreview") {
-      let instance = await getStoragePreference("instance");
-      let urls = REVIEW_PATTERNS.map(url => {
-        return replacePattern(url, { addon: data.slug, instance: instance });
-      });
+      let match = sender.tab.url.match(FILEBROWSER_RE);
+      let instance = match[1];
+
+      let urls = REVIEW_PATTERNS
+        .map(url => replacePattern(url, { addon: data.slug }))
+        .filter(url => url.includes(instance));
+
       let [tab, ...rest] = await browser.tabs.query({ url: urls });
       if (tab) {
         await browser.tabs.update(tab.id, { active: true });
         browser.tabs.remove(sender.tab.id);
       } else {
-        browser.tabs.update(sender.tab.id, { url: url });
+        browser.tabs.update(sender.tab.id, { url: urls[0] });
       }
     }
   })();
