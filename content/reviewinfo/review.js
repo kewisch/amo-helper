@@ -10,18 +10,18 @@ const SKIP_MESSAGES = new Set([
 
 async function initLayout() {
   addScrollToButtons();
-
-  // Put latest permissions at top.
-  await initTopPermissions();
-
-  // Load validation report
-  await retrieveValidation();
-
-  // Add Blocklist button
   addBlocklistButton();
 
-  // Scroll to the end of the header.
-  window.scroll(0, document.querySelector(".addon").offsetTop - 10);
+  Promise.all([
+    // Put latest permissions at top.
+    initTopPermissions(),
+
+    // Load validation report
+    retrieveValidation()
+  ]).finally(() => {
+    // Scroll to the end of the header.
+    window.scroll(0, document.querySelector(".addon").offsetTop - 10);
+  });
 }
 
 function addBlocklistButton() {
@@ -32,13 +32,24 @@ function addBlocklistButton() {
   button.type = "button";
   button.textContent = "File Blocklisting Bug";
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", (event) => {
     browser.runtime.sendMessage({
       action: "blocklist",
-      method: "file",
+      method: event.ctrlKey || event.metaKey ? "gather" : "file",
       guid: document.querySelector(".addon-guid > td").textContent,
       name: document.title.split(" :: ")[0],
     });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key == "Control" || event.key == "Meta") {
+      button.textContent = "Gather ID for Blocklisting";
+    }
+  });
+  document.addEventListener("keyup", (event) => {
+    if (event.key == "Control" || event.key == "Meta") {
+      button.textContent = "File Blocklisting Bug";
+    }
   });
 
   area.appendChild(button);

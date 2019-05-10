@@ -4,6 +4,7 @@
  * Portions Copyright (C) Philipp Kewisch, 2019 */
 
 let gBlocklist = [];
+let gGatherGuids = [];
 
 /**
  * This is taken from addons-server and should be rewritten to be pretty and accurate
@@ -171,15 +172,24 @@ async function downloadBlocklist() {
 }
 
 async function fileBlocklistBug(guid, name) {
+  gGatherGuids.push(guid);
+
+  let guids = [...new Set(gGatherGuids.filter(Boolean))].join("\n");
   let tab = await browser.tabs.create({ url: "http://bugzilla.mozilla.org/form.blocklist" });
 
   await browser.tabs.executeScript(tab.id, {
     code: `
-      document.getElementById("blocklist_guids").value = ${JSON.stringify(guid)};
+      document.getElementById("blocklist_guids").value = ${JSON.stringify(guids)};
       document.getElementById("blocklist_name").value = ${JSON.stringify(name)};
       document.getElementById("blocklist_reason").focus();
     `
   });
+
+  gGatherGuids = [];
+}
+
+async function gatherBlocklistBug(guid) {
+  gGatherGuids.push(guid);
 }
 
 browser.alarms.create("blocklist", { periodInMinutes: 720 });
@@ -202,6 +212,8 @@ browser.runtime.onMessage.addListener((data, sender) => {
     return downloadBlocklist();
   } else if (data.method == "file") {
     return fileBlocklistBug(data.guid, data.name);
+  } else if (data.method == "gather") {
+    return gatherBlocklistBug(data.guid);
   }
 
   return null;
