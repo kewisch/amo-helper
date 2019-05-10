@@ -64,7 +64,7 @@ browser.menus.create({
     let code = `
       var node = document.createElement('textarea');
       node.setAttribute('style', 'position: fixed; top: 0; left: -1000px; z-index: -1;');
-      node.value = ${JSON.stringify(match[5])};
+      node.value = ${JSON.stringify(match[6])};
       document.body.appendChild(node);
       node.select();
       document.execCommand('copy');
@@ -111,5 +111,55 @@ browser.menus.create({
     }
 
     await browser.tabs.create({ url: replacePattern(REVIEW_URL, { instance, type, addon: lookup }) });
+  }
+});
+
+
+var compareVersion = null;
+
+browser.menus.create({
+  id: "amoqueue-compare-versions",
+  type: "normal",
+  title: "Compare this file…",
+  contexts: ["link"],
+  documentUrlPatterns: REVIEW_PATTERNS.map(pattern => replacePattern(pattern, { addon: "*" })),
+  targetUrlPatterns: FILEBROWSER_PATTERNS,
+  onclick: async (info, tab) => {
+    let match = info.linkUrl.match(FILEBROWSER_RE);
+    if (!match) {
+      return;
+    }
+
+    if (compareVersion) {
+      let instance = await getStoragePreference("instance");
+      let url = replacePattern(FILEBROWSER_URL, {
+        instance,
+        product: instance.includes("thunderbird") ? "thunderbird" : "firefox",
+        action: "compare",
+        versions: `${compareVersion}...${match[4]}`
+      });
+
+      browser.tabs.create({ url });
+      browser.menus.update("amoqueue-compare-versions", { title: "Compare this file…" });
+      browser.menus.update("amoqueue-compare-reset", { enabled: false });
+    } else {
+      compareVersion = match[4];
+      browser.menus.update("amoqueue-compare-versions", { title: "Compare this file to " + compareVersion });
+      browser.menus.update("amoqueue-compare-reset", { enabled: true });
+    }
+  }
+});
+
+browser.menus.create({
+  id: "amoqueue-compare-reset",
+  type: "normal",
+  title: "Reset file compare",
+  enabled: false,
+  contexts: ["page"],
+  documentUrlPatterns: REVIEW_PATTERNS.map(pattern => replacePattern(pattern, { addon: "*" })),
+  onclick: async (info, tab) => {
+    browser.menus.update("amoqueue-compare-versions", { title: "Compare this file…" });
+    browser.menus.update("amoqueue-compare-reset", { enabled: false });
+    compareVersion = null;
   }
 });

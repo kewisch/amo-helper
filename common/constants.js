@@ -4,34 +4,49 @@
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
 /* exported REVIEW_URL, ADMIN_URL, LISTING_URL, MANAGE_URL, FEED_URL,
- * API_BASE_URL, REVIEW_RE, QUEUE_RE, ADDON_LINKS_RE, FILEBROWSER_RE, USER_RE,
- * USER_EDIT_RE, CONTENT_REVIEW_RE, REVIEW_PATTERNS, FILEBROWSER_PATTERNS,
- * LISTING_PATTERNS, DEVELOPER_PAGE_PATTERNS, USER_PAGE_PATTERNS, AMO_HOSTS,
- * AMO_EDITORS_PATTERNS AMO_PRIVACY_PAGES, AMO_EULA_PAGES, AMO_QUEUE_PATTERNS,
- * AMO_REVIEW_PATTERNS, ADDON_LINK_PATTERNS */
+ * FILEBROWSER_URL, API_BASE_URL, REVIEW_RE, QUEUE_RE, ADDON_LINKS_RE,
+ * FILEBROWSER_RE, USER_RE, USER_EDIT_RE, CONTENT_REVIEW_RE, REVIEW_PATTERNS,
+ * FILEBROWSER_PATTERNS, LISTING_PATTERNS, DEVELOPER_PAGE_PATTERNS,
+ * USER_PAGE_PATTERNS, AMO_HOSTS, AMO_EDITORS_PATTERNS AMO_PRIVACY_PAGES,
+ * AMO_EULA_PAGES, AMO_QUEUE_PATTERNS, AMO_REVIEW_PATTERNS, ADDON_LINK_PATTERNS
+ */
 
 const REVIEW_URL = "https://reviewers.{instance}/reviewers/review{type}/{addon}";
 const ADMIN_URL = "https://{instance}/admin/addon/manage/{addon}";
 const LISTING_URL = "https://{instance}/addon/{addon}";
 const MANAGE_URL = "https://{instance}/developers/addon/{addon}/edit";
 const FEED_URL = "https://{instance}/developers/feed/{addon}";
+const FILEBROWSER_URL = "https://{instance}/{product}/files/{action}/{versions}/{files}";
 
 const API_BASE_URL = "https://reviewers.{instance}/api/v4/{path}";
 
 const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/review(|-listed|-unlisted|-content)\/(.*)/;
 const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/queue\/(.*)/;
 const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]*)\/(reviewers\/review(|-listed|-unlisted|-content)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
-const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/files\/(compare|browse)\/\d+(...\d+)?\/file\/([^#]*)/;
+
+// 1 = addons.mozilla.org, 2 = en-US, 3 = browse, 4 = id1, 5 = id2, 6 = filepath
+const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/files\/(compare|browse)\/(\d+)(?:\.\.\.)?(\d+)?\/(?:file\/([^#]*))?/;
 const USER_RE = /https:\/\/(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/user\/([^#/]*)/;
 const USER_EDIT_RE = /https:\/\/(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/users\/edit\/([^#/]*)/;
 const CONTENT_REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/review-content\/(.*)/;
 
+// Note these patterns include an add-on, replace with * if necessary
 const REVIEW_PATTERNS = [
   "https://reviewers.addons.mozilla.org/*/reviewers/review/{addon}",
   "https://reviewers.addons.allizom.org/*/reviewers/review/{addon}",
   "https://reviewers.addons-dev.allizom.org/*/reviewers/review/{addon}",
 
-  "https://reviewers.addons.thunderbird.net/*/reviewers/review/{addon}"
+  "https://reviewers.addons.mozilla.org/*/reviewers/review-listed/{addon}",
+  "https://reviewers.addons.allizom.org/*/reviewers/review-listed/{addon}",
+  "https://reviewers.addons-dev.allizom.org/*/reviewers/review-listed/{addon}",
+
+  "https://reviewers.addons.mozilla.org/*/reviewers/review-unlisted/{addon}",
+  "https://reviewers.addons.allizom.org/*/reviewers/review-unlisted/{addon}",
+  "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/{addon}",
+
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review/{addon}",
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review-listed/{addon}",
+  "https://reviewers.addons.thunderbird.net/*/reviewers/review-unlisted/{addon}"
 ];
 
 const FILEBROWSER_PATTERNS = [
