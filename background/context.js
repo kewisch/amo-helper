@@ -142,6 +142,7 @@ browser.menus.create({
       browser.tabs.create({ url });
       browser.menus.update("amoqueue-compare-versions", { title: "Compare this file…" });
       browser.menus.update("amoqueue-compare-reset", { enabled: false });
+      compareVersion = null;
     } else {
       compareVersion = match[4];
       browser.menus.update("amoqueue-compare-versions", { title: "Compare this file to " + compareVersion });
