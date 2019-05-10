@@ -275,6 +275,16 @@ async function updateSize(info) {
   let blocked = await browser.runtime.sendMessage({ action: "blocklist", method: "check", guid: info.guid, version: lastVersion ? lastVersion.version : "0" });
   if (blocked) {
     document.getElementById("main-wrapper").classList.add("amoqueue-blocklisted-" + blocked.severity);
+
+    let bugspan = document.createElement("span");
+
+    let buglink = bugspan.appendChild(document.createElement("a"));
+    buglink.href = blocked.bug;
+    buglink.target = "_blank";
+    buglink.textContent = blocked.bug.replace("https://bugzilla.mozilla.org/show_bug.cgi?id=", "bug ");
+
+    bugspan.appendChild(document.createTextNode(" on " + blocked.created.substr(0, 10)));
+    createSummaryRow("amoqueue-blocklist-bug", "Blocklisted", [bugspan, blocked.reason]);
   }
 
   await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "slug", keys: { ["slugInfo." + info.slug]: info.id } });

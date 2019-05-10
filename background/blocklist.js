@@ -125,7 +125,7 @@ async function checkBlocklist(guid, version) {
   function verifyVersionRange(entry) {
     for (let range of entry.versionRange) {
       if (VersionCompare.compareVersions(version, range.minVersion) > 0 &&
-          VersionCompare.compareVersions(version, range.maxVersion) < 0) {
+          (range.maxVersion == "*" || VersionCompare.compareVersions(version, range.maxVersion) < 0)) {
         return { severity: range.severity == 3 ? "hard" : "soft" };
       }
     }
@@ -137,7 +137,7 @@ async function checkBlocklist(guid, version) {
   for (let entry of gBlocklist) {
     let found = null;
     if (entry.guid.startsWith("/")) {
-      let re = new RegExp(entry.guid);
+      let re = new RegExp(entry.guid.substring(1, entry.guid.length - 1));
       if (re.test(guid)) {
         found = entry;
       }
@@ -148,6 +148,9 @@ async function checkBlocklist(guid, version) {
     if (found) {
       let result = verifyVersionRange(entry);
       if (result) {
+        result.bug = entry.details.bug;
+        result.created = entry.details.created || new Date(entry.last_modified).toISOString();
+        result.reason = entry.details.why;
         return result;
       }
     }
