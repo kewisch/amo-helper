@@ -26,6 +26,21 @@ async function initLayout() {
 
 function addBlocklistButton() {
   let area = document.querySelector("#extra-review-actions > .more-actions-inner > ul");
+  if (!area) {
+    // This doesn't exist on delete add-ons pages
+    let addon = document.querySelector("#addon");
+    let form = addon.appendChild(document.createElement("form"));
+    form.id = "extra-review-actions";
+
+    let para = form.appendChild(document.createElement("p"));
+    let strong = para.appendChild(document.createElement("strong"));
+    strong.textContent = "More Actions";
+
+    let div = form.appendChild(document.createElement("div"));
+    div.className = "more-inner-actions";
+
+    area = div.appendChild(document.createElement("ul"));
+  }
 
   let button = document.createElement("button");
   button.id = "amoqueue_blocklist_addon";

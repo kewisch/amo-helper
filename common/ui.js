@@ -7,6 +7,17 @@
 
 function createAction(label, funcOrDest, className="") {
   let actions = document.getElementById("actions-addon");
+  if (!actions) {
+    // This doesn't exist for deleted add-ons
+    let sidebar = document.getElementById("scroll_sidebar");
+    let firstExistingNode = sidebar.firstElementChild;
+    let actionsLabel = sidebar.insertBefore(document.createElement("strong"), firstExistingNode);
+    actionsLabel.textContent = "Actions";
+
+    actions = sidebar.insertBefore(document.createElement("ul"), firstExistingNode);
+    actions.id = "actions-addon";
+  }
+
   let dest = typeof funcOrDest == "string" ? funcOrDest : "#";
   let func = typeof funcOrDest == "string" ? null : funcOrDest;
 
