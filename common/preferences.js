@@ -50,7 +50,8 @@ const DEFAULT_PREFERENCES = {
   "tinderbar-show": false,
   "tinderbar-approve-text": "",
   "tinderbar-preload-tabs": 3,
-  "filewindow-enabled": false
+  "filewindow-enabled": false,
+  "filewindow-exclusive": false
 };
 
 const HIDDEN_PREFERENCES = {
