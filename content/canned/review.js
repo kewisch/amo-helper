@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
-function setupLayout(cannedData, includeBody) {
+function setupLayout(cannedData, { includeBody, showInitial }) {
   let container = document.querySelector("#review-actions-form .review-actions-canned");
   let comments = document.getElementById("id_comments");
   container.textContent = "";
@@ -18,9 +18,16 @@ function setupLayout(cannedData, includeBody) {
   }
   container.appendChild(input);
 
+  if (showInitial) {
+    input.addEventListener("focus", () => {
+      $(input).autocomplete("search", "");
+    });
+  }
+
   $(input).autocomplete({
     appendTo: "#review-actions-form .review-actions-canned",
     autoFocus: true,
+    minLength: showInitial ? 0 : 1,
     delay: 0,
     source: (request, response) => {
       let matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
@@ -90,7 +97,8 @@ function setupLayout(cannedData, includeBody) {
 getStoragePreference([
   "canned-responses",
   "canned-use-stock",
-  "canned-include-body"
+  "canned-include-body",
+  "canned-show-initial"
 ]).then((prefs) => {
   let cannedData = [];
   if (prefs["canned-use-stock"]) {
@@ -107,5 +115,8 @@ getStoragePreference([
   }
 
   cannedData = cannedData.concat(prefs["canned-responses"]);
-  setupLayout(cannedData, prefs["canned-include-body"]);
+  setupLayout(cannedData, {
+    includeBody: prefs["canned-include-body"],
+    showInitial: prefs["canned-show-initial"]
+  });
 });
