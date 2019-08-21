@@ -15,10 +15,12 @@ async function initPageLayout() {
   let isAdmin = await getStoragePreference("is-admin");
 
   // Last update column
-  let column = document.createElement("th");
-  column.className = "amoqueue-helper-lastupdate";
-  column.textContent = "Last Update";
-  header.appendChild(column);
+  if (QUEUE != "content_review") {
+    let column = document.createElement("th");
+    column.className = "amoqueue-helper-lastupdate";
+    column.textContent = "Last Update";
+    header.appendChild(column);
+  }
 
   // Info column
   column = document.createElement("th");
@@ -45,12 +47,16 @@ async function initPageLayout() {
 
   for (let row of rows) {
     let slug = row.querySelector("a").getAttribute("href").split("/").pop();
+    let cell;
+
+    row.lastElementChild.remove();
 
     // Last Update column
-    // reuse the last column because there is an extra column on AMO
-    let cell = row.lastElementChild; // document.createElement("td");
-    cell.className = "amoqueue-helper-cell amoqueue-helper-lastupdate-cell";
-    row.appendChild(cell);
+    if (QUEUE != "content_review") {
+      cell = document.createElement("td");
+      cell.className = "amoqueue-helper-cell amoqueue-helper-lastupdate-cell";
+      row.appendChild(cell);
+    }
 
     // Info column
     cell = document.createElement("td");
@@ -236,7 +242,7 @@ async function initPageLayout() {
     updateQueueRows();
   });
 
-  if (QUEUE != "auto_approved") {
+  if (QUEUE != "auto_approved" && QUEUE != "content_review") {
     await addSearchRadio("Show Add-ons", "show-webext", ["Both", "WebExtensions", "Legacy"], (state) => {
       document.querySelectorAll("#addon-queue .addon-row").forEach((row) => {
         let iswebext = row.classList.contains("amoqueue-helper-iconclass-webextension");
@@ -268,9 +274,20 @@ async function initPageLayout() {
     });
   }
 
+  if (QUEUE == "content_review") {
+    await addSearchCheckbox("Exclude likely search plugins", "queueinfo-search-plugins", (checked) => {
+      let addonRows = [...document.querySelectorAll(".addon-row")];
+      for (let row of addonRows) {
+        let version = row.querySelector("td a em").textContent;
+        let isPlugin = version.match(/^20\d\d(0[1-9]|1[0-2])([012][0-9]|3[01])$/);
+        hideBecause(row, "searchplugin", checked && isPlugin);
+      }
+    });
+  }
+
   await addSearchCheckbox("Automatically open compare tab when showing review pages", "queueinfo-open-compare");
 
-  if (QUEUE == "new" || QUEUE == "updates") {
+  if (QUEUE == "extension" || QUEUE == "recommended") {
     await addSearchCheckbox("Show waiting time in business days", "queueinfo-business-days", (checked) => {
       let addonRows = [...document.querySelectorAll(".addon-row")];
       for (let row of addonRows) {
