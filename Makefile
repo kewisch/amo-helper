@@ -30,6 +30,7 @@ help:
 
 build:
 	web-ext build -o -i 'junk' -i Makefile -i README.md
+	unzip -l web-ext-artifacts/amo_review_helper-$(version).zip
 
 version:
 	@echo $(version)
