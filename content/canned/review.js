@@ -52,15 +52,27 @@ function setupLayout(cannedData, includeBody) {
     browser.runtime.sendMessage({ action: "openPrefs" });
   });
 
-
-  window.addEventListener("keypress", (event) => {
+  window.addEventListener("keydown", (event) => {
     if ((event.metaKey || event.altKey) && event.shiftKey && event.key.toLowerCase() == "o") {
       if (document.activeElement == input) {
         comments.focus();
       } else {
         input.focus();
       }
-    } else if (document.activeElement == input && (event.key == "Escape" || event.key == "Enter")) {
+    } else if (document.activeElement == input && event.key == "Escape") {
+      input.value = "";
+      comments.focus();
+    } else {
+      // not a handled key code
+      return;
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
+  });
+
+  window.addEventListener("keypress", (event) => {
+    if (document.activeElement == input && event.key == "Enter") {
       input.value = "";
       comments.focus();
     } else {
