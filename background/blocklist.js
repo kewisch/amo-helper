@@ -149,6 +149,7 @@ async function checkBlocklist(guid, version) {
     if (found) {
       let result = verifyVersionRange(entry);
       if (result) {
+        result.id = entry.id;
         result.bug = entry.details.bug;
         result.created = entry.details.created || new Date(entry.last_modified).toISOString();
         result.reason = entry.details.why;

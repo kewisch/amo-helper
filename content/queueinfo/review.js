@@ -283,7 +283,17 @@ async function updateSize(info) {
     buglink.target = "_blank";
     buglink.textContent = blocked.bug.replace("https://bugzilla.mozilla.org/show_bug.cgi?id=", "bug ");
 
-    bugspan.appendChild(document.createTextNode(" on " + blocked.created.substr(0, 10)));
+
+    bugspan.appendChild(document.createTextNode(` on ${blocked.created.substr(0, 10)} (kinto `));
+    console.log(blocked);
+
+    let kintolink = bugspan.appendChild(document.createElement("a"));
+    kintolink.href = `https://settings-writer.prod.mozaws.net/v1/admin/#/buckets/staging/collections/addons/records/${blocked.id}/attributes`;
+    kintolink.target = "_blank";
+    kintolink.textContent = blocked.id;
+
+    bugspan.appendChild(document.createTextNode(")"));
+
     createSummaryRow("amoqueue-blocklist-bug", "Blocklisted", [bugspan, blocked.reason]);
   }
 
