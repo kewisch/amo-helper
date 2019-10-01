@@ -1,6 +1,6 @@
 # AMO Helper
 
-![Build Status](https://github.com/kewisch/amo-helper/workflows/Build/badge.svg)
+[![Build Status](https://github.com/kewisch/amo-helper/workflows/Build/badge.svg)](https://github.com/kewisch/amo-helper/actions?workflow=Build)
 
 This add-on is meant to make ad-hoc improvements to the AMO review experience.
 If features are useful for everyone, we might add them to AMO eventually.
