@@ -1,0 +1,45 @@
+name: "Release"
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  sign:
+    name: "Release"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v1
+
+      - name: "web-ext build"
+        id: "web-ext-build"
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: build
+
+      - name: "web-ext sign"
+        id: "web-ext-sign"
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: sign
+          source: ${{ steps.web-ext-build.outputs.target }}
+          channel: listed
+          apiKey: ${{ secrets.AMO_SIGN_KEY }}
+          apiSecret: ${{ secrets.AMO_SIGN_SECRET }}
+
+      - name: "Rename Artifact"
+        run: mv ${{ steps.web-ext-sign.outputs.target }} web-ext-artifacts/amoqueue.signed.xpi
+
+      - name: "Generate Changelog"
+        run: |
+           git log --reverse --no-merges --format='* %s' `git describe --tags --abbrev=0 ${{ github.ref }}^`..${{ github.ref }} | grep -v chore: > web-ext-artifacts/changelog.txt
+           cat web-ext-artifacts/changelog.txt
+
+      - name: "Create Release"
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: web-ext-artifacts/amoqueue.signed.xpi
+          body_path: web-ext-artifacts/changelog.txt

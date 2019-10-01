@@ -1,0 +1,56 @@
+name: "Push/Pull Request"
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+
+jobs:
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v1
+
+      - name: "Install ESlint"
+        run: npm install eslint
+
+      - name: "Run ESLint"
+        uses: gimenete/eslint-action@1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "web-ext lint"
+        uses: kewisch/action-web-ext@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          cmd: lint
+          channel: listed
+
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v1
+
+      - name: env
+        run: env
+
+      - name: "web-ext build"
+        id: "web-ext-build"
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: build
+
+      - name: "Rename Artifact"
+        run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/amoqueue.xpi
+
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@master
+        with:
+          name: amoqueue.xpi
+          path: web-ext-artifacts/amoqueue.xpi
