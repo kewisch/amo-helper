@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "10.1.0",
+  "version": "10.2.0",
 
   "applications": {
     "gecko": {
@@ -162,6 +162,7 @@
 
         "common/constants.js",
         "common/preferences.js",
+        "common/helper.js",
         "common/ui.js",
 
         "content/copylink/review.js",

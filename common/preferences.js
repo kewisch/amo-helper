@@ -45,6 +45,7 @@ const DEFAULT_PREFERENCES = {
   "reviewinfo-show-permissions": false,
   "reviewinfo-show-validator": false,
   "reviewinfo-dontshow-content": true,
+  "reviewinfo-redirect-unlisted": false,
   "reviewtimer-display": true,
   "reviewtimer-notify-interval": 10,
   "translation-secret-key": "",

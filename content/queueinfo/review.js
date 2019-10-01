@@ -256,19 +256,31 @@ async function updateSize(info) {
 
 // -- main --
 (async function() {
+  // Collect review info and set in storage
+  let info = getInfo(document);
+
+  let prefs = await getStoragePreference([
+    "queueinfo-open-compare",
+    "reviewinfo-redirect-unlisted"
+  ]);
+
+  // Redirect to unlisted page if necessary
+  let reviewUrl = document.location.href.match(REVIEW_RE);
+  if (prefs["reviewinfo-redirect-unlisted"] && reviewUrl[3] == "" && !info.versions.length) {
+    let target = replacePattern(REVIEW_URL, { instance: reviewUrl[1], type: "-unlisted", addon: reviewUrl[4] });
+    document.location.href = target;
+    return;
+  }
+
   // Make file info links open in a new tab
   document.querySelectorAll(".file-info a").forEach((link) => {
     link.setAttribute("target", "_blank");
   });
 
-
   // Open compare link if options enabled
-  if (await getStoragePreference("queueinfo-open-compare")) {
+  if (prefs["queueinfo-open-compare"]) {
     document.querySelector(".listing-body:last-child .file-info a.compare").click();
   }
-
-  // Collect review info and set in storage
-  let info = getInfo(document);
 
   // Check the blocklist
   let lastVersion = info.versions[info.latest_idx];
