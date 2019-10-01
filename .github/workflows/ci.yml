@@ -28,6 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           cmd: lint
+          source: src
           channel: listed
 
   build:
@@ -37,14 +38,12 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v1
 
-      - name: env
-        run: env
-
       - name: "web-ext build"
         id: "web-ext-build"
         uses: kewisch/action-web-ext@v1
         with:
           cmd: build
+          source: src
 
       - name: "Rename Artifact"
         run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/amoqueue.xpi
