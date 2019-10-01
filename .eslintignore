@@ -1,5 +1,5 @@
-libs/
+src/libs/
 profile/
 junk/
 package.json
-amoqueue.xpi
+*.xpi
