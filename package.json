@@ -1,0 +1,25 @@
+{
+  "name": "amoqueue-wx",
+  "version": "10.2.1",
+  "author": "Philipp Kewisch <mozilla@kewis.ch>",
+  "homepage": "https://github.com/kewisch/amo-helper#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kewisch/amo-helper.git"
+  },
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/kewisch/amo-helper/issues"
+  },
+  "scripts": {
+    "bump": "bumper() { bump package.json \"$1\"; bump src/manifest.json \"$1\"; }; bumper",
+    "build": "web-ext -s src build -o -i junk -i Makefile -i README.md; unzip -l web-ext-artifacts/amo_review_helper-$(jq -r .version src/manifest.json)",
+    "tag": "git tag v$(jq -r .version src/manifest.json)",
+    "lint": "eslint src || true"
+  },
+  "devDependencies": {
+    "bump-file": "^2.0.0",
+    "eslint": "^6.6.0"
+  },
+  "dependencies": {}
+}

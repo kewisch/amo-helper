@@ -3,21 +3,18 @@
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
   "version": "10.2.1",
-
   "applications": {
     "gecko": {
       "id": "@amoqueue",
       "strict_min_version": "57.0"
     }
   },
-
   "icons": {
     "16": "images/addon.svg",
     "32": "images/addon.svg",
     "48": "images/addon.svg",
     "128": "images/addon.svg"
   },
-
   "permissions": [
     "alarms",
     "clipboardWrite",
@@ -30,50 +27,39 @@
     "unlimitedStorage",
     "webRequest",
     "webRequestBlocking",
-
     "https://addons.mozilla.org/*",
     "https://addons.allizom.org/*",
     "https://addons-dev.allizom.org/*",
-
     "https://reviewers.addons.mozilla.org/*",
     "https://reviewers.addons.allizom.org/*",
     "https://reviewers.addons-dev.allizom.org/*",
-
     "https://addons.thunderbird.net/*",
     "https://reviewers.addons.thunderbird.net/*",
-
     "https://addons.cdn.mozilla.net/*",
-
     "https://api.cognitive.microsoft.com/*",
     "https://api.microsofttranslator.com/*",
-
     "https://firefox.settings.services.mozilla.com/*/buckets/blocklists/collections/addons/records",
     "https://bugzilla.mozilla.org/form.blocklist"
   ],
-
   "options_ui": {
     "page": "options/options.html",
     "chrome_style": true,
     "browser_style": true
   },
-
   "omnibox": {
     "keyword": "amo"
   },
-
   "browser_action": {
     "default_icon": "images/addon.svg",
     "default_title": "addons.mozilla.org",
     "default_popup": "content/browseraction/popup.html",
     "browser_style": false
   },
-
   "background": {
     "scripts": [
       "common/constants.js",
       "common/helper.js",
       "common/preferences.js",
-
       "background/atnredirect.js",
       "background/info.js",
       "background/blocklist.js",
@@ -91,35 +77,28 @@
       "background/filediff.js"
     ]
   },
-
   "content_scripts": [
     {
       "matches": [
         "https://reviewers.addons.mozilla.org/*/firefox/files/browse/*",
         "https://reviewers.addons.mozilla.org/*/firefox/files/compare/*",
-
         "https://reviewers.addons.allizom.org/*/firefox/files/browse/*",
         "https://reviewers.addons.allizom.org/*/firefox/files/compare/*",
-
         "https://reviewers.addons-dev.allizom.org/*/firefox/files/browse/*",
         "https://reviewers.addons-dev.allizom.org/*/firefox/files/compare/*",
-
         "https://reviewers.addons.thunderbird.net/*/thunderbird/files/browse/*",
         "https://reviewers.addons.thunderbird.net/*/thunderbird/files/compare/*"
       ],
       "js": [
         "libs/jquery-3.1.1.min.js",
-
         "common/constants.js",
         "common/preferences.js",
         "common/ui.js",
-
         "content/copylink/filebrowser.js",
         "content/downloads/filebrowser.js",
         "content/filediff/filebrowser.js",
         "content/reskin/filebrowser.js",
         "content/tabclose/filebrowser.js",
-
         "libs/acorn.min.js",
         "libs/source-map.min.js",
         "libs/pretty-fast.js",
@@ -131,23 +110,21 @@
         "content/filediff/filebrowser.css"
       ],
       "run_at": "document_end"
-    },{
+    },
+    {
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/review/*",
         "https://reviewers.addons.mozilla.org/*/reviewers/review-listed/*",
         "https://reviewers.addons.mozilla.org/*/reviewers/review-unlisted/*",
         "https://reviewers.addons.mozilla.org/*/reviewers/review-content/*",
-
         "https://reviewers.addons.allizom.org/*/reviewers/review/*",
         "https://reviewers.addons.allizom.org/*/reviewers/review-listed/*",
         "https://reviewers.addons.allizom.org/*/reviewers/review-unlisted/*",
         "https://reviewers.addons.allizom.org/*/reviewers/review-content/*",
-
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-listed/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*",
-
         "https://reviewers.addons.thunderbird.net/*/reviewers/review/*",
         "https://reviewers.addons.thunderbird.net/*/reviewers/review-listed/*",
         "https://reviewers.addons.thunderbird.net/*/reviewers/review-unlisted/*",
@@ -159,12 +136,10 @@
         "libs/jquery-3.1.1.min.js",
         "libs/jquery-ui.min.js",
         "libs/purify.js",
-
         "common/constants.js",
         "common/preferences.js",
         "common/helper.js",
         "common/ui.js",
-
         "content/copylink/review.js",
         "content/queueinfo/review.js",
         "content/canned/review.js",
@@ -174,12 +149,10 @@
         "content/reviewtimer/review.js",
         "content/tinderbar/review.js",
         "content/filewindow/review.js",
-
         "content/translate/moderatedreviews.js"
       ],
       "css": [
         "libs/jquery-ui.min.css",
-
         "content/reskin/review.css",
         "content/canned/review.css",
         "content/reviewactions/review.css",
@@ -190,77 +163,84 @@
         "content/translate/review.css"
       ],
       "run_at": "document_end"
-    },{
+    },
+    {
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/queue/reviews*",
         "https://reviewers.addons.mozilla.org/*/reviewers/queue/reviews*",
-
         "https://reviewers.addons.allizom.org/*/reviewers/queue/reviews*",
         "https://reviewers.addons.allizom.org/*/reviewers/queue/reviews*",
-
         "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/reviews*",
-
         "https://reviewers.addons.thunderbird.net/*/reviewers/queue/reviews*",
         "https://reviewers.addons.thunderbird.net/*/reviewers/queue/reviews*"
       ],
-      "css": ["content/tinderbar/moderatedqueue.css"],
+      "css": [
+        "content/tinderbar/moderatedqueue.css"
+      ],
       "run_at": "document_start"
-    },{
+    },
+    {
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/queue/*",
         "https://reviewers.addons.allizom.org/*/reviewers/queue/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/queue/*",
-
         "https://reviewers.addons.thunderbird.net/*/reviewers/queue/*"
       ],
       "js": [
         "libs/moment.min.js",
         "libs/purify.js",
-
         "common/constants.js",
         "common/helper.js",
         "common/preferences.js",
-
         "content/queueinfo/queue.js",
         "content/browseraction/queue.js",
         "content/translate/moderatedreviews.js",
         "content/tinderbar/moderatedqueue.js"
       ],
-      "css": ["content/queueinfo/queue.css", "content/translate/common.css"],
+      "css": [
+        "content/queueinfo/queue.css",
+        "content/translate/common.css"
+      ],
       "run_at": "document_end"
-    },{
+    },
+    {
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/",
         "https://reviewers.addons.allizom.org/*/reviewers/",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/",
-
         "https://reviewers.addons.thunderbird.net/*/reviewers/"
       ],
       "js": [
         "content/admin/dashboard.js"
       ],
       "run_at": "document_end"
-    },{
+    },
+    {
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/review-content/*",
         "https://reviewers.addons.allizom.org/*/reviewers/review-content/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*",
-
         "https://reviewers.addons.thunderbird.net/*/reviewers/review-content/*"
       ],
-      "js": [ "content/contentreview/review.js"],
-      "css": ["content/contentreview/review.css"],
+      "js": [
+        "content/contentreview/review.js"
+      ],
+      "css": [
+        "content/contentreview/review.css"
+      ],
       "run_at": "document_end"
-    },{
+    },
+    {
       "matches": [
         "https://reviewers.addons.mozilla.org/*/reviewers/privacy/*",
         "https://reviewers.addons.allizom.org/*/reviewers/privacy/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/privacy/*",
-
         "https://reviewers.addons.thunderbird.net/*/reviewers/privacy/*"
       ],
-      "css": ["content/reskin/privacy.css"]
+      "css": [
+        "content/reskin/privacy.css"
+      ]
     }
   ]
 }
