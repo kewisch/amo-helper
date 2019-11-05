@@ -1,3 +1,8 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# Portions Copyright (C) Philipp Kewisch, 2019
+---
 name: "Release"
 on:
   push:
@@ -5,9 +10,34 @@ on:
       - 'v*.*.*'
 
 jobs:
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v1
+
+      - name: "Install ESlint"
+        run: npm install eslint
+
+      - name: "Run ESLint"
+        uses: gimenete/eslint-action@1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "web-ext lint"
+        uses: kewisch/action-web-ext@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          cmd: lint
+          source: src
+          channel: listed
+
   sign:
     name: "Release"
     runs-on: ubuntu-latest
+    needs: lint
     steps:
       - name: "Checkout"
         uses: actions/checkout@v1
@@ -35,8 +65,7 @@ jobs:
 
       - name: "Generate Changelog"
         run: |
-           git log --reverse --no-merges --format='* %s' `git describe --tags --abbrev=0 ${{ github.ref }}^`..${{ github.ref }} | grep -v chore: > web-ext-artifacts/changelog.txt
-           cat web-ext-artifacts/changelog.txt
+           git log --reverse --no-merges --format='* %s' `git describe --tags --abbrev=0 ${{ github.ref }}^`..${{ github.ref }} | grep -v chore: | tee web-ext-artifacts/changelog.txt
 
       - name: "Create Release"
         uses: softprops/action-gh-release@v1
