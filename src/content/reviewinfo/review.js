@@ -114,7 +114,9 @@ async function initTopPermissions() {
     "reviewinfo-show-permissions",
     "reviewinfo-dontshow-content"
   ]);
-  let permissionsNode = document.querySelector("#review-files .listing-body:last-child .file-info div strong");
+
+  let reviewFiles = document.querySelector(".review-files, #review-files"); // ATN compatibility
+  let permissionsNode = reviewFiles.querySelector(".listing-body:last-child .file-info div strong");
   let skipContent = document.location.href.match(CONTENT_REVIEW_RE) && prefs["reviewinfo-dontshow-content"];
   if (!permissionsNode || !prefs["reviewinfo-show-permissions"] || skipContent) {
     return;
@@ -158,7 +160,7 @@ async function retrieveValidation() {
     return;
   }
 
-  let validationNode = document.querySelector("#review-files .listing-body:last-child .file-info a[href$='validation']");
+  let validationNode = document.querySelector(".review-files .listing-body:last-child .file-info a[href$='validation']");
   let validationUrl = new URL(validationNode.getAttribute("href") + ".json", document.location);
   let dangerous = new Set(prefs["reviewinfo-dangerous-messages"].split(/,\s*/));
 

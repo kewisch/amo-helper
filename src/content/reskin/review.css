@@ -19,12 +19,13 @@
 }
 
 /* less padding in the files column */
+.review-files .files,
 #review-files .files {
   padding: 15px 0 15px 10px;
 }
 
 /* less wide description columns */
-#review-files table.activity th {
+.review-files table.activity th {
   width: 12.5%;
 }
 

@@ -157,7 +157,7 @@ async function determineSize(version) {
 function getInfo(doc) {
   let lastapproved_idx = null;
 
-  let versions = Array.from(doc.querySelectorAll("#review-files .listing-body")).map((listbody, idx) => {
+  let versions = Array.from(doc.querySelectorAll(".review-files .listing-body, #review-files .listing-body")).map((listbody, idx) => {
     let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
     let submissiondate = floatingtime(headerparts[2].trim(), true);
     let hasAutoApproval = false;

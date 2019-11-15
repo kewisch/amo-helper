@@ -4,7 +4,7 @@
  * Portions Copyright (C) Philipp Kewisch, 2017 */
 
 // Make editors install link trigger a download
-document.getElementById("review-files").addEventListener("click", (event) => {
+document.querySelector(".review-files, #review-files").addEventListener("click", (event) => {
   if (event.target.classList.contains("editors-install")) {
     let listbody = findParent(event.target, "listing-body");
     let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
