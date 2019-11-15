@@ -61,16 +61,15 @@ jobs:
           apiSecret: ${{ secrets.AMO_SIGN_SECRET }}
 
       - name: "Rename Artifact"
-        run: mv ${{ steps.web-ext-sign.outputs.target }} web-ext-artifacts/amoqueue.signed.xpi
+        run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/amoqueue.unsigned.xpi
 
       - name: "Generate Changelog"
-        run: |
-           git log --reverse --no-merges --format='* %s' `git describe --tags --abbrev=0 ${{ github.ref }}^`..${{ github.ref }} | grep -v chore: | tee web-ext-artifacts/changelog.txt
+        run: npx conventional-changelog -p angular -r 2 | tail -n +3 | tee web-ext-artifacts/CHANGELOG.md
 
       - name: "Create Release"
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: web-ext-artifacts/amoqueue.signed.xpi
-          body_path: web-ext-artifacts/changelog.txt
+          files: web-ext-artifacts/amoqueue.unsigned.xpi
+          body_path: web-ext-artifacts/CHANGELOG.md
