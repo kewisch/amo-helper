@@ -14,8 +14,12 @@
 .primary {
   width: 90%;
 }
+body.reviewer-tools div.section .secondary {
+  margin-left: 1px;
+  width: 9%;
+}
 .secondary.scroll_sidebar_parent {
-  width: 10%;
+  width: 9%;
 }
 
 /* less padding in the files column */
