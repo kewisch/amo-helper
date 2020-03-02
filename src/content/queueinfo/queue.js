@@ -188,7 +188,17 @@ async function initPageLayout() {
   let noResultsCell = document.createElement("td");
   noResultsCell.setAttribute("colspan", header.children.length);
   noResultsCell.style.textAlign = "center";
-  noResultsCell.textContent = "no results";
+  noResultsCell.appendChild(document.createTextNode("no results — "));
+
+  let noResultsClear = document.createElement("a");
+  noResultsClear.href = "#";
+  noResultsClear.textContent = "clear search";
+  noResultsCell.appendChild(noResultsClear);
+  noResultsClear.addEventListener("click", (event) => {
+    document.getElementById("id_text_query").value = "";
+    event.preventDefault();
+    updateAutocomplete();
+  });
 
   noResultsRow.appendChild(noResultsCell);
   queueBody.appendChild(noResultsRow);
@@ -198,7 +208,9 @@ async function initPageLayout() {
   if (!textquery) {
     // Content review and appoval don't have the search box
     let form = document.createElement("form");
-    form.setAttribute("onsubmit", "return false;");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+    });
 
     let label = form.appendChild(document.createElement("label"));
     label.setAttribute("for", "id_text_query");
