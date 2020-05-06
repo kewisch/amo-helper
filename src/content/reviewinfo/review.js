@@ -27,10 +27,11 @@ async function initLayout() {
 
 function markVIP() {
   let privboard = document.getElementById("id_whiteboard-private");
+  let hasMozillaAuthor = !!document.querySelector("#scroll_sidebar li a[href$='/firefox/user/4757633/']");
 
   let match = privboard.textContent.match(/\[vip\]\s*([^\n]*)/);
 
-  if (match) {
+  if (match || hasMozillaAuthor) {
     let history = document.getElementById("versions-history");
     let bar = history.parentNode.insertBefore(document.createElement("p"), history.nextElementSibling);
     bar.className = "is_recommendable amoqueue-vip";
@@ -38,9 +39,12 @@ function markVIP() {
     let descr = bar.appendChild(document.createElement("div"));
     descr.textContent = "This is a VIP add-on. Please contact an admin before rejecting or sending an information request.";
 
-    if (match[1]) {
+    if (match && match[1]) {
       let reason = bar.appendChild(document.createElement("div"));
       reason.textContent = "Details: " + match[1];
+    } else if (hasMozillaAuthor) {
+      let reason = bar.appendChild(document.createElement("div"));
+      reason.textContent = "Details: This is an official Mozilla extension.";
     }
   }
 }
