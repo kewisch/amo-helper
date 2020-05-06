@@ -286,7 +286,7 @@ async function updateSize(info) {
   let lastVersion = info.versions[info.latest_idx];
   let blocked = await browser.runtime.sendMessage({ action: "blocklist", method: "check", guid: info.guid, version: lastVersion ? lastVersion.version : "0" });
   if (blocked) {
-    document.getElementById("main-wrapper").classList.add("amoqueue-blocklisted-" + blocked.severity);
+    document.getElementById("main-wrapper").classList.add("amoqueue-striped-background", "amoqueue-blocklisted-" + blocked.severity);
 
     let bugspan = document.createElement("span");
 

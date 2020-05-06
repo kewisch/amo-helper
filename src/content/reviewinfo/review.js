@@ -11,6 +11,7 @@ const SKIP_MESSAGES = new Set([
 async function initLayout() {
   addScrollToButtons();
   addBlocklistButton();
+  markVIP();
 
   Promise.all([
     // Put latest permissions at top.
@@ -22,6 +23,26 @@ async function initLayout() {
     // Scroll to the end of the header.
     window.scroll(0, document.querySelector(".addon").offsetTop - 10);
   });
+}
+
+function markVIP() {
+  let privboard = document.getElementById("id_whiteboard-private");
+
+  let match = privboard.textContent.match(/\[vip\]\s*([^\n]*)/);
+
+  if (match) {
+    let history = document.getElementById("versions-history");
+    let bar = history.parentNode.insertBefore(document.createElement("p"), history.nextElementSibling);
+    bar.className = "is_recommendable amoqueue-vip";
+
+    let descr = bar.appendChild(document.createElement("div"));
+    descr.textContent = "This is a VIP add-on. Please contact an admin before rejecting or sending an information request.";
+
+    if (match[1]) {
+      let reason = bar.appendChild(document.createElement("div"));
+      reason.textContent = "Details: " + match[1];
+    }
+  }
 }
 
 function addBlocklistButton() {

@@ -76,3 +76,27 @@
 #amoqueue_blocklist_addon {
   background-color: #bc2b1a;
 }
+
+#main-wrapper.amoqueue-striped-background #addon {
+  width: 89%;
+}
+#main-wrapper.amoqueue-striped-background #scroll_sidebar {
+  background: #fff;
+  padding: 7px;
+}
+#main-wrapper.amoqueue-striped-background .scroll_sidebar_parent {
+  width: 10%;
+}
+
+#main-wrapper.amoqueue-striped-background h2.addon {
+  background: #fff;
+}
+#main-wrapper.amoqueue-striped-background #footer {
+  background-color: transparent;
+  background-image: linear-gradient(to bottom,transparent 0,transparent 123px,#0c99d5 123px,#0c99d5 200px,#fff 200px,rgba(12,153,213,0) 400px);
+}
+
+#addon .is_recommendable.amoqueue-vip {
+  color: white;
+  background-color: #1E5631;
+}
