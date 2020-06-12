@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AMO Review Helper",
   "short_name": "AMO Helper",
-  "version": "10.4.1",
+  "version": "10.4.2",
   "applications": {
     "gecko": {
       "id": "@amoqueue",
@@ -108,6 +108,24 @@
         "content/copylink/filebrowser.css",
         "content/reskin/filebrowser.css",
         "content/filediff/filebrowser.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://code.addons.mozilla.org/*/browse/*",
+        "https://code.addons.mozilla.org/*/compare/*",
+        "https://code.addons.allizom.org/*/browse/*",
+        "https://code.addons.allizom.org/*/compare/*",
+        "https://code.addons-dev.allizom.org/*/browse/*",
+        "https://code.addons-dev.allizom.org/*/compare/*",
+        "https://code.addons.thunderbird.net/*/browse/*",
+        "https://code.addons.thunderbird.net/*/compare/*"
+      ],
+      "js": [
+        "common/constants.js",
+        "common/helper.js",
+        "content/tabclose/filebrowser.js"
       ],
       "run_at": "document_end"
     },

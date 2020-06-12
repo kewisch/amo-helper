@@ -5,7 +5,7 @@
 
 // Make editors install link trigger a download
 document.querySelector(".review-files, #review-files").addEventListener("click", (event) => {
-  if (event.target.classList.contains("editors-install")) {
+  if (event.target.classList.contains("reviewers-install")) {
     let listbody = findParent(event.target, "listing-body");
     let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
     let version = headerparts[1].trim();

@@ -20,12 +20,13 @@ const FILEBROWSER_URL = "https://{instance}/{product}/files/{action}/{versions}/
 
 const API_BASE_URL = "https://reviewers.{instance}/api/v4/{path}";
 
-const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/review(|-listed|-unlisted|-content)\/(.*)/;
+// 1 = addons.mozilla.org, 2 = en-US, 3 = -listed/-unlisted/-content, 4 = slug
+const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/(?:([^/]+)\/)?reviewers\/review(|-listed|-unlisted|-content)\/(.*)/;
 const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/queue\/(.*)/;
 const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]*)\/(reviewers\/review(|-listed|-unlisted|-content)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
 
 // 1 = addons.mozilla.org, 2 = en-US, 3 = browse, 4 = id1, 5 = id2, 6 = filepath
-const FILEBROWSER_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/files\/(compare|browse)\/(\d+)(?:\.\.\.)?(\d+)?\/(?:file\/([^#]*))?/;
+const FILEBROWSER_RE = /https:\/\/(?:reviewers|code)\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:(?:firefox|thunderbird)\/files\/)?(compare|browse)\/(?:\d+\/versions\/)?(\d+)(?:\.\.\.)?(\d+)?\/(?:(?:file\/|\?path=)([^#]*))?/;
 const USER_RE = /https:\/\/(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/user\/([^#/]*)/;
 const USER_EDIT_RE = /https:\/\/(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/(?:firefox|thunderbird)\/users\/edit\/([^#/]*)/;
 const CONTENT_REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/review-content\/(.*)/;
@@ -95,8 +96,13 @@ const AMO_HOSTS = [
   "reviewers.addons.allizom.org",
   "reviewers.addons-dev.allizom.org",
 
+  "code.addons.mozilla.org",
+  "code.addons.allizom.org",
+  "code.addons-dev.allizom.org",
+
   "addons.thunderbird.net",
-  "reviewers.addons.thunderbird.net"
+  "reviewers.addons.thunderbird.net",
+  "code.addons.thunderbird.net"
 ];
 
 const AMO_EDITORS_PATTERNS = [
