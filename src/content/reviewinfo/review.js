@@ -77,7 +77,7 @@ function addBlocklistButton() {
       action: "blocklist",
       method: event.ctrlKey || event.metaKey ? "gather" : "file",
       guid: document.querySelector(".addon-guid > td").textContent,
-      name: document.title.split(" :: ")[0],
+      name: document.title.split(" – ")[0],
     });
   });
 
