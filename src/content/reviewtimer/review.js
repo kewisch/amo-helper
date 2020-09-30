@@ -9,7 +9,7 @@ let timerStart = null;
 let timerPause = null;
 let timerNotifyInterval = 10;
 
-let addonName = document.title.split(" :: ")[0];
+let addonName = document.title.split(" – ")[0];
 let addonSlug = document.location.pathname.match(/\/([^/]+)$/)[1];
 
 async function initLayout() {
