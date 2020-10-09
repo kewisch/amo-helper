@@ -109,6 +109,16 @@ async function initPageLayout() {
       }
     }
 
+    if (QUEUE == "pending_rejection") {
+      let rejectcell = row.querySelector("td:nth-of-type(6)");
+      rejectcell.classList.add("amoqueue-helper-pendingrejectioncell");
+
+      rejectcell.dataset.fullMinutes = row.querySelector("td:nth-of-type(6)").textContent.split(", ").reduce((acc, value) => {
+        let [length, unit] = value.split(/\s+/, 2);
+        return acc + toMinutes(parseInt(length, 10), unit);
+      }, 0);
+    }
+
     // Partner addon status
     if (isPartnerAddon(slug)) {
       row.classList.add("amoqueue-is-partner");
@@ -591,6 +601,11 @@ function updateSort(rows=null) {
       return fullB - fullA;
     }
   }
+  function sortByPendingRejection(a, b) {
+    let rca = a.querySelector(".amoqueue-helper-pendingrejectioncell");
+    let rcb = b.querySelector(".amoqueue-helper-pendingrejectioncell");
+    return rca.dataset.fullMinutes - rcb.dataset.fullMinutes;
+  }
 
   function sortByWeight(a, b) {
     let wca = a.querySelector("td:nth-of-type(5)");
@@ -609,13 +624,16 @@ function updateSort(rows=null) {
   }
 
   let usesWaitTime = document.querySelector(".amoqueue-helper-waitcell");
+  let usesPendingRejection = document.querySelector(".amoqueue-helper-pendingrejectioncell");
   rows.sort((a, b) => {
     let partner = sortByPartner(a, b);
     if (partner != 0) {
       return partner;
     }
 
-    if (usesWaitTime) {
+    if (usesPendingRejection) {
+      return sortByPendingRejection(a, b);
+    } else if (usesWaitTime) {
       return sortByWaitTime(a, b);
     } else {
       return sortByWeight(a, b);
@@ -725,18 +743,16 @@ function displaySize(size, relative=false) {
 }
 
 function toMinutes(size, unit) {
-  switch (unit) {
-    case "day":
-    case "days":
-      return size * 24 * 60;
-    case "hour":
-    case "hours":
-      return size * 60;
-    case "minute":
-    case "minutes":
-      return size;
-    default:
-      return 0;
+  if (unit.startsWith("week")) {
+    return size * 7 * 24 * 60;
+  } else if (unit.startsWith("day")) {
+    return size * 24 * 60;
+  } else if (unit.startsWith("hour")) {
+    return size * 60;
+  } else if (unit.startsWith("minute")) {
+    return size;
+  } else {
+    return 0;
   }
 }
 
