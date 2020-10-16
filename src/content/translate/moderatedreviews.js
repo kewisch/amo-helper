@@ -105,11 +105,16 @@ function initReviewsLayout() {
 }
 
 (async () => {
-  let queue = document.getElementById("addon-queue") && document.location.pathname.split("/").pop();
   let hasKey = await getStoragePreference("translation-secret-key");
-  if (hasKey && queue == "reviews") {
+  if (!hasKey) {
+    return;
+  }
+
+  let queue = document.location.href.match(QUEUE_RE)?.[3];
+
+  if (queue == "reviews") {
     initRatingsLayout();
-  } else if (hasKey && !queue) {
+  } else if (!queue) {
     initReviewsLayout();
   }
 })();

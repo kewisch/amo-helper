@@ -22,7 +22,10 @@ const API_BASE_URL = "https://reviewers.{instance}/api/v4/{path}";
 
 // 1 = addons.mozilla.org, 2 = en-US, 3 = -listed/-unlisted/-content, 4 = slug
 const REVIEW_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/(?:([^/]+)\/)?reviewers\/review(|-listed|-unlisted|-content)\/(.*)/;
+
+// 1 = addons.mozilla.org, 2 = en-US, 3 = queuename
 const QUEUE_RE = /https:\/\/reviewers\.(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]+)\/reviewers\/queue\/(.*)/;
+
 const ADDON_LINKS_RE = /https:\/\/(?:reviewers\.)?(addons\.mozilla\.org|addons\.allizom\.org|addons-dev\.allizom\.org|addons\.thunderbird\.net)\/([^/]*)\/(reviewers\/review(|-listed|-unlisted|-content)|admin\/addon\/manage|[^/]*\/addon|developers\/feed)\/([^/#?]*)(\/edit)?/;
 
 // 1 = addons.mozilla.org, 2 = en-US, 3 = browse, 4 = id1, 5 = id2, 6 = filepath
