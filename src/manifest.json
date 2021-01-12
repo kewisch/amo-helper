@@ -142,11 +142,7 @@
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-listed/*",
         "https://reviewers.addons-dev.allizom.org/*/reviewers/review-unlisted/*",
-        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*",
-        "https://reviewers.addons.thunderbird.net/*/reviewers/review/*",
-        "https://reviewers.addons.thunderbird.net/*/reviewers/review-listed/*",
-        "https://reviewers.addons.thunderbird.net/*/reviewers/review-unlisted/*",
-        "https://reviewers.addons.thunderbird.net/*/reviewers/review-content/*"
+        "https://reviewers.addons-dev.allizom.org/*/reviewers/review-content/*"
       ],
       "js": [
         "libs/diff.min.js",
@@ -161,7 +157,6 @@
         "content/copylink/review.js",
         "content/queueinfo/review.js",
         "content/canned/review.js",
-        "content/downloads/review.js",
         "content/reviewactions/review.js",
         "content/reviewinfo/review.js",
         "content/reviewtimer/review.js",
@@ -179,6 +174,18 @@
         "content/tinderbar/review.css",
         "content/translate/common.css",
         "content/translate/review.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review/*",
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review-listed/*",
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review-unlisted/*",
+        "https://reviewers.addons.thunderbird.net/*/reviewers/review-content/*"
+      ],
+      "js": [
+        "content/downloads/review.js"
       ],
       "run_at": "document_end"
     },
