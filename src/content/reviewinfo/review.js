@@ -25,28 +25,61 @@ async function initLayout() {
   });
 }
 
+function updateTags(tagMap) {
+  let value = document.querySelector("#id_action .on-tab input").value;
+  let submit = document.querySelector(".review-actions-save input[type='submit']");
+  let message = document.querySelector(".amoqueue-action-warning");
+
+  if (tagMap["no-action"]) {
+    message.textContent = "Please don't take action: " + tagMap["no-action"];
+  } else {
+    submit.disabled = true;
+    if (tagMap["no-reject"] && value.includes("reject")) {
+      message.textContent = "Please do not reject: " + tagMap["no-reject"];
+    } else if (tagMap["no-engage"] && (value.includes("reject") || value == "reply")) {
+      message.textContent = "Please do not engage: " + tagMap["no-engage"];
+    } else {
+      message.textContent = "";
+      submit.disabled = false;
+    }
+  }
+}
+
 function markVIP() {
-  let privboard = document.getElementById("id_whiteboard-private");
+  let privboard = document.getElementById("id_whiteboard-private").textContent;
   let hasMozillaAuthor = !!document.querySelector("#scroll_sidebar li a[href$='/firefox/user/4757633/']");
 
-  let match = privboard.textContent.match(/\[vip\]\s*([^\n]*)/);
+  let tags = privboard.matchAll(/\[([a-zA-Z_-]+)\]\s*([^\n]+)/g) || [];
+  let tagMap = {};
+  for (let [, tag, reason] of tags) {
+    tagMap[tag] = reason;
+  }
 
-  if (match || hasMozillaAuthor) {
+  if (!tags.vip && hasMozillaAuthor) {
+    tags.vip = "This is an official Mozilla add-on";
+  }
+
+  if (tagMap.vip) {
     let history = document.getElementById("versions-history");
     let bar = history.parentNode.insertBefore(document.createElement("p"), history.nextElementSibling);
-    bar.className = "is_recommendable amoqueue-vip";
+    bar.className = "is_promoted amoqueue-vip";
 
     let descr = bar.appendChild(document.createElement("div"));
     descr.textContent = "This is a VIP add-on. Please contact an admin before rejecting or sending an information request.";
 
-    if (match && match[1]) {
-      let reason = bar.appendChild(document.createElement("div"));
-      reason.textContent = "Details: " + match[1];
-    } else if (hasMozillaAuthor) {
-      let reason = bar.appendChild(document.createElement("div"));
-      reason.textContent = "Details: This is an official Mozilla extension.";
-    }
+    let reasonDetails = bar.appendChild(document.createElement("div"));
+    reasonDetails.textContent = "Details: " + tagMap.vip;
   }
+
+  let saveSection = document.querySelector(".review-actions-section.review-actions-save");
+  let message = document.createElement("span");
+  message.className = "amoqueue-action-warning";
+  saveSection.insertBefore(message, saveSection.firstElementChild);
+
+  updateTags(tagMap);
+  document.getElementById("id_action").addEventListener("click", (event) => {
+    updateTags(tagMap);
+  });
 }
 
 function addBlocklistButton() {

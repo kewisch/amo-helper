@@ -93,7 +93,14 @@
   background-image: linear-gradient(to bottom,transparent 0,transparent 123px,#0c99d5 123px,#0c99d5 200px,#fff 200px,rgba(12,153,213,0) 400px);
 }
 
-#addon .is_recommendable.amoqueue-vip {
+#addon .is_promoted.amoqueue-vip {
   color: white;
   background-color: #1E5631;
+  font-size: 1.2em;
+}
+
+.amoqueue-action-warning {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: red;
 }
