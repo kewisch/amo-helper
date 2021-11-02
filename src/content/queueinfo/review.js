@@ -159,6 +159,7 @@ function getInfo(doc) {
 
   let versions = Array.from(doc.querySelectorAll(".review-files .listing-body, #review-files .listing-body")).map((listbody, idx) => {
     let headerparts = listbody.previousElementSibling.firstElementChild.textContent.match(/Version ([^·]+)· ([^·]+)· (.*)/);
+    let blocked = !!listbody.previousElementSibling.querySelector(".blocked-version");
     let submissiondate = floatingtime(headerparts[2].trim(), true);
     let hasAutoApproval = false;
     let hasConfirmApproval = false;
@@ -218,6 +219,7 @@ function getInfo(doc) {
       version: headerparts[1].trim(),
       date: submissiondate,
       status: status,
+      blocked: blocked,
 
       installurl: installanchor ? (new URL(installanchor.getAttribute("href"), location.href)).href : null,
       sourceurl: sourceanchor ? (new URL(sourceanchor.getAttribute("href"), location.href)).href : null,
@@ -284,29 +286,8 @@ async function updateSize(info) {
 
   // Check the blocklist
   let lastVersion = info.versions[info.latest_idx];
-  let blocked = await browser.runtime.sendMessage({ action: "blocklist", method: "check", guid: info.guid, version: lastVersion ? lastVersion.version : "0" });
-  if (blocked) {
-    document.getElementById("main-wrapper").classList.add("amoqueue-striped-background", "amoqueue-blocklisted-" + blocked.severity);
-
-    let bugspan = document.createElement("span");
-
-    let buglink = bugspan.appendChild(document.createElement("a"));
-    buglink.href = blocked.bug;
-    buglink.target = "_blank";
-    buglink.textContent = blocked.bug.replace("https://bugzilla.mozilla.org/show_bug.cgi?id=", "bug ");
-
-
-    bugspan.appendChild(document.createTextNode(` on ${blocked.created.substr(0, 10)} (kinto `));
-    console.log(blocked);
-
-    let kintolink = bugspan.appendChild(document.createElement("a"));
-    kintolink.href = `https://settings-writer.prod.mozaws.net/v1/admin/#/buckets/staging/collections/addons/records/${blocked.id}/attributes`;
-    kintolink.target = "_blank";
-    kintolink.textContent = blocked.id;
-
-    bugspan.appendChild(document.createTextNode(")"));
-
-    createSummaryRow("amoqueue-blocklist-bug", "Blocklisted", [bugspan, blocked.reason]);
+  if (lastVersion?.blocked) {
+    document.getElementById("main-wrapper").classList.add("amoqueue-striped-background", "amoqueue-blocklisted");
   }
 
   await browser.runtime.sendMessage({ action: "infostorage", op: "set", storage: "slug", keys: { ["slugInfo." + info.slug]: info.id } });

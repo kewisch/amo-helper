@@ -62,11 +62,8 @@
   margin-bottom: 2em;
 }
 
-#main-wrapper.amoqueue-blocklisted-hard {
+#main-wrapper.amoqueue-blocklisted {
   background: repeating-linear-gradient(45deg, #fff, #fff 10px, #fbd4dc 10px, #fbd4dc 20px);
-}
-#main-wrapper.amoqueue-blocklisted-soft {
-  background: repeating-linear-gradient(45deg, #fff, #fff 10px, #f2eca2 10px, #f2eca2 20px);
 }
 
 #main-wrapper.amoqueue-blocklisted #addon {

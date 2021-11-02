@@ -53,7 +53,8 @@ const DEFAULT_PREFERENCES = {
   "tinderbar-approve-text": "",
   "tinderbar-preload-tabs": 3,
   "filewindow-enabled": false,
-  "filewindow-exclusive": false
+  "filewindow-exclusive": false,
+  "blocklist-addfile": false
 };
 
 const HIDDEN_PREFERENCES = {

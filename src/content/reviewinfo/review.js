@@ -50,6 +50,21 @@ function markVIP() {
 }
 
 function addBlocklistButton() {
+  function updateSize() {
+    browser.runtime.sendMessage({
+      action: "blocklist",
+      method: "get"
+    }).then((guids) => {
+      if (guids.length == 0) {
+        button.textContent = "Block add-on";
+        button.title = "";
+      } else {
+        button.textContent = `Block ${count + 1} add-on(s)`;
+        button.title = guids.join("\n");
+      }
+    });
+  }
+
   let area = document.querySelector("#extra-review-actions > .more-actions-inner > ul");
   if (!area) {
     // This doesn't exist on delete add-ons pages
@@ -67,32 +82,29 @@ function addBlocklistButton() {
     area = div.appendChild(document.createElement("ul"));
   }
 
-  let button = document.createElement("button");
-  button.id = "amoqueue_blocklist_addon";
-  button.type = "button";
-  button.textContent = "File Blocklisting Bug";
-
-  button.addEventListener("click", (event) => {
-    browser.runtime.sendMessage({
-      action: "blocklist",
-      method: event.ctrlKey || event.metaKey ? "gather" : "file",
-      guid: document.querySelector(".addon-guid > td").textContent,
-      name: document.title.split(" – ")[0],
+  let button = document.getElementById("block_addon");
+  if (button) {
+    button.addEventListener("click", (event) => {
+      browser.runtime.sendMessage({
+        action: "blocklist",
+        method: event.ctrlKey || event.metaKey ? "gather" : "file",
+        guid: document.querySelector(".addon-guid > td").textContent,
+        name: document.title.split(" – ")[0],
+      }).then(updateSize);
+      event.preventDefault();
     });
-  });
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key == "Control" || event.key == "Meta") {
-      button.textContent = "Gather ID for Blocklisting";
-    }
-  });
-  document.addEventListener("keyup", (event) => {
-    if (event.key == "Control" || event.key == "Meta") {
-      button.textContent = "File Blocklisting Bug";
-    }
-  });
-
-  area.appendChild(button);
+    document.addEventListener("keydown", (event) => {
+      if (event.key == "Control" || event.key == "Meta") {
+        button.textContent = "Gather ID for Blocklisting";
+      }
+    });
+    document.addEventListener("keyup", (event) => {
+      if (event.key == "Control" || event.key == "Meta") {
+        updateSize();
+      }
+    });
+  }
 }
 
 function addScrollToButtons() {
