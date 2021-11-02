@@ -26,14 +26,14 @@ async function initLayout() {
 }
 
 function updateTags(tagMap) {
-  let value = document.querySelector("#id_action .on-tab input").value;
+  let value = document.querySelector("#id_action .on-tab input")?.value;
   let submit = document.querySelector(".review-actions-save input[type='submit']");
   let message = document.querySelector(".amoqueue-action-warning");
 
+  submit.disabled = true;
   if (tagMap["no-action"]) {
     message.textContent = "Please don't take action: " + tagMap["no-action"];
-  } else {
-    submit.disabled = true;
+  } else if (value) {
     if (tagMap["no-reject"] && value.includes("reject")) {
       message.textContent = "Please do not reject: " + tagMap["no-reject"];
     } else if (tagMap["no-engage"] && (value.includes("reject") || value == "reply")) {
